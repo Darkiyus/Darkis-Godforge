@@ -7,7 +7,8 @@ export interface AuthorityContext { currentUserId: string; isGM: boolean; ownsAc
 
 export class SocketRouter {
   private readonly activations = new Map<string, ActivationStatus>();
-  constructor(private readonly api: GodForgeApi, private readonly authority: AuthorityContext, private readonly transport?: SocketTransport) {}
+  constructor(private readonly api: GodForgeApi, private readonly authority: AuthorityContext, private transport?: SocketTransport) {}
+  setTransport(transport: SocketTransport): void { this.transport = transport; }
   register(): void { this.transport?.register("activateAbility", async (payload) => this.handleActivation(this.parseRequest(payload))); }
   async activate(request: Omit<ActivationRequest, "activationId" | "userId">): Promise<void> {
     const full: ActivationRequest = { ...request, activationId: crypto.randomUUID(), userId: this.authority.currentUserId };

@@ -6,7 +6,7 @@ export interface FormulaFacts { actor: { level: number; hpPercent?: number }; ta
 type Token = string;
 
 function tokenize(formula: string): Token[] { const compact = formula.replace(/\s/g, ""); const tokens = compact.match(tokenPattern); if (!tokens || tokens.join("") !== compact) throw new Error("Formula contains an unsupported term."); return tokens; }
-export function validateFormula(formula: string): boolean { const compact = formula.replace(/\s/g, ""); if (allowedDice.test(compact)) return true; try { new Parser(tokenize(compact), { actor: { level: 0 }, target: {} }).parse(); return true; } catch { return false; } }
+export function validateFormula(formula: string): boolean { const compact = formula.replace(/\s/g, ""); const diceTerms = compact.match(/\b\d+d\d+\b/g) ?? []; const withoutDice = compact.replace(/\b\d+d\d+\b/g, "0"); if (diceTerms.some((term) => !/^\d+d\d+$/.test(term))) return false; try { new Parser(tokenize(withoutDice), { actor: { level: 0 }, target: {} }).parse(); return true; } catch { return false; } }
 export function evaluateFormula(formula: string, facts: FormulaFacts): number { const compact = formula.replace(/\s/g, ""); if (!validateFormula(compact)) throw new Error("Formula contains an unsupported term."); if (allowedDice.test(compact)) throw new Error("Dice formulas require Foundry Roll at runtime."); return new Parser(tokenize(compact), facts).parse(); }
 
 class Parser {
