@@ -7,6 +7,7 @@ import type { ActorGodForgeState, GrantChoiceMap } from "./core/types";
 import { resolveGrantGroup } from "./core/grant-service";
 import { canUse, consume, reset } from "./core/usage-service";
 import { executeAbility, type EffectContext, type EffectTarget } from "./core/effect-engine";
+import { resolveClassGrants, type ClassGrantResult } from "./core/class-coupling";
 
 export interface GodForgeActor { id: string; uuid?: string; flags?: { [namespace: string]: unknown }; update(data: { flags: { "darkis-godforge": ActorGodForgeState | null } }): Promise<unknown>; }
 export interface ActivationOptions { target?: EffectTarget; facts?: EffectContext["facts"]; rollDice?: EffectContext["rollDice"]; }
@@ -19,6 +20,8 @@ export class GodForgeApi {
   getDeity(id: string): DeityDefinition | null { return this.deities.get(id); }
   getActorDeity(actor: GodForgeActor): DeityDefinition | null { const state = actor.flags?.["darkis-godforge"]; if (!state || typeof state !== "object" || !("deityId" in state) || typeof state.deityId !== "string") return null; return this.getDeity(state.deityId); }
   getGrantChoices(deityId: string, _context: SelectionContext) { return this.getDeity(deityId)?.grantGroups ?? null; }
+  getClassGrants(deityId: string, classId: string, selections: { groupId: string; refs: string[] }[] = []): ClassGrantResult { const deity = this.getDeity(deityId); if (!deity) throw new Error(`Unknown deity: ${deityId}`); return resolveClassGrants(deity, classId, selections); }
+  buildClassCoupling(deityId: string, classId: string, systemId: string, selections: { groupId: string; refs: string[] }[] = []): object | null { return this.adapters.get(systemId).buildClassCoupling(this.getClassGrants(deityId, classId, selections)); }
   async assignDeity(actor: GodForgeActor, deityId: string, choices: GrantChoiceMap = {}): Promise<void> {
     const deity = this.getDeity(deityId); if (!deity || !deity.visibility.players) throw new Error("Deity is not available for assignment.");
     const grants = deity.grantGroups.flatMap((group) => resolveGrantGroup(group, { groupId: group.id, refs: choices[group.id] ?? [] }));

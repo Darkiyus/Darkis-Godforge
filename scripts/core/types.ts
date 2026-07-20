@@ -64,6 +64,7 @@ export interface DeityDefinition {
   favoredWeapon?: string;
   font?: string;
   skill?: string;
+  cause?: string;
   passiveBonuses: PassiveBonusDefinition[];
   abilities: AbilityDefinition[];
   grantGroups: GrantGroup[];
