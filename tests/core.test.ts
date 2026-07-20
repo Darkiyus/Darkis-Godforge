@@ -43,7 +43,11 @@ describe("conditions and grants", () => { it("evaluates nested boolean condition
 describe("nested grants", () => { it("previews nested AND/OR groups and preserves overrides", () => { const group = { id: "root", mode: "all" as const, label: "", grants: [{ type: "ability" as const, ref: "a", overrides: { name: "Renamed" } }, { id: "choice", mode: "any" as const, pick: 1, label: "", grants: [{ type: "bonus" as const, ref: "b" }, { type: "bonus" as const, ref: "c" }] }] }; expect(previewGrantGroup(group)).toEqual(["a", "b", "c"]); }); });
 describe("nested grant resolution", () => { it("resolves a selected AND subgroup inside an OR group", () => { const group = { id: "root", mode: "any" as const, pick: 1, label: "", grants: [{ id: "combined", mode: "all" as const, label: "", grants: [{ type: "ability" as const, ref: "a" }, { type: "bonus" as const, ref: "b" }] }, { type: "ability" as const, ref: "c" }] }; expect(resolveGrantGroup(group, [{ groupId: "root", refs: ["combined"] }])).toEqual(["a", "b"]); }); });
 describe("grant choice views", () => { it("finds nested OR groups below AND groups", () => { const group = { id: "root", mode: "all" as const, label: "Root", grants: [{ id: "nested", mode: "any" as const, pick: 1, label: "Nested", grants: [{ type: "ability" as const, ref: "a" }] }] }; expect(hasGrantChoices([group])).toBe(true); expect(collectGrantChoiceGroups(group)).toEqual([{ id: "nested", label: "Nested", pick: 1, options: [{ id: "a", label: "a" }], requirements: [] }]); }); it("marks choices in unselected OR branches as conditional", () => { const group = { id: "root", mode: "any" as const, pick: 1, label: "Root", grants: [{ id: "branch", mode: "any" as const, pick: 1, label: "Branch", grants: [{ type: "ability" as const, ref: "a" }] }, { type: "ability" as const, ref: "b" }] }; expect(collectGrantChoiceGroups(group)[1]?.requirements).toEqual([{ groupId: "root", optionId: "branch" }]); }); });
-describe("usage", () => { it("consumes and resets daily uses", () => { const state = { used: 0, max: 1, lastResetAt: 0, reset: "daily" as const }; expect(canUse(state, 0)).toBe(true); expect(consume(state, 0).used).toBe(1); expect(shouldReset({ ...state, used: 1 }, 86400000)).toBe(true); }); });
+describe("usage", () => {
+  it("consumes and resets legacy daily uses by elapsed time", () => { const state = { used: 0, max: 1, lastResetAt: 0, reset: "daily" as const }; expect(canUse(state, 0)).toBe(true); expect(consume(state, 0).used).toBe(1); expect(shouldReset({ ...state, used: 1 }, 86400000)).toBe(true); });
+  it("does not time-reset event-based usages", () => { for (const reset of ["daily-preparations", "ten-minute-rest", "refocus", "encounter-end", "scene-change", "custom-rest", "manual"] as const) expect(shouldReset({ used: 1, max: 1, lastResetAt: 0, reset }, 365 * 86400000)).toBe(false); });
+  it("uses explicit calendar periods only for calendar resets", () => { expect(shouldReset({ used: 1, max: 1, lastResetAt: 0, reset: "calendar-month" }, 29 * 86400000)).toBe(false); expect(shouldReset({ used: 1, max: 1, lastResetAt: 0, reset: "calendar-month" }, 30 * 86400000)).toBe(true); });
+});
 describe("catalog", () => { it("filters hidden and pantheon entries", () => expect(filterCatalog([deity, { ...deity, id: "b", domains: ["fire"] }], { pantheonFilter: "shadow" }, new Set(["a"]))).toEqual([])); });
 describe("visibility model", () => {
   it("migrates legacy visibility and publication state", () => {
@@ -151,6 +155,19 @@ describe("dashboard markup regressions", () => {
     }
     expect(implementation).toContain("foundry?.applications?.apps?.FilePicker");
     expect(implementation).toContain("FilePicker.fromButton");
+  });
+
+  it("uses a real deity wizard without fragment links or hidden required fields", () => {
+    const template = readFileSync("templates/deity-editor.hbs", "utf8");
+    const implementation = readFileSync("scripts/applications/deity-editor.ts", "utf8");
+    expect(template).not.toMatch(/href="#dg-/);
+    expect([...template.matchAll(/data-wizard-step="(\d+)"/g)].map((match) => match[1])).toEqual(["0", "1", "2", "3", "4", "5", "6", "7"]);
+    expect([...template.matchAll(/data-wizard-panel="(\d+)"/g)].map((match) => match[1])).toEqual(["0", "1", "2", "3", "4", "5", "6", "7"]);
+    expect([...template.matchAll(/<[^>]+\srequired(?:\s|>)/g)]).toHaveLength(1);
+    expect(template).toContain('<select name="replacement.sourceUuid">');
+    expect(template).toContain("{{#each officialDeities}}");
+    expect(implementation).toContain("private setupWizard");
+    expect(implementation).toContain("panel.hidden = index !== activeStep");
   });
 });
 describe("Foundry entry points", () => {

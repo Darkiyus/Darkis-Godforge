@@ -61,6 +61,10 @@ export function registerFoundryBootstrap(api: GodForgeApi, deityService: DeitySe
   });
   runtime.Hooks.on("renderCharacterSheetPF2e", (app: unknown, html: unknown) => { if (openHub) addGodForgeSheetButton(app, html, openHub); });
   runtime.Hooks.on("renderActorSheet", (app: unknown, html: unknown) => { if (openHub) addGodForgeSheetButton(app, html, openHub); });
+  runtime.Hooks.on("pf2e.restForTheNight", (actor: unknown) => {
+    if (getFoundryGame()?.system?.id !== "pf2e" || !actor || typeof actor !== "object" || !("id" in actor)) return;
+    void api.resetActorUsages(actor as GodForgeActor, "daily-preparations").catch((error: unknown) => console.error("Darkis GodForge | Could not reset daily-preparation usages.", error));
+  });
   runtime.Hooks.once("ready", async () => {
     const game = requireGame("ready"); if (!game) return;
     exposeModuleApi(game, api, openDashboard, openCodex, openHub);

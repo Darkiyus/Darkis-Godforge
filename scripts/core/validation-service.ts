@@ -6,7 +6,7 @@ export interface ValidationIssue { level: "warning" | "error"; field: string; me
 export function validateDeity(deity: DeityDefinition): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   if (!deity.name.trim()) issues.push({ level: "error", field: "name", message: "Name is required." });
-  if (!deity.title.trim()) issues.push({ level: "error", field: "title", message: "Title is required." });
+  if (!deity.title.trim()) issues.push({ level: "warning", field: "title", message: "Title is empty." });
   if (!deity.description.trim()) issues.push({ level: "warning", field: "description", message: "Description is empty." });
   for (const bonus of deity.passiveBonuses) {
     if (!bonus.name.trim() || !bonus.selector.trim()) issues.push({ level: "error", field: `bonus.${bonus.id}`, message: "Bonus name and selector are required." });

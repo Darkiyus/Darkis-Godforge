@@ -45,7 +45,7 @@ export class GodForgeApi {
   }
   async removeDeity(actor: GodForgeActor): Promise<void> { this.requireActorOwner(actor); if (actor.unsetFlag) await Promise.all(["deityId", "grants", "usages"].map((key) => actor.unsetFlag!("darkis-godforge", key))); else await actor.update({ flags: { "darkis-godforge": null } }); await this.removeActorDeityItems(actor); }
   async resetActorUsages(actor: GodForgeActor, resetType: string): Promise<void> {
-    requireGM(); const state = this.readState(actor); const now = Date.now(); const usages = Object.fromEntries(Object.entries(state.usages).map(([id, usage]) => usage.reset === resetType ? [id, reset(usage, now)] : [id, usage])); await actor.update({ flags: { "darkis-godforge": { ...state, usages } } });
+    this.requireActorOwner(actor); const state = this.readState(actor); const now = Date.now(); const usages = Object.fromEntries(Object.entries(state.usages).map(([id, usage]) => usage.reset === resetType ? [id, reset(usage, now)] : [id, usage])); await actor.update({ flags: { "darkis-godforge": { ...state, usages } } });
   }
   async activateAbility(actor: GodForgeActor, abilityId: string, options: ActivationOptions = {}): Promise<void> {
     requireGM(); const state = this.readState(actor); const deity = this.deities.get(state.deityId); const ability = deity?.abilities.find((item) => item.id === abilityId); if (!ability) throw new Error("Ability is not available for this actor.");

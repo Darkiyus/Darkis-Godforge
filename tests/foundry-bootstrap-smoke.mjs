@@ -64,6 +64,14 @@ assert.equal(typeof controls["darkis-godforge"]?.tools?.codex?.onChange, "functi
 
 await globalThis.Hooks.callAll("ready");
 assert.equal(typeof godForgeModule.api?.openDashboard, "function", "public API must remain exposed at ready");
+let resetState = null;
+const actor = {
+  id: "actor-1",
+  flags: { "darkis-godforge": { deityId: "deity-1", grants: [], usages: { wonder: { used: 1, max: 1, lastResetAt: 0, reset: "daily-preparations" } } } },
+  async update(data) { resetState = data.flags["darkis-godforge"]; this.flags["darkis-godforge"] = resetState; }
+};
+await globalThis.Hooks.callAll("pf2e.restForTheNight", actor);
+assert.equal(resetState.usages.wonder.used, 0, "PF2e rest hook must reset daily-preparation usages");
 godForgeModule.api.openDashboard();
 await Promise.resolve();
 assert.equal(state.rendered, true, "openDashboard must render the ApplicationV2 dashboard");

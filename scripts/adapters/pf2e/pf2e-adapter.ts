@@ -8,7 +8,7 @@ import { buildPf2eClassCoupling } from "./class-coupling";
 // ref: https://github.com/foundryvtt/pf2e/wiki/Rule-Elements (FlatModifier)
 export class Pf2eAdapter implements GodForgeSystemAdapter {
   readonly id = "pf2e";
-  readonly capabilities = { lore: true, deity: true, passiveBonuses: true, abilities: true, classCoupling: true, selectors: ["perception", "stealth", "deception", "ac", "attack-roll"] };
+  readonly capabilities = { lore: true, deity: true, passiveBonuses: true, abilities: true, classCoupling: true, selectors: ["acrobatics", "arcana", "athletics", "crafting", "deception", "diplomacy", "intimidation", "medicine", "nature", "occultism", "performance", "religion", "society", "stealth", "survival", "thievery", "perception", "ac", "attack-roll"] };
   async materialize(deity: DeityDefinition, context?: MaterializationContext): Promise<string | null> { if (!context) return null; const document = await context.createItem(buildPf2eDeityData(deity, deity.id) as unknown as Record<string, unknown>); return document.uuid; }
   async listOfficialDeities() { return listOfficialDeitiesFromPacks(this.id); }
   listSkills(): string[] { const skills = (globalThis as unknown as { CONFIG?: { PF2E?: { skills?: Record<string, unknown> } } }).CONFIG?.PF2E?.skills; return skills ? Object.keys(skills).sort() : [...this.capabilities.selectors]; }

@@ -12,7 +12,7 @@ import { CURRENT_SCHEMA_VERSION } from "../core/migration-service";
 const visibilityFields = Object.keys(DEFAULT_VISIBILITY.fields) as Array<keyof VisibilityFields>;
 
 export class GodForgeDeityEditor extends gmApplicationBase() {
-  static DEFAULT_OPTIONS = { id: "darkis-godforge-deity-editor", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.NEW_DEITY", resizable: true }, position: { width: 780, height: "auto" } };
+  static DEFAULT_OPTIONS = { id: "darkis-godforge-deity-editor", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.NEW_DEITY", resizable: true }, position: { width: 980, height: 760 } };
   static PARTS = { main: { template: "modules/darkis-godforge/templates/deity-editor.hbs" } };
 
   constructor(
@@ -25,11 +25,19 @@ export class GodForgeDeityEditor extends gmApplicationBase() {
   async _prepareContext(): Promise<Record<string, unknown>> {
     requireGM();
     const systemId = getFoundryGame()?.system?.id ?? "";
-    const selectors = this.adapters.tryGet(systemId)?.listSkills() ?? [];
+    const adapter = this.adapters.tryGet(systemId);
+    const selectors = adapter?.listSkills() ?? [];
+    let officialDeities: Awaited<ReturnType<NonNullable<typeof adapter>["listOfficialDeities"]>> = [];
+    try { officialDeities = await (adapter?.listOfficialDeities() ?? Promise.resolve([])); }
+    catch (error) { console.error("Darkis GodForge | Could not load official deities for the editor.", error); }
+    const selectedSource = this.existing?.replacement.sourceUuid ?? "";
+    const officialOptions = officialDeities.map((deity) => ({ ...deity, selected: deity.sourceUuid === selectedSource }));
+    if (selectedSource && !officialOptions.some((deity) => deity.sourceUuid === selectedSource)) officialOptions.push({ id: selectedSource, sourceUuid: selectedSource, official: true, name: selectedSource, title: selectedSource, domains: [], selected: true });
     const ui = uiText();
     return {
       ui: { ...ui, NEW_DEITY: this.existing ? ui.EDIT_DEITY : ui.NEW_DEITY },
       selectors,
+      officialDeities: officialOptions,
       visibilityFields: visibilityFields.map((key) => ({ key, label: ui[`VIS_FIELD_${key.replace(/([A-Z])/g, "_$1").toUpperCase()}`] ?? key })),
       visibilityOptions: ["public", "selection", "followers", "owner", "trusted", "gm", "hidden-until-selected"].map((value) => ({ value, label: ui[`VIS_${value.replaceAll("-", "_").toUpperCase()}`] ?? value }))
     };
@@ -40,6 +48,7 @@ export class GodForgeDeityEditor extends gmApplicationBase() {
     const root = this.element;
     const form = root?.querySelector<HTMLFormElement>("form");
     if (root && form && this.existing) this.populateForm(root, form, this.existing);
+    if (root && form) this.setupWizard(root, form);
     root?.querySelectorAll<HTMLButtonElement>("[data-action='browse-image']").forEach((button) => button.addEventListener("click", () => this.openFilePicker(root, button)));
     root?.querySelectorAll<HTMLElement>("[data-image-field]").forEach((field) => {
       field.addEventListener("dragover", (event) => { event.preventDefault(); event.dataTransfer!.dropEffect = "copy"; });
@@ -60,21 +69,81 @@ export class GodForgeDeityEditor extends gmApplicationBase() {
       if (button.dataset.action === "move-up" && card.previousElementSibling) card.parentElement?.insertBefore(card, card.previousElementSibling);
       if (button.dataset.action === "move-down" && card.nextElementSibling) card.parentElement?.insertBefore(card.nextElementSibling, card);
       this.updateStackingWarnings(root);
+      if (form) this.updateWizardPreview(root, form);
     });
-    root?.addEventListener("input", (event) => { this.updateStackingWarnings(root); const input = event.target as HTMLInputElement; if (input.matches("[data-image-input]")) this.updateImagePreview(root, input.name, input.value); });
+    root?.addEventListener("input", (event) => { this.updateStackingWarnings(root); const input = event.target as HTMLInputElement; if (input.matches("[data-image-input]")) this.updateImagePreview(root, input.name, input.value); if (form) this.updateWizardPreview(root, form); });
+    root?.addEventListener("change", () => { if (form) this.updateWizardPreview(root, form); });
     root?.querySelectorAll<HTMLInputElement>("[data-image-input]").forEach((input) => this.updateImagePreview(root, input.name, input.value));
-    root?.querySelector<HTMLElement>("[data-action='preview-player']")?.addEventListener("click", () => {
-      if (!form?.reportValidity()) return;
+    root?.querySelectorAll<HTMLElement>("[data-action='preview-player']").forEach((button) => button.addEventListener("click", () => {
+      const name = form?.elements.namedItem("name") as HTMLInputElement | null;
+      if (!form || !name?.reportValidity()) return;
       const deity = this.previewDefinition(form);
       void new GodForgeCodex(this.deityService, { deity, viewer: { isGM: false, selection: true } }).render(true);
+    }));
+    root?.querySelector<HTMLElement>("[data-action='save-draft']")?.addEventListener("click", () => {
+      const name = form?.elements.namedItem("name") as HTMLInputElement | null;
+      if (!form || !name?.reportValidity()) return;
+      this.saveDefinition(form, true);
     });
     form?.addEventListener("submit", (event) => {
       event.preventDefault();
-      requireGM();
-      const deity = this.existing ? this.deityService.update(this.existing.id, this.readInput(form)) : this.deityService.create(this.readInput(form));
-      this.onSaved(deity);
-      void this.close?.();
+      this.saveDefinition(form, false);
     });
+  }
+
+  private setupWizard(root: HTMLElement, form: HTMLFormElement): void {
+    const panels = [...root.querySelectorAll<HTMLElement>("[data-wizard-panel]")];
+    const steps = [...root.querySelectorAll<HTMLButtonElement>("[data-wizard-step]")];
+    const previous = root.querySelector<HTMLButtonElement>("[data-action='previous-step']");
+    const next = root.querySelector<HTMLButtonElement>("[data-action='next-step']");
+    const finish = root.querySelector<HTMLButtonElement>("[data-action='finish']");
+    const current = root.querySelector<HTMLElement>("[data-wizard-current]");
+    let activeStep = 0;
+    const showStep = (requested: number): void => {
+      activeStep = Math.max(0, Math.min(panels.length - 1, requested));
+      panels.forEach((panel, index) => { panel.hidden = index !== activeStep; });
+      steps.forEach((step, index) => {
+        if (index === activeStep) step.setAttribute("aria-current", "step");
+        else step.removeAttribute("aria-current");
+      });
+      if (previous) previous.disabled = activeStep === 0;
+      if (next) next.hidden = activeStep === panels.length - 1;
+      if (finish) finish.hidden = activeStep !== panels.length - 1;
+      if (current) current.textContent = String(activeStep + 1);
+      this.updateWizardPreview(root, form);
+    };
+    steps.forEach((step) => step.addEventListener("click", () => showStep(Number(step.dataset.wizardStep ?? 0))));
+    previous?.addEventListener("click", () => showStep(activeStep - 1));
+    next?.addEventListener("click", () => showStep(activeStep + 1));
+    showStep(0);
+  }
+
+  private updateWizardPreview(root: HTMLElement, form: HTMLFormElement): void {
+    const ui = uiText();
+    const value = (name: string): string => (form.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null)?.value.trim() ?? "";
+    const setText = (selector: string, text: string): void => { const element = root.querySelector<HTMLElement>(selector); if (element) element.textContent = text; };
+    setText("[data-wizard-preview-name]", value("name") || ui.NEW_DEITY_PLACEHOLDER || "New deity");
+    setText("[data-wizard-preview-title]", value("title") || "—");
+    setText("[data-wizard-preview-description]", value("description") || ui.PREVIEW_EMPTY_DESCRIPTION || "—");
+    const quote = root.querySelector<HTMLElement>("[data-wizard-preview-quote]");
+    if (quote) { quote.textContent = value("quote"); quote.hidden = !quote.textContent; }
+    const status = form.elements.namedItem("status") as HTMLSelectElement | null;
+    setText("[data-wizard-preview-status]", status?.selectedOptions[0]?.textContent ?? ui.STATUS_DRAFT ?? "Draft");
+    const source = form.elements.namedItem("replacement.sourceUuid") as HTMLSelectElement | null;
+    setText("[data-wizard-preview-source]", source?.value ? (source.selectedOptions[0]?.textContent ?? source.value) : "—");
+    setText("[data-wizard-preview-bonuses]", String(form.querySelectorAll("[data-bonus-row]").length));
+    setText("[data-wizard-preview-abilities]", String(form.querySelectorAll("[data-ability-row]").length));
+    const image = root.querySelector<HTMLImageElement>("[data-wizard-preview-image]");
+    if (image) image.src = value("image") ? safeImageUrl(value("image")) : "modules/darkis-godforge/assets/logo.png";
+  }
+
+  private saveDefinition(form: HTMLFormElement, asDraft: boolean): void {
+    requireGM();
+    const input = this.readInput(form);
+    if (asDraft) input.status = "draft";
+    const deity = this.existing ? this.deityService.update(this.existing.id, input) : this.deityService.create(input);
+    this.onSaved(deity);
+    void this.close?.();
   }
 
   private appendTemplate(root: HTMLElement | undefined, name: string, targetSelector: string): void {
@@ -85,6 +154,8 @@ export class GodForgeDeityEditor extends gmApplicationBase() {
     fragment.querySelector<HTMLSelectElement>("[name$='.visibility']")?.querySelector<HTMLOptionElement>("[value='followers']")?.setAttribute("selected", "selected");
     target.append(fragment);
     this.updateStackingWarnings(root);
+    const form = root?.querySelector<HTMLFormElement>("form");
+    if (root && form) this.updateWizardPreview(root, form);
   }
 
   private previewDefinition(form: HTMLFormElement): DeityDefinition {
