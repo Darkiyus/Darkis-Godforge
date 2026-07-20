@@ -1,6 +1,6 @@
 <div class="dg-app-shell" tabindex="-1">
   <aside class="dg-sidebar" aria-label="{{ui.TITLE}}">
-    <div class="dg-brand"><img src="modules/darkis-godforge/assets/logo.png" alt="{{ui.TITLE}}"><span>{{ui.TITLE}}</span></div>
+    <div class="dg-brand"><img src="modules/darkis-godforge/assets/logo.png" alt="{{ui.TITLE}}"></div>
     <nav>
       <p>{{ui.OVERVIEW}}</p>
       <button class="{{#if nav.overview}}active{{/if}}" type="button" data-section="overview"><i class="fas fa-table-cells-large" aria-hidden="true"></i><span>{{ui.OVERVIEW}}</span></button>
@@ -27,8 +27,7 @@
   <main class="dg-dashboard-main">
     <header class="dg-hero">
       <div class="dg-hero-shade"></div>
-      <img class="dg-hero-logo" src="modules/darkis-godforge/assets/logo.png" alt="{{ui.TITLE}}">
-      <div class="dg-hero-copy"><p class="eyebrow">{{ui.TITLE}}</p><h1>{{ui.TAGLINE}}</h1><p>{{ui.SUBTITLE}}</p></div>
+      <div class="dg-hero-copy"><h1>{{ui.TAGLINE}}</h1></div>
       <div class="dg-hero-actions"><button class="dg-secondary" data-action="codex"><i class="fas fa-book-open" aria-hidden="true"></i> {{ui.CODEX}}</button><button class="dg-primary" data-action="create"><i class="fas fa-plus" aria-hidden="true"></i> {{ui.CREATE}}</button></div>
     </header>
 
@@ -72,7 +71,7 @@
   </main>
 
   <aside class="dg-context-rail">
-    <section><h2>{{ui.QUICK_ACCESS}}</h2><button data-action="create"><i class="fas fa-plus" aria-hidden="true"></i><span><strong>{{ui.CREATE}}</strong></span></button><button data-action="player-preview"><i class="fas fa-eye" aria-hidden="true"></i><span><strong>{{ui.PLAYER_PREVIEW}}</strong><small>{{ui.VISIBILITY_HINT}}</small></span></button><button data-manager="data" data-manager-mode="transfer"><i class="fas fa-file-import" aria-hidden="true"></i><span><strong>{{ui.IMPORT_EXPORT}}</strong><small>{{ui.IMPORT_EXPORT_HINT}}</small></span></button></section>
+    <section class="dg-quick-access"><h2>{{ui.QUICK_ACCESS}}</h2><div class="dg-quick-list"><button type="button" data-action="create"><i class="fas fa-plus" aria-hidden="true"></i><strong>{{ui.CREATE}}</strong></button><button type="button" data-action="player-preview"><i class="fas fa-eye" aria-hidden="true"></i><strong>{{ui.PLAYER_PREVIEW}}</strong></button><button type="button" data-manager="data" data-manager-mode="transfer"><i class="fas fa-file-import" aria-hidden="true"></i><strong>{{ui.IMPORT_EXPORT}}</strong></button></div></section>
     <section><h2>{{ui.SYSTEM_STATUS}}</h2><dl><div><dt>Foundry</dt><dd>{{systemInfo.foundry}}</dd></div><div><dt>{{ui.SYSTEM}}</dt><dd>{{systemInfo.system}} {{systemInfo.systemVersion}}</dd></div><div><dt>GodForge</dt><dd>{{systemInfo.moduleVersion}}</dd></div><div><dt>{{ui.ADAPTER}}</dt><dd>{{systemInfo.adapter}}</dd></div><div><dt>{{ui.SCHEMA}}</dt><dd>{{systemInfo.schema}}</dd></div></dl><span class="dg-health"><i class="fas fa-circle-check" aria-hidden="true"></i> {{ui.DIAGNOSTICS_OK}}</span></section>
   </aside>
 </div>

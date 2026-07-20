@@ -127,6 +127,13 @@ describe("dashboard markup regressions", () => {
     expect(template).not.toMatch(/<p class="eyebrow">{{ui\.([A-Z_]+)}}<\/p><h2>{{ui\.\1}}<\/h2>/);
   });
 
+  it("keeps the dashboard branding compact and quick actions structurally separate", () => {
+    const template = readFileSync("templates/dashboard.hbs", "utf8");
+    expect(template).not.toContain("dg-hero-logo");
+    expect(template).not.toContain("<span>{{ui.TITLE}}</span>");
+    expect(template).toContain("class=\"dg-quick-list\"");
+  });
+
   it("keeps interactive typography below Foundry's window content", () => {
     const css = readFileSync("styles/godforge.css", "utf8");
     expect(css).not.toMatch(/\.darkis-godforge\s+:where\(/);
