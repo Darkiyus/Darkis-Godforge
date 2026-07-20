@@ -1,10 +1,13 @@
 import type { DeityService } from "../core/deity-service";
-import { escapeHtml } from "../core/sanitize";
+import { handlebarsApplicationBase } from "../foundry/application-base";
+import { uiText } from "../foundry/i18n";
 
-type ApplicationBase = { render(force?: boolean): void };
-function foundryApp(): new (...args: never[]) => ApplicationBase { return (globalThis as { foundry?: { applications?: { api?: { ApplicationV2?: new (...args: never[]) => ApplicationBase } } } }).foundry?.applications?.api?.ApplicationV2 ?? class { render(): void { /* preview fallback */ } }; }
-
-export class GodForgeCodex extends foundryApp() {
+export class GodForgeCodex extends handlebarsApplicationBase() {
+  static DEFAULT_OPTIONS = { id: "darkis-godforge-codex", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: true } };
+  static PARTS = { main: { template: "modules/darkis-godforge/templates/codex.hbs" } };
+  private searchTerm = "";
+  private selectedDomain = "";
   constructor(private readonly deityService: DeityService) { super(); }
-  override render(force = false): void { void force; const host = document.createElement("div"); host.className = "dg-codex dg-detail"; host.innerHTML = `<button class="dg-close" data-close>×</button><div class="dg-codex-title"><p class="eyebrow">DARKIS GODFORGE</p><h2>Götterkodex</h2><p class="muted">Durchsuche dein Pantheon und entdecke seine Geschichten.</p></div><div class="dg-codex-toolbar"><input data-search placeholder="Götter durchsuchen..."><select data-filter><option value="">Alle Domänen</option>${[...new Set(this.deityService.list().flatMap((deity) => deity.domains))].sort().map((domain) => `<option value="${escapeHtml(domain)}">${escapeHtml(domain)}</option>`).join("")}</select></div><div class="dg-codex-list" data-list></div>`; document.body.append(host); host.querySelectorAll<HTMLElement>("[data-close]").forEach((button) => button.addEventListener("click", () => host.remove())); const search = host.querySelector<HTMLInputElement>("[data-search]"); const filter = host.querySelector<HTMLSelectElement>("[data-filter]"); const refresh = (): void => { const term = search?.value.toLocaleLowerCase() ?? ""; const domain = filter?.value ?? ""; const entries = this.deityService.list().filter((deity) => (!term || `${deity.name} ${deity.title}`.toLocaleLowerCase().includes(term)) && (!domain || deity.domains.includes(domain))); const list = host.querySelector<HTMLElement>("[data-list]"); if (list) list.innerHTML = entries.map((deity) => `<article class="dg-codex-entry"><div><h3>${escapeHtml(deity.name)}</h3><p>${escapeHtml(deity.title)}</p></div><span>${deity.domains.slice(0, 3).map(escapeHtml).join(" · ")}</span></article>`).join("") || `<p class="muted">Keine Gottheiten gefunden.</p>`; }; search?.addEventListener("input", refresh); filter?.addEventListener("change", refresh); refresh(); }
+  async _prepareContext(): Promise<Record<string, unknown>> { const deities = this.deityService.list().filter((deity) => (!this.searchTerm || `${deity.name} ${deity.title}`.toLocaleLowerCase().includes(this.searchTerm)) && (!this.selectedDomain || deity.domains.includes(this.selectedDomain))); return { ui: uiText(), deities, domains: [...new Set(this.deityService.list().flatMap((deity) => deity.domains))].sort() }; }
+  _onRender(): void { const root = this.element; if (!root) return; root.querySelector<HTMLInputElement>("[data-search]")?.addEventListener("input", (event) => { this.searchTerm = (event.target as HTMLInputElement).value.toLocaleLowerCase(); void this.render(true); }); root.querySelector<HTMLSelectElement>("[data-filter]")?.addEventListener("change", (event) => { this.selectedDomain = (event.target as HTMLSelectElement).value; void this.render(true); }); }
 }

@@ -1,3 +1,9 @@
 {
-  "DARKIS_GODFORGE": { "UI": { "TITLE": "Darkis GodForge", "CREATE": "Create new deity", "SEARCH": "Search deities...", "OVERVIEW": "Overview", "DOMAINS": "Domains", "ABILITIES": "Abilities", "VISIBILITY": "Visibility" }, "ERROR": { "NO_USES": "No uses remaining." } }
+  "DARKIS_GODFORGE": {
+    "UI": {
+      "TITLE": "Darkis GodForge", "TAGLINE": "Create gods. Shape belief.", "SUBTITLE": "Forge destiny.", "CREATE": "Create deity", "CODEX": "Divine Codex", "MY_DEITIES": "My deities", "ENTRIES": "entries", "DOMAINS": "Domains", "ABILITIES": "Abilities", "VISIBILITY": "Visibility", "PASSIVE_BONUS": "Passive bonus", "DIVINE_ABILITY": "Divine ability", "SEARCH": "Search deities...", "ALL_DOMAINS": "All domains", "NO_RESULTS": "No deities found.", "NEW_DEITY": "Create a new deity", "NEW_DEITY_HINT": "Define the identity and first domains of your deity.", "NAME": "Name", "TITLE_FIELD": "Title", "DESCRIPTION": "Description", "ALIGNMENT": "Alignment", "SAVE": "Save deity", "CANCEL": "Cancel", "OPEN_DASHBOARD": "Open GodForge", "NEW_DEITY_PLACEHOLDER": "e.g. Tenebris", "TITLE_PLACEHOLDER": "e.g. Goddess of Shadows", "DOMAINS_PLACEHOLDER": "Shadows, secrets, deception", "SANCTUARIES": "Sanctuaries"
+    },
+    "SETTINGS": { "LANGUAGE": "GodForge language", "LANGUAGE_HINT": "Language used by GodForge surfaces.", "AUTO": "Automatic" },
+    "ERROR": { "NO_USES": "No uses remaining." }
+  }
 }

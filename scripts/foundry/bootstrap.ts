@@ -9,7 +9,8 @@ const namespace = "darkis-godforge";
 export function registerFoundryBootstrap(api: GodForgeApi, deityService: DeityService, openDashboard: () => void, socketRouter?: SocketRouter): void {
   const runtime = getFoundryRuntime(); if (!runtime) return;
   runtime.Hooks.once("init", () => {
-    runtime.game?.settings?.register(namespace, "language", { name: "DARKIS_GODFORGE.SETTINGS.LANGUAGE", hint: "DARKIS_GODFORGE.SETTINGS.LANGUAGE_HINT", scope: "client", config: true, type: String, default: "auto", choices: { auto: "DARKIS_GODFORGE.SETTINGS.AUTO", de: "Deutsch", en: "English" } });
+    const languages = runtime.game?.modules?.get(namespace)?.languages ?? [{ lang: "de", name: "Deutsch" }, { lang: "en", name: "English" }]; const choices = Object.fromEntries([["auto", "DARKIS_GODFORGE.SETTINGS.AUTO"], ...languages.map((language) => [language.lang, language.name])]);
+    runtime.game?.settings?.register(namespace, "language", { name: "DARKIS_GODFORGE.SETTINGS.LANGUAGE", hint: "DARKIS_GODFORGE.SETTINGS.LANGUAGE_HINT", scope: "client", config: true, type: String, default: "auto", choices });
     runtime.game?.keybindings?.register(namespace, "open-dashboard", { name: "DARKIS_GODFORGE.UI.OPEN_DASHBOARD", editable: [], onDown: () => { if (runtime.game?.user?.isGM !== true) return false; openDashboard(); return true; } });
   });
   runtime.Hooks.on("getSceneControlButtons", (...args: unknown[]) => {
