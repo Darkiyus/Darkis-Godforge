@@ -4,13 +4,14 @@ import { getFoundryRuntime } from "./runtime";
 import { JournalDeityRepository } from "./journal-repository";
 import type { SocketRouter } from "./socket-router";
 import { createSocketlibTransport } from "./socketlib-transport";
+import { loadLanguage } from "./i18n";
 
 const namespace = "darkis-godforge";
 export function registerFoundryBootstrap(api: GodForgeApi, deityService: DeityService, openDashboard: () => void, socketRouter?: SocketRouter): void {
   const runtime = getFoundryRuntime(); if (!runtime) return;
   runtime.Hooks.once("init", () => {
     const languages = runtime.game?.modules?.get(namespace)?.languages ?? [{ lang: "de", name: "Deutsch" }, { lang: "en", name: "English" }]; const choices = Object.fromEntries([["auto", "DARKIS_GODFORGE.SETTINGS.AUTO"], ...languages.map((language) => [language.lang, language.name])]);
-    runtime.game?.settings?.register(namespace, "language", { name: "DARKIS_GODFORGE.SETTINGS.LANGUAGE", hint: "DARKIS_GODFORGE.SETTINGS.LANGUAGE_HINT", scope: "client", config: true, type: String, default: "auto", choices });
+    runtime.game?.settings?.register(namespace, "language", { name: "DARKIS_GODFORGE.SETTINGS.LANGUAGE", hint: "DARKIS_GODFORGE.SETTINGS.LANGUAGE_HINT", scope: "client", config: true, type: String, default: "auto", choices, onChange: (language: unknown) => { if (typeof language !== "string" || language === "auto") return; const entry = languages.find((item) => item.lang === language); if (entry?.path) void loadLanguage(language, `modules/${namespace}/${entry.path}`); } });
     runtime.game?.keybindings?.register(namespace, "open-dashboard", { name: "DARKIS_GODFORGE.UI.OPEN_DASHBOARD", editable: [], onDown: () => { if (runtime.game?.user?.isGM !== true) return false; openDashboard(); return true; } });
   });
   runtime.Hooks.on("getSceneControlButtons", (...args: unknown[]) => {
@@ -19,7 +20,8 @@ export function registerFoundryBootstrap(api: GodForgeApi, deityService: DeitySe
     if (!control?.tools || !Array.isArray(control.tools)) return;
     control.tools.push({ name: namespace, title: "DARKIS_GODFORGE.UI.OPEN_DASHBOARD", icon: "fas fa-hammer", button: openDashboard, visible: runtime.game?.user?.isGM === true });
   });
-  runtime.Hooks.once("ready", () => {
+  runtime.Hooks.once("ready", async () => {
+    const selectedLanguage = runtime.game?.settings?.get?.(namespace, "language"); const languageEntry = runtime.game?.modules?.get(namespace)?.languages?.find((entry) => entry.lang === selectedLanguage); if (typeof selectedLanguage === "string" && languageEntry?.path) await loadLanguage(selectedLanguage, `modules/${namespace}/${languageEntry.path}`);
     const collection = runtime.game?.journal; if (collection) for (const deity of new JournalDeityRepository(collection).load()) deityService.save(deity);
     const transport = createSocketlibTransport(runtime.game?.modules?.get("socketlib")?.api); if (transport && socketRouter) { socketRouter.setTransport(transport); socketRouter.register(); }
     const module = runtime.game?.modules?.get(namespace); if (module) module.api = api;

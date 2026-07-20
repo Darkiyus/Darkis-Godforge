@@ -7,5 +7,6 @@ export class AdapterRegistry {
   constructor() { this.register(new Pf2eAdapter()); this.register(new Starfinder2eAdapter()); this.register(new Starfinder1eAdapter()); }
   register(adapter: GodForgeSystemAdapter): void { this.adapters.set(adapter.id, adapter); }
   get(systemId: string): GodForgeSystemAdapter { const adapter = this.adapters.get(systemId); if (!adapter) throw new Error(`Unsupported game system: ${systemId}`); return adapter; }
+  tryGet(systemId: string): GodForgeSystemAdapter | null { return this.adapters.get(systemId) ?? null; }
   supports(systemId: string): boolean { return this.adapters.has(systemId); }
 }

@@ -12,16 +12,16 @@ import { buildCharacterWidgetData, type CharacterWidgetData } from "./core/chara
 import { exportDefinitions, importDefinitions } from "./core/import-export-service";
 import { drawWeighted, type RandomDraw } from "./core/random-service";
 
-export interface GodForgeActor { id: string; uuid?: string; flags?: { [namespace: string]: unknown }; update(data: { flags: { "darkis-godforge": ActorGodForgeState | null } }): Promise<unknown>; }
+export interface GodForgeActor { id: string; uuid?: string; flags?: { [namespace: string]: unknown }; update(data: { flags: { "darkis-godforge": ActorGodForgeState | null } }): Promise<unknown>; unsetFlag?(namespace: string, key: string): Promise<unknown>; }
 export interface ActivationOptions { target?: EffectTarget; facts?: EffectContext["facts"]; rollDice?: EffectContext["rollDice"]; }
 
 export class GodForgeApi {
   private catalogCache: { key: string; result: ReturnType<typeof filterCatalog> } | null = null;
   constructor(private readonly deities: DeityService, private readonly adapters: AdapterRegistry) {}
-  getSelectableDeities(context: SelectionContext) { const source = this.deities.list(); const primitiveContext = { classId: context.classId, level: context.level, region: context.region, pantheonFilter: context.pantheonFilter }; const key = JSON.stringify([source.map((deity) => [deity.id, deity.revision]), primitiveContext]); if (this.catalogCache?.key === key) return this.catalogCache.result; const hidden = new Set(source.filter((deity) => deity.replacement.mode === "hide" && deity.replacement.sourceUuid).map((deity) => deity.replacement.sourceUuid)); const result = filterCatalog(source, context, hidden); this.catalogCache = { key, result }; return result; }
+  async getSelectableDeities(context: SelectionContext) { const source = this.deities.list(); const systemId = context.systemId ?? (globalThis as unknown as { game?: { system?: { id?: string } } }).game?.system?.id ?? ""; const primitiveContext = { classId: context.classId, level: context.level, region: context.region, pantheonFilter: context.pantheonFilter, systemId, catalogContext: context.catalogContext }; const key = JSON.stringify([source.map((deity) => [deity.id, deity.revision]), primitiveContext]); if (this.catalogCache?.key === key) return this.catalogCache.result; const official = await (this.adapters.tryGet(systemId)?.listOfficialDeities() ?? Promise.resolve([])); const contextName = context.catalogContext ?? "characterBuilder"; const hiddenSources = new Set(source.filter((deity) => deity.replacement.sourceUuid && (deity.replacement.mode === "hide" || deity.replacement.mode === "replace") && (!deity.replacement.contexts.length || deity.replacement.contexts.includes(contextName))).map((deity) => deity.replacement.sourceUuid)); const homebrew = filterCatalog(source, context, new Set()); const visibleOfficial = official.filter((deity) => !deity.sourceUuid || !hiddenSources.has(deity.sourceUuid)); const result = [...homebrew, ...visibleOfficial]; this.catalogCache = { key, result }; return result; }
   exportDeities(now?: string) { return exportDefinitions(this.deities.list(), now); }
   importDeities(value: unknown): number { const imported = importDefinitions(value); for (const deity of imported) this.deities.save(deity); this.catalogCache = null; return imported.length; }
-  drawRandomDeity(random = Math.random): RandomDraw { return drawWeighted(this.deities.list().map((deity) => ({ id: deity.id, label: deity.name, weight: 1 })), random); }
+  drawRandomDeity(random: () => number): RandomDraw { return drawWeighted(this.deities.list().map((deity) => ({ id: deity.id, label: deity.name, weight: 1 })), random); }
   getAdapterCapabilities(systemId: string) { return this.adapters.get(systemId).capabilities; }
   async materializeDeity(deityId: string, systemId: string, context?: MaterializationContext): Promise<string | null> { const deity = this.getDeity(deityId); if (!deity) throw new Error(`Unknown deity: ${deityId}`); return this.adapters.get(systemId).materialize(deity, context); }
   getDeity(id: string): DeityDefinition | null { return this.deities.get(id); }
@@ -36,7 +36,7 @@ export class GodForgeApi {
     const usages = Object.fromEntries(deity.abilities.filter((ability) => ability.uses).map((ability) => [ability.id, { used: 0, max: ability.uses!.max, lastResetAt: Date.now(), reset: ability.uses!.reset }]));
     await actor.update({ flags: { "darkis-godforge": { deityId, grants, usages } } });
   }
-  async removeDeity(actor: GodForgeActor): Promise<void> { await actor.update({ flags: { "darkis-godforge": null } }); }
+  async removeDeity(actor: GodForgeActor): Promise<void> { if (actor.unsetFlag) { await Promise.all(["deityId", "grants", "usages"].map((key) => actor.unsetFlag!("darkis-godforge", key))); return; } await actor.update({ flags: { "darkis-godforge": null } }); }
   async resetActorUsages(actor: GodForgeActor, resetType: string): Promise<void> {
     const state = this.readState(actor); const now = Date.now(); const usages = Object.fromEntries(Object.entries(state.usages).map(([id, usage]) => usage.reset === resetType ? [id, reset(usage, now)] : [id, usage])); await actor.update({ flags: { "darkis-godforge": { ...state, usages } } });
   }

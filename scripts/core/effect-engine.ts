@@ -1,4 +1,4 @@
-import { evaluateFormula, type FormulaFacts } from "./formula-service";
+import { evaluateFormula, evaluateFormulaWithDice, type FormulaFacts } from "./formula-service";
 import { evaluateCondition, type Facts } from "./condition-service";
 import type { AbilityDefinition, EffectNode } from "./types";
 
@@ -19,7 +19,7 @@ async function executeEffect(effect: EffectNode, context: EffectContext, result:
   if (effect.type === "heal" || effect.type === "damage") {
     const recipient = effect.target === "target" ? context.target : context.actor;
     if (!recipient) throw new Error("This ability requires a valid target.");
-    const amount = context.rollDice && /d/.test(effect.formula) ? await context.rollDice(effect.formula) : evaluateFormula(effect.formula, context.facts);
+    const amount = /\b\d+d\d+\b/.test(effect.formula) ? context.rollDice ? await evaluateFormulaWithDice(effect.formula, context.facts, context.rollDice) : (() => { throw new Error("Dice terms require a Foundry Roll resolver."); })() : evaluateFormula(effect.formula, context.facts);
     if (effect.type === "heal") { result.healing += amount; if (recipient.hp !== undefined) recipient.hp = Math.min(recipient.maxHp ?? Number.MAX_SAFE_INTEGER, recipient.hp + amount); }
     else { result.damage += amount; if (recipient.hp !== undefined) recipient.hp = Math.max(0, recipient.hp - amount); }
     return;

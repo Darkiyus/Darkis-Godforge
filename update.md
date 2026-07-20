@@ -1,14 +1,18 @@
-# Update
+# Update 0.1
 
-Die im Review beschriebenen kritischen Fehler wurden behoben:
+Die Reviewpunkte wurden umgesetzt und anschließend durch einen vollständigen Projektcheck geprüft.
 
-- HTML-Ausgaben und Bildpfade werden gegen XSS abgesichert.
-- GM-/Besitzprüfung und socketlib-Transport sind verdrahtet.
-- Beispieldaten werden nicht mehr automatisch in Welten geschrieben.
-- Das Dashboard öffnet sich nicht mehr automatisch bei jedem Login.
-- Ersetzungsfilter und Katalog-Cache wurden korrigiert.
-- Gemischte Würfelformeln wie `3d8 + @actor.level` funktionieren wieder.
-- Der Formelparser berücksichtigt Operatorpräzedenz korrekt.
-- Zufalls-/Importpfade und Regressionstests wurden erweitert.
+- Foundry-Bildpfade und URL-Sicherheit korrigiert
+- offizielle Systemgottheiten und kontextabhängige Ersetzungen verdrahtet
+- gemischte Würfelformeln vollständig auswertbar
+- Sprachumschaltung mit separat geladenen Sprachkatalogen
+- deutsche und englische Übersetzungsschlüssel in Parität
+- verschachtelte Grant-Gruppen und Fähigkeitsüberschreibungen
+- getrenntes Timing-Modell für Aktion, Nutzung, Reset, Abklingzeit und Dauer
+- PF2e-Klassenkopplung aus dem systemneutralen Kern entfernt
+- Actor-Flags über Foundrys Flag-API entfernbar
+- unsupported systems werden sauber deaktiviert
+- Zufallsentscheidungen benötigen einen autoritativen Resolver
+- Handlebars-Detailansicht und UI-Regressionskorrekturen
 
-Validierung: 20 Tests, TypeScript, ESLint, Build, Diff-Check und npm-Audit erfolgreich.
+Validierung: TypeScript, ESLint, 22 Tests, Produktions-Build, npm-Audit und Diff-Check erfolgreich.
