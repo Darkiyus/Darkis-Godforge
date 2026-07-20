@@ -10,6 +10,7 @@ Ein Foundry-VTT-Modul für frei konfigurierbare Homebrew-Gottheiten in<br>
 **Pathfinder 2e**, **Starfinder 1e** und **Starfinder 2e**.
 
 [![Release](https://img.shields.io/github/v/release/Darkiyus/Darkis-Godforge?display_name=tag&style=for-the-badge&color=8b5cf6)](https://github.com/Darkiyus/Darkis-Godforge/releases/latest)
+[![Status](https://img.shields.io/badge/Status-Alpha-f59e0b?style=for-the-badge)](#entwicklungsstatus--development-status)
 [![Foundry VTT](https://img.shields.io/badge/Foundry_VTT-v13–v14-ff6400?style=for-the-badge)](https://foundryvtt.com/)
 [![Pathfinder 2e](https://img.shields.io/badge/Pathfinder-2e-b91c1c?style=for-the-badge)](https://github.com/foundryvtt/pf2e)
 [![Starfinder](https://img.shields.io/badge/Starfinder-1e_%26_2e-2563eb?style=for-the-badge)](https://foundryvtt.com/packages/)
@@ -23,6 +24,9 @@ Ein Foundry-VTT-Modul für frei konfigurierbare Homebrew-Gottheiten in<br>
 ---
 
 ## Deutsch
+
+> [!WARNING]
+> **Alpha-Version:** Darkis GodForge befindet sich in aktiver Entwicklung. Funktionen, Datenstrukturen und Bedienoberflächen können sich noch ändern. Bitte sichere deine Welt vor Aktualisierungen.
 
 Darkis GodForge gibt Spielleitungen die Werkzeuge, eigene Gottheiten direkt in Foundry VTT zu verwalten. Erstelle neue Glaubensmächte, ordne Domänen und Fähigkeiten zu, verwalte Segnungen und ersetze auf Wunsch offizielle Gottheiten durch deine eigenen Schöpfungen.
 
@@ -69,7 +73,7 @@ https://github.com/Darkiyus/Darkis-Godforge/releases/latest/download/module.json
 
 4. Klicke auf **Installieren**.
 5. Öffne deine Pathfinder- oder Starfinder-Welt unter **Welten verwalten**.
-6. Aktiviere unter **Module verwalten** die Module **Darkis GodForge** und **socketlib**.
+6. Aktiviere unter **Module verwalten** das Modul **Darkis GodForge**. `socketlib` kann optional für die GM-Autorisierung installiert werden.
 
 Foundry lädt über diese URL automatisch die passende aktuelle Veröffentlichung. Zukünftige Aktualisierungen können anschließend direkt über die Foundry-Modulverwaltung installiert werden.
 
@@ -78,7 +82,7 @@ Foundry lädt über diese URL automatisch die passende aktuelle Veröffentlichun
 Nach der Aktivierung können Spielleitungen GodForge auf zwei Wegen öffnen:
 
 1. **Spieleinstellungen → Darkis GodForge → GodForge öffnen**
-2. Über das **Hammer-Symbol** in den Token-Werkzeugen der Szenensteuerung
+2. Über die eigene **GodForge-Hammergruppe** in der Szenensteuerung
 
 Alternativ steht für Integrationen die Modul-API unter `game.modules.get("darkis-godforge").api` zur Verfügung.
 
@@ -92,12 +96,15 @@ Alternativ steht für Integrationen die Modul-API unter `game.modules.get("darki
 
 - Foundry VTT 13 oder 14
 - Pathfinder 2e, Starfinder 1e oder Starfinder 2e
-- [socketlib](https://foundryvtt.com/packages/socketlib) – erforderlich
+- [socketlib](https://foundryvtt.com/packages/socketlib) – optional empfohlen für GM-Autorisierung
 - [libWrapper](https://foundryvtt.com/packages/lib-wrapper) – empfohlen
 
 ---
 
 ## English
+
+> [!WARNING]
+> **Alpha release:** Darkis GodForge is under active development. Features, data structures, and interfaces may still change. Back up your world before updating.
 
 Darkis GodForge gives Game Masters the tools to manage custom deities directly inside Foundry VTT. Create new divine powers, define domains and abilities, manage blessings, and replace official deities with creations tailored to your world.
 
@@ -144,7 +151,7 @@ https://github.com/Darkiyus/Darkis-Godforge/releases/latest/download/module.json
 
 4. Click **Install**.
 5. Open your Pathfinder or Starfinder world from **Game Worlds**.
-6. Enable **Darkis GodForge** and **socketlib** under **Manage Modules**.
+6. Enable **Darkis GodForge** under **Manage Modules**. `socketlib` is optional and can be installed for GM-authorized actions.
 
 Foundry uses this URL to download the current release automatically. Future updates can then be installed directly through Foundry's module manager.
 
@@ -153,7 +160,7 @@ Foundry uses this URL to download the current release automatically. Future upda
 After enabling the module, Game Masters can open GodForge in two ways:
 
 1. **Game Settings → Darkis GodForge → Open GodForge**
-2. Select the **hammer icon** in the Token tools of the Scene Controls
+2. Select the dedicated **GodForge hammer group** in the Scene Controls
 
 Integrations can also access the module API through `game.modules.get("darkis-godforge").api`.
 
@@ -167,10 +174,15 @@ Integrations can also access the module API through `game.modules.get("darkis-go
 
 - Foundry VTT 13 or 14
 - Pathfinder 2e, Starfinder 1e, or Starfinder 2e
-- [socketlib](https://foundryvtt.com/packages/socketlib) – required
+- [socketlib](https://foundryvtt.com/packages/socketlib) – optional and recommended for GM-authorized actions
 - [libWrapper](https://foundryvtt.com/packages/lib-wrapper) – recommended
 
 ---
+
+## Entwicklungsstatus / Development status
+
+**Alpha:** Das Modul wird aktiv entwickelt und kann noch inkompatible Änderungen erhalten.<br>
+**Alpha:** The module is under active development and may still receive breaking changes.
 
 ## Sprachen / Languages
 

@@ -1,78 +1,78 @@
-var ce = Object.defineProperty;
-var de = (i, e, t) => e in i ? ce(i, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : i[e] = t;
-var d = (i, e, t) => de(i, typeof e != "symbol" ? e + "" : e, t);
-function le(i, e) {
+var ee = Object.defineProperty;
+var te = (i, e, t) => e in i ? ee(i, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : i[e] = t;
+var l = (i, e, t) => te(i, typeof e != "symbol" ? e + "" : e, t);
+function ie(i, e) {
   return { name: i.name, type: "deity", description: i.description, system: { alignment: i.alignment ? [i.alignment] : [], domains: i.domains, favoredWeapon: i.favoredWeapon ?? "", font: i.font ? [i.font] : [], sanctification: i.sanctification ? [i.sanctification] : [], skill: i.skill ?? "" }, flags: { "darkis-godforge": { definitionUuid: e } } };
 }
-function J() {
+function C() {
   const i = globalThis, e = typeof Hooks < "u" ? Hooks : i.Hooks;
-  return e ? { Hooks: e, game: k() } : null;
+  return e ? { Hooks: e } : null;
 }
-function k() {
+function m() {
   const i = globalThis;
   return typeof game < "u" ? game : i.game;
 }
-function X() {
+function V() {
   const i = globalThis;
   return typeof ui < "u" ? ui : i.ui;
 }
-function j(i) {
+function _(i) {
   if (!i || typeof i != "object") return !1;
   const e = i;
   return typeof e.id == "string" && typeof e.name == "string" && typeof e.schemaVersion == "number" && Array.isArray(e.domains) && Array.isArray(e.abilities);
 }
-async function U(i) {
-  var r, n, o, a;
-  const t = (((n = (r = k()) == null ? void 0 : r.packs) == null ? void 0 : n.contents) ?? []).filter((c) => {
-    var h;
-    return c.documentName === "Item" && (!((h = c.metadata) != null && h.system) || c.metadata.system === i);
-  }), s = [];
-  for (const c of t) {
-    const h = await c.getIndex({ fields: ["type", "img", "system.domains", "system.alignment"] });
-    for (const l of h) {
-      if (l.type !== "deity" || !l._id || !l.name || !c.collection) continue;
-      const g = `Compendium.${c.collection}.Item.${l._id}`;
-      s.push({ id: g, sourceUuid: g, official: !0, name: l.name, title: l.name, image: l.img, domains: ((o = l.system) == null ? void 0 : o.domains) ?? [], alignment: (a = l.system) == null ? void 0 : a.alignment });
+async function F(i) {
+  var s, n, o, a;
+  const t = (((n = (s = m()) == null ? void 0 : s.packs) == null ? void 0 : n.contents) ?? []).filter((d) => {
+    var u;
+    return d.documentName === "Item" && (!((u = d.metadata) != null && u.system) || d.metadata.system === i);
+  }), r = [];
+  for (const d of t) {
+    const u = await d.getIndex({ fields: ["type", "img", "system.domains", "system.alignment"] });
+    for (const c of u) {
+      if (c.type !== "deity" || !c._id || !c.name || !d.collection) continue;
+      const h = `Compendium.${d.collection}.Item.${c._id}`;
+      r.push({ id: h, sourceUuid: h, official: !0, name: c.name, title: c.name, image: c.img, domains: ((o = c.system) == null ? void 0 : o.domains) ?? [], alignment: (a = c.system) == null ? void 0 : a.alignment });
     }
   }
-  return s;
+  return r;
 }
-function ue(i) {
+function re(i) {
   if (i.classId !== "cleric" && i.classId !== "champion") return null;
   const e = i.systemValues;
   return { classId: i.classId, deityId: i.deityId, grants: i.grants, domains: { available: e.domains, pick: i.classId === "cleric" ? 1 : 0 }, divineFont: i.classId === "cleric" ? e.font : void 0, favoredWeapon: e.favoredWeapon, trainedSkill: i.classId === "cleric" ? e.skill : void 0, sanctification: e.sanctification, cause: i.classId === "champion" ? e.cause : void 0 };
 }
-class he {
+class se {
   constructor() {
-    d(this, "id", "pf2e");
-    d(this, "capabilities", { lore: !0, deity: !0, passiveBonuses: !0, abilities: !0, classCoupling: !0, selectors: ["perception", "stealth", "deception", "ac", "attack-roll"] });
+    l(this, "id", "pf2e");
+    l(this, "capabilities", { lore: !0, deity: !0, passiveBonuses: !0, abilities: !0, classCoupling: !0, selectors: ["perception", "stealth", "deception", "ac", "attack-roll"] });
   }
   async materialize(e, t) {
-    return t ? (await t.createItem(le(e, e.id))).uuid : null;
+    return t ? (await t.createItem(ie(e, e.id))).uuid : null;
   }
   async listOfficialDeities() {
-    return U(this.id);
+    return F(this.id);
   }
   buildPassiveBonus(e) {
     return { key: "FlatModifier", selector: e.selector, value: e.value, type: e.modifierType, slug: e.id };
   }
   buildClassCoupling(e) {
-    return ue(e);
+    return re(e);
   }
 }
-function Z(i) {
+function $(i) {
   return { name: i.name, type: "deity", description: i.description, system: { domains: i.domains, favoredWeapon: i.favoredWeapon ?? "", alignment: i.alignment ? [i.alignment] : [] }, flags: { "darkis-godforge": { definitionUuid: i.id } } };
 }
-class fe {
+class ne {
   constructor() {
-    d(this, "id", "sfrpg");
-    d(this, "capabilities", { lore: !0, deity: !0, passiveBonuses: !0, abilities: !0, classCoupling: !1, selectors: ["perception", "stealth", "bluff", "ac", "attack-roll", "piloting"] });
+    l(this, "id", "sfrpg");
+    l(this, "capabilities", { lore: !0, deity: !0, passiveBonuses: !0, abilities: !0, classCoupling: !1, selectors: ["perception", "stealth", "bluff", "ac", "attack-roll", "piloting"] });
   }
   async materialize(e, t) {
-    return t ? (await t.createItem(Z(e))).uuid : null;
+    return t ? (await t.createItem($(e))).uuid : null;
   }
   async listOfficialDeities() {
-    return U(this.id);
+    return F(this.id);
   }
   buildPassiveBonus(e) {
     return { key: "Modifier", selector: e.selector, value: e.value, type: e.modifierType, slug: e.id };
@@ -81,16 +81,16 @@ class fe {
     return null;
   }
 }
-class ge {
+class ae {
   constructor() {
-    d(this, "id", "sf2e");
-    d(this, "capabilities", { lore: !0, deity: !0, passiveBonuses: !0, abilities: !0, classCoupling: !0, selectors: ["perception", "stealth", "deception", "ac", "attack-roll", "piloting"] });
+    l(this, "id", "sf2e");
+    l(this, "capabilities", { lore: !0, deity: !0, passiveBonuses: !0, abilities: !0, classCoupling: !0, selectors: ["perception", "stealth", "deception", "ac", "attack-roll", "piloting"] });
   }
   async materialize(e, t) {
-    return t ? (await t.createItem(Z(e))).uuid : null;
+    return t ? (await t.createItem($(e))).uuid : null;
   }
   async listOfficialDeities() {
-    return U(this.id);
+    return F(this.id);
   }
   buildPassiveBonus(e) {
     return { key: "FlatModifier", selector: e.selector, value: e.value, type: e.modifierType, slug: e.id };
@@ -99,10 +99,10 @@ class ge {
     return { classId: e.classId, deityId: e.deityId, system: e.systemValues, grants: e.grants };
   }
 }
-class pe {
+class oe {
   constructor() {
-    d(this, "adapters", /* @__PURE__ */ new Map());
-    this.register(new he()), this.register(new ge()), this.register(new fe());
+    l(this, "adapters", /* @__PURE__ */ new Map());
+    this.register(new se()), this.register(new ae()), this.register(new ne());
   }
   register(e) {
     this.adapters.set(e.id, e);
@@ -119,67 +119,67 @@ class pe {
     return this.adapters.has(e);
   }
 }
-function me(i) {
+function ce(i) {
   return { id: i.id, name: i.name, title: i.title, image: i.image, domains: i.domains, alignment: i.alignment };
 }
-function ye(i, e, t) {
-  return i.filter((s) => s.visibility.library && !t.has(s.id) && (!e.pantheonFilter || s.domains.includes(e.pantheonFilter))).map(me);
+function de(i, e, t) {
+  return i.filter((r) => r.visibility.library && !t.has(r.id) && (!e.pantheonFilter || r.domains.includes(e.pantheonFilter))).map(ce);
 }
-function x(i, e) {
-  const t = Q(i);
-  if (i.mode === "all") return i.grants.flatMap((r) => "mode" in r ? x(r) : [r.ref]);
-  const s = (e == null ? void 0 : e.groupId) === i.id ? e.refs : [];
-  if (!i.pick || s.length !== i.pick || s.some((r) => !t.includes(r))) throw new Error(`Grant group ${i.id} requires ${i.pick ?? 1} valid choice(s).`);
-  return s;
+function R(i, e) {
+  const t = z(i);
+  if (i.mode === "all") return i.grants.flatMap((s) => "mode" in s ? R(s) : [s.ref]);
+  const r = (e == null ? void 0 : e.groupId) === i.id ? e.refs : [];
+  if (!i.pick || r.length !== i.pick || r.some((s) => !t.includes(s))) throw new Error(`Grant group ${i.id} requires ${i.pick ?? 1} valid choice(s).`);
+  return r;
 }
-function Q(i) {
-  return i.grants.flatMap((e) => "mode" in e ? Q(e) : [e.ref]);
+function z(i) {
+  return i.grants.flatMap((e) => "mode" in e ? z(e) : [e.ref]);
 }
-function ee(i, e) {
+function W(i, e) {
   return i.used < i.max;
 }
-function ve(i, e) {
-  if (!ee(i)) throw new Error("No uses remaining.");
+function le(i, e) {
+  if (!W(i)) throw new Error("No uses remaining.");
   return { ...i, used: i.used + 1 };
 }
-function we(i, e) {
+function ue(i, e) {
   return { ...i, used: 0, lastResetAt: e };
 }
-const Ie = /@(?:actor\.level|actor\.hpPercent|target\.hpPercent)|[A-Za-z_][A-Za-z0-9_.]*|\d+(?:\.\d+)?|[()+\-*/,]/g, be = /^\d+d\d+(?:[+\-]\d+)?$/, Ee = /* @__PURE__ */ new Set(["min", "max", "round", "floor", "ceil", "abs", "clamp", "if"]);
-function te(i) {
-  const e = i.replace(/\s/g, ""), t = e.match(Ie);
+const ge = /@(?:actor\.level|actor\.hpPercent|target\.hpPercent)|[A-Za-z_][A-Za-z0-9_.]*|\d+(?:\.\d+)?|[()+\-*/,]/g, he = /^\d+d\d+(?:[+\-]\d+)?$/, fe = /* @__PURE__ */ new Set(["min", "max", "round", "floor", "ceil", "abs", "clamp", "if"]);
+function K(i) {
+  const e = i.replace(/\s/g, ""), t = e.match(ge);
   if (!t || t.join("") !== e) throw new Error("Formula contains an unsupported term.");
   return t;
 }
-function ie(i) {
-  const e = i.replace(/\s/g, ""), t = e.match(/\b\d+d\d+\b/g) ?? [], s = e.replace(/\b\d+d\d+\b/g, "0");
-  if (t.some((r) => !/^\d+d\d+$/.test(r))) return !1;
+function q(i) {
+  const e = i.replace(/\s/g, ""), t = e.match(/\b\d+d\d+\b/g) ?? [], r = e.replace(/\b\d+d\d+\b/g, "0");
+  if (t.some((s) => !/^\d+d\d+$/.test(s))) return !1;
   try {
-    return new se(te(s), { actor: { level: 0 }, target: {} }).parse(), !0;
+    return new Y(K(r), { actor: { level: 0 }, target: {} }).parse(), !0;
   } catch {
     return !1;
   }
 }
-function R(i, e) {
+function A(i, e) {
   const t = i.replace(/\s/g, "");
-  if (!ie(t)) throw new Error("Formula contains an unsupported term.");
-  if (be.test(t)) throw new Error("Dice formulas require Foundry Roll at runtime.");
-  return new se(te(t), e).parse();
+  if (!q(t)) throw new Error("Formula contains an unsupported term.");
+  if (he.test(t)) throw new Error("Dice formulas require Foundry Roll at runtime.");
+  return new Y(K(t), e).parse();
 }
-async function Ae(i, e, t) {
-  if (!ie(i)) throw new Error("Formula contains an unsupported term.");
-  const s = i.replace(/\s/g, "").match(/\b\d+d\d+\b/g) ?? [];
-  let r = i;
-  for (const n of [...new Set(s)]) {
+async function pe(i, e, t) {
+  if (!q(i)) throw new Error("Formula contains an unsupported term.");
+  const r = i.replace(/\s/g, "").match(/\b\d+d\d+\b/g) ?? [];
+  let s = i;
+  for (const n of [...new Set(r)]) {
     const o = await t(n);
     if (!Number.isFinite(o)) throw new Error("Dice result is not a finite number.");
-    r = r.replace(new RegExp(`\\b${n}\\b`, "g"), String(o));
+    s = s.replace(new RegExp(`\\b${n}\\b`, "g"), String(o));
   }
-  return R(r, e);
+  return A(s, e);
 }
-class se {
+class Y {
   constructor(e, t) {
-    d(this, "position", 0);
+    l(this, "position", 0);
     this.tokens = e, this.facts = t;
   }
   parse() {
@@ -191,16 +191,16 @@ class se {
   expression() {
     let e = this.term();
     for (; this.peek("+") || this.peek("-"); ) {
-      const t = this.take(), s = this.term();
-      e = t === "+" ? e + s : e - s;
+      const t = this.take(), r = this.term();
+      e = t === "+" ? e + r : e - r;
     }
     return e;
   }
   term() {
     let e = this.unary();
     for (; this.peek("*") || this.peek("/"); ) {
-      const t = this.take(), s = this.unary();
-      e = t === "*" ? e * s : e / s;
+      const t = this.take(), r = this.unary();
+      e = t === "*" ? e * r : e / r;
     }
     return e;
   }
@@ -217,7 +217,7 @@ class se {
     if (e === "@actor.level") return this.facts.actor.level;
     if (e === "@actor.hpPercent") return this.facts.actor.hpPercent ?? 0;
     if (e === "@target.hpPercent") return this.facts.target.hpPercent ?? 0;
-    if (Ee.has(e)) return this.call(e);
+    if (fe.has(e)) return this.call(e);
     throw new Error("Unknown formula identifier.");
   }
   call(e) {
@@ -248,146 +248,146 @@ class se {
     this.position += 1;
   }
 }
-function S(i, e) {
+function b(i, e) {
   if (i.type === "fact") return e[i.key] === i.equals;
-  if (i.type === "not") return !S(i.child, e);
-  const t = i.children.map((s) => S(s, e));
+  if (i.type === "not") return !b(i.child, e);
+  const t = i.children.map((r) => b(r, e));
   return i.type === "and" ? t.every(Boolean) : t.some(Boolean);
 }
-async function Se(i, e) {
+async function me(i, e) {
   const t = { messages: [], healing: 0, damage: 0, appliedModifiers: [], appliedConditions: [] };
-  if (i.condition && !S(i.condition, e.conditionFacts ?? {})) return t;
-  for (const s of i.effects) await re(s, e, t);
+  if (i.condition && !b(i.condition, e.conditionFacts ?? {})) return t;
+  for (const r of i.effects) await J(r, e, t);
   return t;
 }
-async function re(i, e, t) {
+async function J(i, e, t) {
   if (i.type === "message") {
     t.messages.push(i.text);
     return;
   }
   if (i.type === "branch") {
-    const r = S(i.condition, e.conditionFacts ?? {}) ? i.then : i.otherwise ?? [];
-    for (const n of r) await re(n, e, t);
+    const s = b(i.condition, e.conditionFacts ?? {}) ? i.then : i.otherwise ?? [];
+    for (const n of s) await J(n, e, t);
     return;
   }
   if (i.type === "heal" || i.type === "damage") {
-    const r = i.target === "target" ? e.target : e.actor;
-    if (!r) throw new Error("This ability requires a valid target.");
-    const n = /\b\d+d\d+\b/.test(i.formula) ? e.rollDice ? await Ae(i.formula, e.facts, e.rollDice) : (() => {
+    const s = i.target === "target" ? e.target : e.actor;
+    if (!s) throw new Error("This ability requires a valid target.");
+    const n = /\b\d+d\d+\b/.test(i.formula) ? e.rollDice ? await pe(i.formula, e.facts, e.rollDice) : (() => {
       throw new Error("Dice terms require a Foundry Roll resolver.");
-    })() : R(i.formula, e.facts);
-    i.type === "heal" ? (t.healing += n, r.hp !== void 0 && (r.hp = Math.min(r.maxHp ?? Number.MAX_SAFE_INTEGER, r.hp + n))) : (t.damage += n, r.hp !== void 0 && (r.hp = Math.max(0, r.hp - n)));
+    })() : A(i.formula, e.facts);
+    i.type === "heal" ? (t.healing += n, s.hp !== void 0 && (s.hp = Math.min(s.maxHp ?? Number.MAX_SAFE_INTEGER, s.hp + n))) : (t.damage += n, s.hp !== void 0 && (s.hp = Math.max(0, s.hp - n)));
     return;
   }
   if (i.type === "modifier") {
-    const r = typeof i.value == "number" ? i.value : R(i.value, e.facts);
-    e.actor.modifiers[i.selector] = r, t.appliedModifiers.push(i.selector);
+    const s = typeof i.value == "number" ? i.value : A(i.value, e.facts);
+    e.actor.modifiers[i.selector] = s, t.appliedModifiers.push(i.selector);
     return;
   }
   if (i.type !== "condition") return;
-  const s = i.target === "target" ? e.target : e.actor;
-  if (!s) throw new Error("This ability requires a valid target.");
-  s.conditions.push(i.condition), t.appliedConditions.push(i.condition);
+  const r = i.target === "target" ? e.target : e.actor;
+  if (!r) throw new Error("This ability requires a valid target.");
+  r.conditions.push(i.condition), t.appliedConditions.push(i.condition);
 }
-function De(i, e, t = []) {
+function ye(i, e, t = []) {
   if (!e.trim()) throw new Error("Class identifier is required for deity coupling.");
-  const s = i.grantGroups.flatMap((r) => x(r, t.find((n) => n.groupId === r.id)));
-  return { deityId: i.id, classId: e, grants: s, choices: t, systemValues: { domains: i.domains, font: i.font, favoredWeapon: i.favoredWeapon, skill: i.skill, sanctification: i.sanctification, cause: i.cause } };
+  const r = i.grantGroups.flatMap((s) => R(s, t.find((n) => n.groupId === s.id)));
+  return { deityId: i.id, classId: e, grants: r, choices: t, systemValues: { domains: i.domains, font: i.font, favoredWeapon: i.favoredWeapon, skill: i.skill, sanctification: i.sanctification, cause: i.cause } };
 }
-function ke(i, e) {
+function ve(i, e) {
   return !i || !e ? { deity: null, grants: [], abilities: [] } : { deity: { id: i.id, name: i.name, title: i.title, image: i.image }, grants: e.grants, abilities: i.abilities.map((t) => {
-    var s;
-    return { id: t.id, name: t.name, description: t.description, uses: t.uses ? { used: ((s = e.usages[t.id]) == null ? void 0 : s.used) ?? 0, max: t.uses.max } : void 0 };
+    var r;
+    return { id: t.id, name: t.name, description: t.description, uses: t.uses ? { used: ((r = e.usages[t.id]) == null ? void 0 : r.used) ?? 0, max: t.uses.max } : void 0 };
   }) };
 }
-function Te(i) {
+function we(i) {
   const e = [];
   if (i.schemaVersion > 1) throw new Error(`Unsupported deity schema ${i.schemaVersion}.`);
   if (i.schemaVersion === 1) return { definition: structuredClone(i), migrated: !1, warnings: e };
   const t = { ...structuredClone(i), schemaVersion: 1, revision: i.revision + 1, updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
   return e.push("Legacy definition normalized to schema version 1."), { definition: t, migrated: !0, warnings: e };
 }
-function Oe(i, e = (/* @__PURE__ */ new Date()).toISOString()) {
+function be(i, e = (/* @__PURE__ */ new Date()).toISOString()) {
   return { format: "darkis-godforge", schemaVersion: 1, exportedAt: e, deities: structuredClone(i) };
 }
-function Ge(i) {
+function Ie(i) {
   if (!i || typeof i != "object") return !1;
   const e = i;
   return e.format === "darkis-godforge" && typeof e.schemaVersion == "number" && e.schemaVersion <= 1 && Array.isArray(e.deities) && e.deities.every((t) => typeof t == "object" && t !== null && typeof t.id == "string" && typeof t.name == "string" && typeof t.schemaVersion == "number" && Array.isArray(t.domains) && Array.isArray(t.abilities));
 }
-function Ce(i) {
-  if (!Ge(i)) throw new Error("Invalid GodForge export: expected a valid deity export.");
-  return i.deities.map((e) => Te(e).definition);
+function Ee(i) {
+  if (!Ie(i)) throw new Error("Invalid GodForge export: expected a valid deity export.");
+  return i.deities.map((e) => we(e).definition);
 }
-function Re(i, e) {
-  const t = i.filter((a) => Number.isFinite(a.weight) && a.weight > 0), s = t.reduce((a, c) => a + c.weight, 0);
-  if (!t.length || s <= 0) throw new Error("Random table has no selectable entries.");
-  const r = Math.min(Math.max(e(), 0), 0.999999999) * s;
+function De(i, e) {
+  const t = i.filter((a) => Number.isFinite(a.weight) && a.weight > 0), r = t.reduce((a, d) => a + d.weight, 0);
+  if (!t.length || r <= 0) throw new Error("Random table has no selectable entries.");
+  const s = Math.min(Math.max(e(), 0), 0.999999999) * r;
   let n = 0;
-  for (const [a, c] of t.entries())
-    if (n += c.weight, r < n) return { entry: c, index: a, roll: r };
-  return { entry: t[t.length - 1], index: t.length - 1, roll: r };
+  for (const [a, d] of t.entries())
+    if (n += d.weight, s < n) return { entry: d, index: a, roll: s };
+  return { entry: t[t.length - 1], index: t.length - 1, roll: s };
 }
-class Ne {
+class ke {
   constructor(e, t) {
-    d(this, "catalogCache", null);
+    l(this, "catalogCache", null);
     this.deities = e, this.adapters = t;
   }
   async getSelectableDeities(e) {
-    var v, w, I, b;
-    const t = this.deities.list(), s = e.systemId ?? ((w = (v = k()) == null ? void 0 : v.system) == null ? void 0 : w.id) ?? "", r = { classId: e.classId, level: e.level, region: e.region, pantheonFilter: e.pantheonFilter, systemId: s, catalogContext: e.catalogContext }, n = JSON.stringify([t.map((u) => [u.id, u.revision]), r]);
-    if (((I = this.catalogCache) == null ? void 0 : I.key) === n) return this.catalogCache.result;
-    const o = await (((b = this.adapters.tryGet(s)) == null ? void 0 : b.listOfficialDeities()) ?? Promise.resolve([])), a = e.catalogContext ?? "characterBuilder", c = new Set(t.filter((u) => u.replacement.sourceUuid && (u.replacement.mode === "hide" || u.replacement.mode === "replace") && (!u.replacement.contexts.length || u.replacement.contexts.includes(a))).map((u) => u.replacement.sourceUuid)), h = ye(t, e, /* @__PURE__ */ new Set()), l = o.filter((u) => !u.sourceUuid || !c.has(u.sourceUuid)), g = [...h, ...l];
-    return this.catalogCache = { key: n, result: g }, g;
+    var y, g, v, w;
+    const t = this.deities.list(), r = e.systemId ?? ((g = (y = m()) == null ? void 0 : y.system) == null ? void 0 : g.id) ?? "", s = { classId: e.classId, level: e.level, region: e.region, pantheonFilter: e.pantheonFilter, systemId: r, catalogContext: e.catalogContext }, n = JSON.stringify([t.map((f) => [f.id, f.revision]), s]);
+    if (((v = this.catalogCache) == null ? void 0 : v.key) === n) return this.catalogCache.result;
+    const o = await (((w = this.adapters.tryGet(r)) == null ? void 0 : w.listOfficialDeities()) ?? Promise.resolve([])), a = e.catalogContext ?? "characterBuilder", d = new Set(t.filter((f) => f.replacement.sourceUuid && (f.replacement.mode === "hide" || f.replacement.mode === "replace") && (!f.replacement.contexts.length || f.replacement.contexts.includes(a))).map((f) => f.replacement.sourceUuid)), u = de(t, e, /* @__PURE__ */ new Set()), c = o.filter((f) => !f.sourceUuid || !d.has(f.sourceUuid)), h = [...u, ...c];
+    return this.catalogCache = { key: n, result: h }, h;
   }
   exportDeities(e) {
-    return Oe(this.deities.list(), e);
+    return be(this.deities.list(), e);
   }
   importDeities(e) {
-    const t = Ce(e);
-    for (const s of t) this.deities.save(s);
+    const t = Ee(e);
+    for (const r of t) this.deities.save(r);
     return this.catalogCache = null, t.length;
   }
   drawRandomDeity(e) {
-    return Re(this.deities.list().map((t) => ({ id: t.id, label: t.name, weight: 1 })), e);
+    return De(this.deities.list().map((t) => ({ id: t.id, label: t.name, weight: 1 })), e);
   }
   getAdapterCapabilities(e) {
     return this.adapters.get(e).capabilities;
   }
-  async materializeDeity(e, t, s) {
-    const r = this.getDeity(e);
-    if (!r) throw new Error(`Unknown deity: ${e}`);
-    return this.adapters.get(t).materialize(r, s);
+  async materializeDeity(e, t, r) {
+    const s = this.getDeity(e);
+    if (!s) throw new Error(`Unknown deity: ${e}`);
+    return this.adapters.get(t).materialize(s, r);
   }
   getDeity(e) {
     return this.deities.get(e);
   }
   getActorDeity(e) {
-    var s;
-    const t = (s = e.flags) == null ? void 0 : s["darkis-godforge"];
+    var r;
+    const t = (r = e.flags) == null ? void 0 : r["darkis-godforge"];
     return !t || typeof t != "object" || !("deityId" in t) || typeof t.deityId != "string" ? null : this.getDeity(t.deityId);
   }
   getCharacterWidgetData(e) {
-    var r;
-    const t = (r = e.flags) == null ? void 0 : r["darkis-godforge"], s = t && typeof t == "object" && "deityId" in t && "grants" in t && "usages" in t ? t : null;
-    return ke(this.getActorDeity(e), s);
+    var s;
+    const t = (s = e.flags) == null ? void 0 : s["darkis-godforge"], r = t && typeof t == "object" && "deityId" in t && "grants" in t && "usages" in t ? t : null;
+    return ve(this.getActorDeity(e), r);
   }
   getGrantChoices(e, t) {
-    var s;
-    return ((s = this.getDeity(e)) == null ? void 0 : s.grantGroups) ?? null;
+    var r;
+    return ((r = this.getDeity(e)) == null ? void 0 : r.grantGroups) ?? null;
   }
-  getClassGrants(e, t, s = []) {
-    const r = this.getDeity(e);
-    if (!r) throw new Error(`Unknown deity: ${e}`);
-    return De(r, t, s);
+  getClassGrants(e, t, r = []) {
+    const s = this.getDeity(e);
+    if (!s) throw new Error(`Unknown deity: ${e}`);
+    return ye(s, t, r);
   }
-  buildClassCoupling(e, t, s, r = []) {
-    return this.adapters.get(s).buildClassCoupling(this.getClassGrants(e, t, r));
+  buildClassCoupling(e, t, r, s = []) {
+    return this.adapters.get(r).buildClassCoupling(this.getClassGrants(e, t, s));
   }
-  async assignDeity(e, t, s = {}) {
-    const r = this.getDeity(t);
-    if (!r || !r.visibility.players) throw new Error("Deity is not available for assignment.");
-    const n = r.grantGroups.flatMap((a) => x(a, { groupId: a.id, refs: s[a.id] ?? [] })), o = Object.fromEntries(r.abilities.filter((a) => a.uses).map((a) => [a.id, { used: 0, max: a.uses.max, lastResetAt: Date.now(), reset: a.uses.reset }]));
+  async assignDeity(e, t, r = {}) {
+    const s = this.getDeity(t);
+    if (!s || !s.visibility.players) throw new Error("Deity is not available for assignment.");
+    const n = s.grantGroups.flatMap((a) => R(a, { groupId: a.id, refs: r[a.id] ?? [] })), o = Object.fromEntries(s.abilities.filter((a) => a.uses).map((a) => [a.id, { used: 0, max: a.uses.max, lastResetAt: Date.now(), reset: a.uses.reset }]));
     await e.update({ flags: { "darkis-godforge": { deityId: t, grants: n, usages: o } } });
   }
   async removeDeity(e) {
@@ -398,151 +398,160 @@ class Ne {
     await e.update({ flags: { "darkis-godforge": null } });
   }
   async resetActorUsages(e, t) {
-    const s = this.readState(e), r = Date.now(), n = Object.fromEntries(Object.entries(s.usages).map(([o, a]) => a.reset === t ? [o, we(a, r)] : [o, a]));
-    await e.update({ flags: { "darkis-godforge": { ...s, usages: n } } });
+    const r = this.readState(e), s = Date.now(), n = Object.fromEntries(Object.entries(r.usages).map(([o, a]) => a.reset === t ? [o, ue(a, s)] : [o, a]));
+    await e.update({ flags: { "darkis-godforge": { ...r, usages: n } } });
   }
-  async activateAbility(e, t, s = {}) {
-    const r = this.readState(e), n = this.getDeity(r.deityId), o = n == null ? void 0 : n.abilities.find((l) => l.id === t);
+  async activateAbility(e, t, r = {}) {
+    const s = this.readState(e), n = this.getDeity(s.deityId), o = n == null ? void 0 : n.abilities.find((c) => c.id === t);
     if (!o) throw new Error("Ability is not available for this actor.");
-    const a = r.usages[t];
-    if (a && !ee(a)) throw new Error("No uses remaining.");
-    const c = a ? { ...r.usages, [t]: ve(a) } : r.usages, h = { id: e.id, modifiers: {}, conditions: [] };
-    await Se(o, { actor: h, target: s.target, facts: s.facts ?? { actor: { level: 0 }, target: {} }, rollDice: s.rollDice }), await e.update({ flags: { "darkis-godforge": { ...r, usages: c } } });
+    const a = s.usages[t];
+    if (a && !W(a)) throw new Error("No uses remaining.");
+    const d = a ? { ...s.usages, [t]: le(a) } : s.usages, u = { id: e.id, modifiers: {}, conditions: [] };
+    await me(o, { actor: u, target: r.target, facts: r.facts ?? { actor: { level: 0 }, target: {} }, rollDice: r.rollDice }), await e.update({ flags: { "darkis-godforge": { ...s, usages: d } } });
   }
   getReplacementFor(e) {
     return this.deities.list().find((t) => t.replacement.sourceUuid === e && t.replacement.mode === "replace") ?? null;
   }
   isSourceHidden(e, t) {
-    return this.deities.list().some((s) => s.replacement.sourceUuid === e && s.replacement.mode === "hide" && s.replacement.contexts.includes(t));
+    return this.deities.list().some((r) => r.replacement.sourceUuid === e && r.replacement.mode === "hide" && r.replacement.contexts.includes(t));
   }
   registerAdapter(e) {
     this.adapters.register(e);
   }
   readState(e) {
-    var s;
-    const t = (s = e.flags) == null ? void 0 : s["darkis-godforge"];
+    var r;
+    const t = (r = e.flags) == null ? void 0 : r["darkis-godforge"];
     if (!t || typeof t != "object" || !("deityId" in t) || typeof t.deityId != "string" || !("usages" in t) || typeof t.usages != "object") throw new Error("Actor has no assigned deity.");
     return t;
   }
 }
-function ne(i) {
+function X(i) {
   if (!i) return "icons/svg/eye.svg";
   const e = i.trim();
   return /^(?:javascript|data|vbscript):/i.test(e) || /^\/\//.test(e) || /[\u0000-\u001f]/.test(e) ? "icons/svg/eye.svg" : e;
 }
-function T() {
-  var s;
-  const i = globalThis, e = typeof foundry < "u" ? foundry : i.foundry, t = (s = e == null ? void 0 : e.applications) == null ? void 0 : s.api;
-  return t != null && t.ApplicationV2 && t.HandlebarsApplicationMixin ? t.HandlebarsApplicationMixin(t.ApplicationV2) : class {
+function E() {
+  var r;
+  const i = globalThis, e = typeof foundry < "u" ? foundry : i.foundry, t = (r = e == null ? void 0 : e.applications) == null ? void 0 : r.api;
+  if (t != null && t.ApplicationV2 && t.HandlebarsApplicationMixin) return t.HandlebarsApplicationMixin(t.ApplicationV2);
+  if (C()) {
+    const s = "Darkis GodForge | Foundry ApplicationV2 is unavailable while loading the module.";
+    return console.error(s), class {
+      render() {
+        return Promise.reject(new Error(s));
+      }
+    };
+  }
+  return class {
     render() {
       return Promise.resolve(this);
     }
   };
 }
-const Me = { UI: { TITLE: "Darkis GodForge", TAGLINE: "Create gods. Shape belief.", SUBTITLE: "Forge destiny.", CREATE: "Create deity", CODEX: "Divine Codex", MY_DEITIES: "My deities", ENTRIES: "entries", DOMAINS: "Domains", ABILITIES: "Abilities", VISIBILITY: "Visibility", PASSIVE_BONUS: "Passive bonus", DIVINE_ABILITY: "Divine ability", SEARCH: "Search deities...", ALL_DOMAINS: "All domains", NO_RESULTS: "No deities found.", NEW_DEITY: "Create a new deity", NEW_DEITY_HINT: "Define the identity and first domains of your deity.", NAME: "Name", TITLE_FIELD: "Title", DESCRIPTION: "Description", ALIGNMENT: "Alignment", SAVE: "Save deity", CANCEL: "Cancel", OPEN_DASHBOARD: "Open GodForge", NEW_DEITY_PLACEHOLDER: "e.g. Tenebris", TITLE_PLACEHOLDER: "e.g. Goddess of Shadows", DOMAINS_PLACEHOLDER: "Shadows, secrets, deception", SANCTUARIES: "Sanctuaries" }, SETTINGS: { MENU_NAME: "GodForge management", MENU_LABEL: "Open GodForge", MENU_HINT: "Opens the dashboard for creating and managing custom deities.", LANGUAGE: "GodForge language", LANGUAGE_HINT: "Language used by GodForge surfaces.", AUTO: "Automatic" }, ERROR: { NO_USES: "No uses remaining." } }, L = {
-  DARKIS_GODFORGE: Me
-}, N = /* @__PURE__ */ new Map([["en", L]]);
-async function B(i, e) {
-  if (i === "auto" || N.has(i)) return;
+const Ae = { UI: { TITLE: "Darkis GodForge", TAGLINE: "Create gods. Shape belief.", SUBTITLE: "Forge destiny.", CREATE: "Create deity", CODEX: "Divine Codex", MY_DEITIES: "My deities", ENTRIES: "entries", DOMAINS: "Domains", ABILITIES: "Abilities", VISIBILITY: "Visibility", PASSIVE_BONUS: "Passive bonus", DIVINE_ABILITY: "Divine ability", SEARCH: "Search deities...", ALL_DOMAINS: "All domains", NO_RESULTS: "No deities found.", NEW_DEITY: "Create a new deity", NEW_DEITY_HINT: "Define the identity and first domains of your deity.", NAME: "Name", TITLE_FIELD: "Title", DESCRIPTION: "Description", ALIGNMENT: "Alignment", SAVE: "Save deity", CANCEL: "Cancel", OPEN_DASHBOARD: "Open GodForge", NEW_DEITY_PLACEHOLDER: "e.g. Tenebris", TITLE_PLACEHOLDER: "e.g. Goddess of Shadows", DOMAINS_PLACEHOLDER: "Shadows, secrets, deception", SANCTUARIES: "Sanctuaries" }, SETTINGS: { MENU_NAME: "GodForge management", MENU_LABEL: "Open GodForge", MENU_HINT: "Opens the dashboard for creating and managing custom deities.", LANGUAGE: "GodForge language", LANGUAGE_HINT: "Language used by GodForge surfaces.", AUTO: "Automatic" }, ERROR: { NO_USES: "No uses remaining." } }, M = {
+  DARKIS_GODFORGE: Ae
+}, S = /* @__PURE__ */ new Map([["en", M]]);
+async function U(i, e) {
+  if (i === "auto" || S.has(i)) return;
   const t = await fetch(e);
   if (!t.ok) throw new Error(`Unable to load GodForge language ${i}.`);
-  N.set(i, await t.json());
+  S.set(i, await t.json());
 }
-function Fe(i) {
-  var n, o, a, c;
-  const e = k(), t = (o = (n = e == null ? void 0 : e.settings) == null ? void 0 : n.get) == null ? void 0 : o.call(n, "darkis-godforge", "language");
+function Se(i) {
+  var n, o, a, d;
+  const e = m(), t = (o = (n = e == null ? void 0 : e.settings) == null ? void 0 : n.get) == null ? void 0 : o.call(n, "darkis-godforge", "language");
   if (typeof t == "string" && t !== "auto") {
-    const h = H(N.get(t), i);
-    if (typeof h == "string") return h;
+    const u = x(S.get(t), i);
+    if (typeof u == "string") return u;
   }
-  const s = (c = (a = e == null ? void 0 : e.i18n) == null ? void 0 : a.localize) == null ? void 0 : c.call(a, i);
-  if (s && s !== i) return s;
-  const r = H(L, i);
-  return typeof r == "string" ? r : i;
+  const r = (d = (a = e == null ? void 0 : e.i18n) == null ? void 0 : a.localize) == null ? void 0 : d.call(a, i);
+  if (r && r !== i) return r;
+  const s = x(M, i);
+  return typeof s == "string" ? s : i;
 }
-function O() {
-  return Object.fromEntries(Object.keys(L.DARKIS_GODFORGE.UI).map((i) => [i, Fe(`DARKIS_GODFORGE.UI.${i}`)]));
+function D() {
+  return Object.fromEntries(Object.keys(M.DARKIS_GODFORGE.UI).map((i) => [i, Se(`DARKIS_GODFORGE.UI.${i}`)]));
 }
-function H(i, e) {
-  return e.split(".").reduce((t, s) => t && typeof t == "object" ? t[s] : void 0, i);
+function x(i, e) {
+  return e.split(".").reduce((t, r) => t && typeof t == "object" ? t[r] : void 0, i);
 }
-class M extends T() {
+class G extends E() {
   constructor(t) {
     super();
-    d(this, "searchTerm", "");
-    d(this, "selectedDomain", "");
+    l(this, "searchTerm", "");
+    l(this, "selectedDomain", "");
     this.deityService = t;
   }
   async _prepareContext() {
-    const t = this.deityService.list().filter((s) => (!this.searchTerm || `${s.name} ${s.title}`.toLocaleLowerCase().includes(this.searchTerm)) && (!this.selectedDomain || s.domains.includes(this.selectedDomain)));
-    return { ui: O(), deities: t, domains: [...new Set(this.deityService.list().flatMap((s) => s.domains))].sort(), searchTerm: this.searchTerm, selectedDomain: this.selectedDomain };
+    const t = this.deityService.list().filter((r) => (!this.searchTerm || `${r.name} ${r.title}`.toLocaleLowerCase().includes(this.searchTerm)) && (!this.selectedDomain || r.domains.includes(this.selectedDomain)));
+    return { ui: D(), deities: t, domains: [...new Set(this.deityService.list().flatMap((r) => r.domains))].sort(), searchTerm: this.searchTerm, selectedDomain: this.selectedDomain };
   }
   _onRender() {
     const t = this.element;
     if (!t) return;
-    const s = t.querySelector("[data-search]"), r = t.querySelector("[data-filter]");
-    s && (s.value = this.searchTerm), r && (r.value = this.selectedDomain), s == null || s.addEventListener("input", (n) => {
+    const r = t.querySelector("[data-search]"), s = t.querySelector("[data-filter]");
+    r && (r.value = this.searchTerm), s && (s.value = this.selectedDomain), r == null || r.addEventListener("input", (n) => {
       this.searchTerm = n.target.value.toLocaleLowerCase(), this.render(!0);
-    }), r == null || r.addEventListener("change", (n) => {
+    }), s == null || s.addEventListener("change", (n) => {
       this.selectedDomain = n.target.value, this.render(!0);
     });
   }
 }
-d(M, "DEFAULT_OPTIONS", { id: "darkis-godforge-codex", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: !0 } }), d(M, "PARTS", { main: { template: "modules/darkis-godforge/templates/codex.hbs" } });
-class F extends T() {
+l(G, "DEFAULT_OPTIONS", { id: "darkis-godforge-codex", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: !0 } }), l(G, "PARTS", { main: { template: "modules/darkis-godforge/templates/codex.hbs" } });
+class T extends E() {
   constructor(e, t) {
     super(), this.deityService = e, this.onSaved = t;
   }
   async _prepareContext() {
-    return { ui: O() };
+    return { ui: D() };
   }
   _onRender() {
-    var s;
+    var r;
     const e = this.element;
-    (s = e == null ? void 0 : e.querySelector("[data-action='close']")) == null || s.addEventListener("click", () => {
-      var r;
-      (r = this.close) == null || r.call(this);
+    (r = e == null ? void 0 : e.querySelector("[data-action='close']")) == null || r.addEventListener("click", () => {
+      var s;
+      (s = this.close) == null || s.call(this);
     });
     const t = e == null ? void 0 : e.querySelector("form");
-    t == null || t.addEventListener("submit", (r) => {
+    t == null || t.addEventListener("submit", (s) => {
       var a;
-      r.preventDefault();
-      const n = new FormData(t), o = this.deityService.create({ name: String(n.get("name") ?? "").trim(), title: String(n.get("title") ?? "").trim(), description: String(n.get("description") ?? "").trim(), domains: String(n.get("domains") ?? "").split(",").map((c) => c.trim()).filter(Boolean), alignment: String(n.get("alignment") ?? "").trim() || void 0, passiveBonuses: [], abilities: [], grantGroups: [], replacement: { sourceUuid: "", mode: "none", contexts: [] }, visibility: { library: !0, players: !0, characterSheet: !0 } });
+      s.preventDefault();
+      const n = new FormData(t), o = this.deityService.create({ name: String(n.get("name") ?? "").trim(), title: String(n.get("title") ?? "").trim(), description: String(n.get("description") ?? "").trim(), domains: String(n.get("domains") ?? "").split(",").map((d) => d.trim()).filter(Boolean), alignment: String(n.get("alignment") ?? "").trim() || void 0, passiveBonuses: [], abilities: [], grantGroups: [], replacement: { sourceUuid: "", mode: "none", contexts: [] }, visibility: { library: !0, players: !0, characterSheet: !0 } });
       this.onSaved(o), (a = this.close) == null || a.call(this);
     });
   }
 }
-d(F, "DEFAULT_OPTIONS", { id: "darkis-godforge-deity-editor", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.NEW_DEITY", resizable: !0 } }), d(F, "PARTS", { main: { template: "modules/darkis-godforge/templates/deity-editor.hbs" } });
-class _ extends T() {
+l(T, "DEFAULT_OPTIONS", { id: "darkis-godforge-deity-editor", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.NEW_DEITY", resizable: !0 } }), l(T, "PARTS", { main: { template: "modules/darkis-godforge/templates/deity-editor.hbs" } });
+class O extends E() {
   constructor(e) {
     super(), this.deity = e;
   }
   async _prepareContext() {
-    return { ui: O(), deity: { ...this.deity, image: ne(this.deity.image) } };
+    return { ui: D(), deity: { ...this.deity, image: X(this.deity.image) } };
   }
 }
-d(_, "DEFAULT_OPTIONS", { id: "darkis-godforge-deity-detail", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: !0 } }), d(_, "PARTS", { main: { template: "modules/darkis-godforge/templates/deity-detail.hbs" } });
-class D extends T() {
+l(O, "DEFAULT_OPTIONS", { id: "darkis-godforge-deity-detail", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: !0 } }), l(O, "PARTS", { main: { template: "modules/darkis-godforge/templates/deity-detail.hbs" } });
+class I extends E() {
   constructor(e) {
     super(), this.deityService = e;
   }
   async _prepareContext() {
-    const e = O(), t = this.deityService.list().map((s) => ({ ...s, image: ne(s.image) }));
-    return { ui: e, deities: t, stats: { deities: t.length, sanctuaries: 0, bonuses: t.reduce((s, r) => s + r.passiveBonuses.length, 0), abilities: t.reduce((s, r) => s + r.abilities.length, 0) } };
+    const e = D(), t = this.deityService.list().map((r) => ({ ...r, image: X(r.image) }));
+    return { ui: e, deities: t, stats: { deities: t.length, sanctuaries: 0, bonuses: t.reduce((r, s) => r + s.passiveBonuses.length, 0), abilities: t.reduce((r, s) => r + s.abilities.length, 0) } };
   }
   _onRender() {
     var t;
     const e = this.element;
-    e && (e.querySelectorAll("[data-action='create']").forEach((s) => s.addEventListener("click", () => new F(this.deityService, () => void this.render(!0)).render(!0))), (t = e.querySelector("[data-action='codex']")) == null || t.addEventListener("click", () => new M(this.deityService).render(!0)), e.querySelectorAll("[data-deity]").forEach((s) => s.addEventListener("click", () => {
-      const r = this.deityService.get(s.dataset.deity ?? "");
-      r && new _(r).render(!0);
+    e && (e.querySelectorAll("[data-action='create']").forEach((r) => r.addEventListener("click", () => new T(this.deityService, () => void this.render(!0)).render(!0))), (t = e.querySelector("[data-action='codex']")) == null || t.addEventListener("click", () => new G(this.deityService).render(!0)), e.querySelectorAll("[data-deity]").forEach((r) => r.addEventListener("click", () => {
+      const s = this.deityService.get(r.dataset.deity ?? "");
+      s && new O(s).render(!0);
     })));
   }
 }
-d(D, "DEFAULT_OPTIONS", { id: "darkis-godforge-dashboard", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: !0 } }), d(D, "PARTS", { main: { template: "modules/darkis-godforge/templates/dashboard.hbs" } });
-class _e {
+l(I, "DEFAULT_OPTIONS", { id: "darkis-godforge-dashboard", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: !0 } }), l(I, "PARTS", { main: { template: "modules/darkis-godforge/templates/dashboard.hbs" } });
+class Ge {
   constructor() {
-    d(this, "definitions", /* @__PURE__ */ new Map());
+    l(this, "definitions", /* @__PURE__ */ new Map());
   }
   list() {
     return [...this.definitions.values()];
@@ -554,115 +563,156 @@ class _e {
     return this.definitions.set(e.id, structuredClone(e)), e;
   }
   create(e) {
-    const t = (/* @__PURE__ */ new Date()).toISOString(), s = { ...structuredClone(e), id: crypto.randomUUID(), schemaVersion: 1, revision: 1, createdAt: t, updatedAt: t, checksum: "pending" };
-    return s.checksum = this.checksum(s), this.save(s);
+    const t = (/* @__PURE__ */ new Date()).toISOString(), r = { ...structuredClone(e), id: crypto.randomUUID(), schemaVersion: 1, revision: 1, createdAt: t, updatedAt: t, checksum: "pending" };
+    return r.checksum = this.checksum(r), this.save(r);
   }
   update(e, t) {
-    const s = this.get(e);
-    if (!s) throw new Error(`Unknown deity: ${e}`);
-    const r = { ...s, ...structuredClone(t), id: e, revision: s.revision + 1, updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
-    return r.checksum = this.checksum(r), this.save(r);
+    const r = this.get(e);
+    if (!r) throw new Error(`Unknown deity: ${e}`);
+    const s = { ...r, ...structuredClone(t), id: e, revision: r.revision + 1, updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
+    return s.checksum = this.checksum(s), this.save(s);
   }
   delete(e) {
     return this.definitions.delete(e);
   }
   checksum(e) {
     const t = JSON.stringify({ ...e, checksum: void 0 });
-    let s = 2166136261;
-    for (let r = 0; r < t.length; r += 1) s = Math.imul(s ^ t.charCodeAt(r), 16777619);
-    return (s >>> 0).toString(16);
+    let r = 2166136261;
+    for (let s = 0; s < t.length; s += 1) r = Math.imul(r ^ t.charCodeAt(s), 16777619);
+    return (r >>> 0).toString(16);
   }
 }
-const C = "darkis-godforge";
-class Ue {
+const k = "darkis-godforge";
+class Te {
   constructor(e) {
     this.collection = e;
   }
   load() {
     return this.collection.contents.flatMap((e) => {
-      var s;
-      const t = (s = e.flags) == null ? void 0 : s[C];
-      return t && typeof t == "object" && "deity" in t && j(t.deity) ? [t.deity] : [];
+      var r;
+      const t = (r = e.flags) == null ? void 0 : r[k];
+      return t && typeof t == "object" && "deity" in t && _(t.deity) ? [t.deity] : [];
     });
   }
   async save(e) {
     const t = this.collection.contents.find((n) => {
       var a;
-      const o = (a = n.flags) == null ? void 0 : a[C];
-      return o && typeof o == "object" && "deity" in o && j(o.deity) && o.deity.id === e.id;
-    }), s = { [C]: { schemaVersion: e.schemaVersion, deity: e } };
-    return t ? (await t.update({ flags: s }), t.uuid) : this.collection.create ? (await this.collection.create({ name: e.name, flags: s })).uuid : null;
+      const o = (a = n.flags) == null ? void 0 : a[k];
+      return o && typeof o == "object" && "deity" in o && _(o.deity) && o.deity.id === e.id;
+    }), r = { [k]: { schemaVersion: e.schemaVersion, deity: e } };
+    return t ? (await t.update({ flags: r }), t.uuid) : this.collection.create ? (await this.collection.create({ name: e.name, flags: r })).uuid : null;
   }
 }
-function xe(i) {
+function Oe(i) {
   if (!i || typeof i != "object" || !("registerModule" in i)) return null;
   const t = i.registerModule("darkis-godforge");
   if (!t || typeof t != "object" || !("register" in t) || !("executeAsGM" in t)) return null;
-  const s = t;
-  return { register: (r, n) => s.register(r, n), executeAsGM: (r, n) => s.executeAsGM(r, n) };
+  const r = t;
+  return { register: (s, n) => r.register(s, n), executeAsGM: (s, n) => r.executeAsGM(s, n) };
 }
 const p = "darkis-godforge";
-function Le(i) {
-  return class extends D {
+function Ce(i) {
+  return class extends I {
     constructor() {
       super(i);
     }
   };
 }
-function Pe(i, e, t) {
-  const s = { name: p, title: "DARKIS_GODFORGE.UI.OPEN_DASHBOARD", icon: "fas fa-hammer", order: 0, button: !0, visible: t, onChange: (o, a) => e() };
-  if (Array.isArray(i)) {
-    const o = i.find((a) => typeof a == "object" && a !== null && a.name === "token") ?? i.find((a) => typeof a == "object" && a !== null && Array.isArray(a.tools));
-    if (!o || !Array.isArray(o.tools)) return;
-    s.order = o.tools.length, o.tools.push({ ...s, onClick: e });
-    return;
-  }
-  if (!i || typeof i != "object") return;
-  const r = i, n = r.tokens ?? Object.values(r).find((o) => (o == null ? void 0 : o.name) === "tokens" || (o == null ? void 0 : o.name) === "token");
-  !(n != null && n.tools) || Array.isArray(n.tools) || (s.order = Object.keys(n.tools).length, n.tools[p] = s);
-}
-function je(i, e, t, s) {
-  const r = J();
-  r && (V(r, i, t), r.Hooks.once("init", () => {
-    var a, c, h, l, g, v, w, I, b, u;
-    const n = ((h = (c = (a = r.game) == null ? void 0 : a.modules) == null ? void 0 : c.get(p)) == null ? void 0 : h.languages) ?? [{ lang: "de", name: "Deutsch" }, { lang: "en", name: "English" }], o = Object.fromEntries([["auto", "DARKIS_GODFORGE.SETTINGS.AUTO"], ...n.map((f) => [f.lang, f.name])]);
-    try {
-      (v = (g = (l = r.game) == null ? void 0 : l.settings) == null ? void 0 : g.registerMenu) == null || v.call(g, p, "dashboard", { name: "DARKIS_GODFORGE.SETTINGS.MENU_NAME", label: "DARKIS_GODFORGE.SETTINGS.MENU_LABEL", hint: "DARKIS_GODFORGE.SETTINGS.MENU_HINT", icon: "fas fa-hammer", type: Le(e), restricted: !0 });
-    } catch (f) {
-      console.error("Darkis GodForge | Could not register dashboard settings menu.", f);
+function Fe(i, e, t) {
+  if (!i || typeof i != "object" || Array.isArray(i)) return;
+  const r = i, s = Math.max(-1, ...Object.values(r).map((n) => n.order ?? -1)) + 1;
+  r[p] = {
+    name: p,
+    title: "DARKIS_GODFORGE.UI.TITLE",
+    icon: "fas fa-hammer",
+    order: s,
+    visible: t,
+    tools: {
+      dashboard: { name: "dashboard", title: "DARKIS_GODFORGE.UI.OPEN_DASHBOARD", icon: "fas fa-hammer", order: 0, button: !0, visible: t, onChange: (n, o) => e() }
     }
-    (I = (w = r.game) == null ? void 0 : w.settings) == null || I.register(p, "language", { name: "DARKIS_GODFORGE.SETTINGS.LANGUAGE", hint: "DARKIS_GODFORGE.SETTINGS.LANGUAGE_HINT", scope: "client", config: !0, type: String, default: "auto", choices: o, onChange: (f) => {
-      if (typeof f != "string" || f === "auto") return;
-      const m = n.find((A) => A.lang === f);
-      m != null && m.path && B(f, `modules/${p}/${m.path}`);
-    } }), (u = (b = r.game) == null ? void 0 : b.keybindings) == null || u.register(p, "open-dashboard", { name: "DARKIS_GODFORGE.UI.OPEN_DASHBOARD", editable: [], onDown: () => {
-      var f, m;
-      return ((m = (f = r.game) == null ? void 0 : f.user) == null ? void 0 : m.isGM) !== !0 ? !1 : (t(), !0);
-    } });
-  }), r.Hooks.on("getSceneControlButtons", (...n) => {
+  };
+}
+function Re(i, e, t, r) {
+  const s = C();
+  s && (s.Hooks.once("init", () => {
+    var d, u;
+    const n = L("init");
+    if (!n) return;
+    P(n, i, t);
+    const o = ((u = (d = n.modules) == null ? void 0 : d.get(p)) == null ? void 0 : u.languages) ?? [{ lang: "de", name: "Deutsch" }, { lang: "en", name: "English" }], a = Object.fromEntries([["auto", "DARKIS_GODFORGE.SETTINGS.AUTO"], ...o.map((c) => [c.lang, c.name])]);
+    if (!n.settings) console.error("Darkis GodForge | game.settings is unavailable during init.");
+    else {
+      if (!n.settings.registerMenu) console.error("Darkis GodForge | game.settings.registerMenu is unavailable during init.");
+      else try {
+        n.settings.registerMenu(p, "dashboard", { name: "DARKIS_GODFORGE.SETTINGS.MENU_NAME", label: "DARKIS_GODFORGE.SETTINGS.MENU_LABEL", hint: "DARKIS_GODFORGE.SETTINGS.MENU_HINT", icon: "fas fa-hammer", type: Ce(e), restricted: !0 });
+      } catch (c) {
+        console.error("Darkis GodForge | Could not register dashboard settings menu.", c);
+      }
+      try {
+        n.settings.register(p, "language", { name: "DARKIS_GODFORGE.SETTINGS.LANGUAGE", hint: "DARKIS_GODFORGE.SETTINGS.LANGUAGE_HINT", scope: "client", config: !0, type: String, default: "auto", choices: a, onChange: (c) => {
+          if (typeof c != "string" || c === "auto") return;
+          const h = o.find((y) => y.lang === c);
+          h != null && h.path && U(c, `modules/${p}/${h.path}`);
+        } });
+      } catch (c) {
+        console.error("Darkis GodForge | Could not register language setting.", c);
+      }
+    }
+    if (!n.keybindings) console.error("Darkis GodForge | game.keybindings is unavailable during init.");
+    else try {
+      n.keybindings.register(p, "open-dashboard", { name: "DARKIS_GODFORGE.UI.OPEN_DASHBOARD", editable: [], onDown: () => {
+        var c, h;
+        return ((h = (c = m()) == null ? void 0 : c.user) == null ? void 0 : h.isGM) !== !0 ? !1 : (t(), !0);
+      } });
+    } catch (c) {
+      console.error("Darkis GodForge | Could not register dashboard keybinding.", c);
+    }
+  }), s.Hooks.on("getSceneControlButtons", (...n) => {
     var o, a;
-    Pe(n[0], t, ((a = (o = r.game) == null ? void 0 : o.user) == null ? void 0 : a.isGM) === !0);
-  }), r.Hooks.once("ready", async () => {
-    var h, l, g, v, w, I, b, u, f, m, A;
-    const n = (g = (l = (h = r.game) == null ? void 0 : h.settings) == null ? void 0 : l.get) == null ? void 0 : g.call(l, p, "language"), o = (b = (I = (w = (v = r.game) == null ? void 0 : v.modules) == null ? void 0 : w.get(p)) == null ? void 0 : I.languages) == null ? void 0 : b.find((G) => G.lang === n);
-    typeof n == "string" && (o != null && o.path) && await B(n, `modules/${p}/${o.path}`);
-    const a = (u = r.game) == null ? void 0 : u.journal;
-    if (a) for (const G of new Ue(a).load()) e.save(G);
-    const c = xe((A = (m = (f = r.game) == null ? void 0 : f.modules) == null ? void 0 : m.get("socketlib")) == null ? void 0 : A.api);
-    c && s && (s.setTransport(c), s.register()), V(r, i, t);
+    Fe(n[0], t, ((a = (o = m()) == null ? void 0 : o.user) == null ? void 0 : a.isGM) === !0);
+  }), s.Hooks.once("ready", async () => {
+    var o, a, d, u, c, h, y;
+    const n = L("ready");
+    if (n) {
+      P(n, i, t);
+      try {
+        const g = (a = (o = n.settings) == null ? void 0 : o.get) == null ? void 0 : a.call(o, p, "language"), v = (c = (u = (d = n.modules) == null ? void 0 : d.get(p)) == null ? void 0 : u.languages) == null ? void 0 : c.find((w) => w.lang === g);
+        typeof g == "string" && (v != null && v.path) && await U(g, `modules/${p}/${v.path}`);
+      } catch (g) {
+        console.error("Darkis GodForge | Could not load the selected language.", g);
+      }
+      try {
+        if (n.journal) for (const g of new Te(n.journal).load()) e.save(g);
+      } catch (g) {
+        console.error("Darkis GodForge | Could not load deity journals.", g);
+      }
+      try {
+        const g = Oe((y = (h = n.modules) == null ? void 0 : h.get("socketlib")) == null ? void 0 : y.api);
+        g && r && (r.setTransport(g), r.register());
+      } catch (g) {
+        console.error("Darkis GodForge | Could not initialize socketlib integration.", g);
+      }
+    }
   }));
 }
-function V(i, e, t) {
-  var n, o;
-  const s = (o = (n = i.game) == null ? void 0 : n.modules) == null ? void 0 : o.get(p);
-  if (!s) return;
-  const r = e;
-  r.openDashboard = t, s.api = r;
+function L(i) {
+  const e = m();
+  return e || console.error(`Darkis GodForge | The Foundry game singleton is unavailable during ${i}.`), e ?? null;
 }
-class Be {
-  constructor(e, t, s) {
-    d(this, "activations", /* @__PURE__ */ new Map());
-    this.api = e, this.authority = t, this.transport = s;
+function P(i, e, t) {
+  var n;
+  const r = (n = i.modules) == null ? void 0 : n.get(p);
+  if (!r) {
+    console.error("Darkis GodForge | Module entry is unavailable; public API could not be exposed.");
+    return;
+  }
+  const s = e;
+  s.openDashboard = t, r.api = s;
+}
+class Me {
+  constructor(e, t, r) {
+    l(this, "activations", /* @__PURE__ */ new Map());
+    this.api = e, this.authority = t, this.transport = r;
   }
   setTransport(e) {
     this.transport = e;
@@ -694,8 +744,8 @@ class Be {
     this.activations.set(e.activationId, "validated"), this.activations.set(e.activationId, "running");
     try {
       await this.api.activateAbility(t, e.abilityId, e.options), this.activations.set(e.activationId, "completed");
-    } catch (s) {
-      throw this.activations.set(e.activationId, "aborted"), s;
+    } catch (r) {
+      throw this.activations.set(e.activationId, "aborted"), r;
     }
   }
   parseRequest(e) {
@@ -705,36 +755,37 @@ class Be {
     return { activationId: t.activationId, actorId: t.actorId, userId: t.userId, abilityId: t.abilityId, options: t.options ?? {} };
   }
 }
-const P = new _e(), ae = new pe(), oe = new Ne(P, ae);
-let $ = null;
-function W() {
-  $ ?? ($ = new D(P)), $.render(!0).catch((i) => {
-    var e, t, s;
-    console.error("Darkis GodForge | Could not open dashboard.", i), (s = (t = (e = X()) == null ? void 0 : e.notifications) == null ? void 0 : t.error) == null || s.call(t, "Darkis GodForge could not be opened. Check the browser console.");
+const N = new Ge(), Z = new oe(), Q = new ke(N, Z);
+let j = null;
+function B() {
+  j ?? (j = new I(N)), j.render(!0).catch((i) => {
+    var e, t, r;
+    console.error("Darkis GodForge | Could not open dashboard.", i), (r = (t = (e = V()) == null ? void 0 : e.notifications) == null ? void 0 : t.error) == null || r.call(t, "Darkis GodForge could not be opened. Check the browser console.");
   });
 }
-const E = J(), y = E == null ? void 0 : E.game;
-var z, K;
-const He = new Be(oe, { currentUserId: ((z = y == null ? void 0 : y.user) == null ? void 0 : z.id) ?? "unknown", isGM: ((K = y == null ? void 0 : y.user) == null ? void 0 : K.isGM) ?? !1, ownsActor: (i, e) => {
-  var s;
+const H = C(), Ne = new Me(Q, { get currentUserId() {
+  var i, e;
+  return ((e = (i = m()) == null ? void 0 : i.user) == null ? void 0 : e.id) ?? "unknown";
+}, get isGM() {
+  var i, e;
+  return ((e = (i = m()) == null ? void 0 : i.user) == null ? void 0 : e.isGM) ?? !1;
+}, ownsActor: (i, e) => {
+  var r;
   const t = i;
-  return ((s = t.testUserPermission) == null ? void 0 : s.call(t, { id: e }, "OWNER")) ?? !1;
+  return ((r = t.testUserPermission) == null ? void 0 : r.call(t, { id: e }, "OWNER")) ?? !1;
 }, resolveActor: (i) => {
-  var e;
-  return ((e = y == null ? void 0 : y.actors) == null ? void 0 : e.get(i)) ?? null;
+  var e, t;
+  return ((t = (e = m()) == null ? void 0 : e.actors) == null ? void 0 : t.get(i)) ?? null;
 } });
-var q, Y;
-if (E) {
-  const i = (Y = (q = E.game) == null ? void 0 : q.system) == null ? void 0 : Y.id;
-  i && !ae.supports(i) ? E.Hooks.once("ready", () => {
-    var e, t, s;
-    (s = (t = (e = X()) == null ? void 0 : e.notifications) == null ? void 0 : t.warn) == null || s.call(t, `Darkis GodForge does not support ${i}.`);
-  }) : je(oe, P, W, He);
-} else typeof document < "u" && W();
+H ? (Re(Q, N, B, Ne), H.Hooks.once("ready", () => {
+  var e, t, r, s, n;
+  const i = (t = (e = m()) == null ? void 0 : e.system) == null ? void 0 : t.id;
+  i && !Z.supports(i) && ((n = (s = (r = V()) == null ? void 0 : r.notifications) == null ? void 0 : s.warn) == null || n.call(s, `Darkis GodForge does not support ${i}.`));
+})) : typeof document < "u" && B();
 export {
-  D as GodForgeDashboard,
-  oe as api,
-  P as deityService,
-  ae as registry,
-  He as socketRouter
+  I as GodForgeDashboard,
+  Q as api,
+  N as deityService,
+  Z as registry,
+  Ne as socketRouter
 };
