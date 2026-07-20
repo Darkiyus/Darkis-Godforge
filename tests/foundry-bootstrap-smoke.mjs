@@ -52,6 +52,7 @@ globalThis.game = {
 
 await globalThis.Hooks.callAll("init");
 assert.equal(typeof godForgeModule.api?.openDashboard, "function", "public API must be exposed during init");
+assert.equal(typeof godForgeModule.api?.openCodex, "function", "public codex API must be exposed during init");
 assert.equal(state.menu, true, "dashboard settings menu must be registered");
 assert.equal(state.language, true, "language setting must be registered");
 assert.equal(state.keybinding, true, "dashboard keybinding must be registered");
@@ -59,6 +60,7 @@ assert.equal(state.keybinding, true, "dashboard keybinding must be registered");
 const controls = { tokens: { name: "tokens", title: "Tokens", icon: "fas fa-user", order: 0, tools: {} } };
 await globalThis.Hooks.callAll("getSceneControlButtons", controls);
 assert.equal(typeof controls["darkis-godforge"]?.tools?.dashboard?.onChange, "function", "dedicated GodForge Scene Control must be registered");
+assert.equal(typeof controls["darkis-godforge"]?.tools?.codex?.onChange, "function", "GodForge Codex Scene Control must be registered");
 
 await globalThis.Hooks.callAll("ready");
 assert.equal(typeof godForgeModule.api?.openDashboard, "function", "public API must remain exposed at ready");

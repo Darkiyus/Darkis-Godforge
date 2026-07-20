@@ -1,13 +1,16 @@
+import { CURRENT_SCHEMA_VERSION, migrateDefinition } from "./migration-service";
 import type { DeityDefinition } from "./types";
 
 export class DeityService {
   private readonly definitions = new Map<string, DeityDefinition>();
+  private persistDefinition?: (definition: DeityDefinition) => Promise<unknown>;
+  setPersistence(handler: (definition: DeityDefinition) => Promise<unknown>): void { this.persistDefinition = handler; }
   list(): DeityDefinition[] { return [...this.definitions.values()]; }
   get(id: string): DeityDefinition | null { return this.definitions.get(id) ?? null; }
-  save(definition: DeityDefinition): DeityDefinition { this.definitions.set(definition.id, structuredClone(definition)); return definition; }
+  save(definition: DeityDefinition): DeityDefinition { const normalized = migrateDefinition(definition).definition; this.definitions.set(normalized.id, structuredClone(normalized)); if (this.persistDefinition) void this.persistDefinition(structuredClone(normalized)).catch((error: unknown) => console.error("Darkis GodForge | Could not persist deity.", error)); return normalized; }
   create(input: Omit<DeityDefinition, "id" | "schemaVersion" | "revision" | "createdAt" | "updatedAt" | "checksum">): DeityDefinition {
     const now = new Date().toISOString();
-    const definition: DeityDefinition = { ...structuredClone(input), id: crypto.randomUUID(), schemaVersion: 1, revision: 1, createdAt: now, updatedAt: now, checksum: "pending" };
+    const definition: DeityDefinition = { ...structuredClone(input), id: crypto.randomUUID(), schemaVersion: CURRENT_SCHEMA_VERSION, revision: 1, createdAt: now, updatedAt: now, checksum: "pending" };
     definition.checksum = this.checksum(definition);
     return this.save(definition);
   }

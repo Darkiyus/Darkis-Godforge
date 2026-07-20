@@ -1,23 +1,21 @@
 <div align="center">
 
-<img src="logo.png" alt="Darkis GodForge Logo" width="300">
+<img src="assets/logo.png" alt="Darkis GodForge" width="340">
 
 # Darkis GodForge
 
 ### Erschaffe Götter. Forme Glauben. Verändere Welten.
 
-Ein Foundry-VTT-Modul für frei konfigurierbare Homebrew-Gottheiten in<br>
-**Pathfinder 2e**, **Starfinder 1e** und **Starfinder 2e**.
+Homebrew-Gottheiten für **Pathfinder 2e**, **Starfinder 2e** und **Starfinder 1e** in Foundry VTT.
 
 [![Release](https://img.shields.io/github/v/release/Darkiyus/Darkis-Godforge?display_name=tag&style=for-the-badge&color=8b5cf6)](https://github.com/Darkiyus/Darkis-Godforge/releases/latest)
 [![Status](https://img.shields.io/badge/Status-Alpha-f59e0b?style=for-the-badge)](#entwicklungsstatus--development-status)
-[![Foundry VTT](https://img.shields.io/badge/Foundry_VTT-v13–v14-ff6400?style=for-the-badge)](https://foundryvtt.com/)
-[![Pathfinder 2e](https://img.shields.io/badge/Pathfinder-2e-b91c1c?style=for-the-badge)](https://github.com/foundryvtt/pf2e)
-[![Starfinder](https://img.shields.io/badge/Starfinder-1e_%26_2e-2563eb?style=for-the-badge)](https://foundryvtt.com/packages/)
-[![Languages](https://img.shields.io/badge/Sprachen-DE_%7C_EN-14b8a6?style=for-the-badge)](#sprachen--languages)
-[![Downloads](https://img.shields.io/github/downloads/Darkiyus/Darkis-Godforge/total?style=for-the-badge&color=0f766e)](https://github.com/Darkiyus/Darkis-Godforge/releases)
+[![Foundry](https://img.shields.io/badge/Foundry_VTT-v13_%7C_v14-ff6400?style=for-the-badge)](https://foundryvtt.com/)
+[![Systems](https://img.shields.io/badge/Systeme-Pathfinder_%7C_Starfinder-7c3aed?style=for-the-badge)](#unterstützte-systeme)
+[![Languages](https://img.shields.io/badge/Sprachen-DE_%7C_EN-0f766e?style=for-the-badge)](#sprachen--languages)
+[![Downloads](https://img.shields.io/github/downloads/Darkiyus/Darkis-Godforge/total?style=for-the-badge&color=2563eb)](https://github.com/Darkiyus/Darkis-Godforge/releases)
 
-**[Deutsch](#deutsch) · [English](#english) · [Installation](#installation) · [Manifest-URL](https://github.com/Darkiyus/Darkis-Godforge/releases/latest/download/module.json)**
+**[Deutsch](#deutsch) · [English](#english) · [Manifest installieren](https://github.com/Darkiyus/Darkis-Godforge/releases/latest/download/module.json)**
 
 </div>
 
@@ -26,171 +24,171 @@ Ein Foundry-VTT-Modul für frei konfigurierbare Homebrew-Gottheiten in<br>
 ## Deutsch
 
 > [!WARNING]
-> **Alpha-Version:** Darkis GodForge befindet sich in aktiver Entwicklung. Funktionen, Datenstrukturen und Bedienoberflächen können sich noch ändern. Bitte sichere deine Welt vor Aktualisierungen.
+> **Alpha:** Darkis GodForge wird aktiv entwickelt. Sichere deine Welt vor Aktualisierungen; Datenmodell und Bedienung können sich bis zur stabilen Version noch ändern.
 
-Darkis GodForge gibt Spielleitungen die Werkzeuge, eigene Gottheiten direkt in Foundry VTT zu verwalten. Erstelle neue Glaubensmächte, ordne Domänen und Fähigkeiten zu, verwalte Segnungen und ersetze auf Wunsch offizielle Gottheiten durch deine eigenen Schöpfungen.
+Darkis GodForge ist eine vollständige Werkbank für eigene Gottheiten. Die Spielleitung baut Identität, Regeln, Segnungen, Wunder und Systemwerte in Foundry. Spieler erhalten einen gesonderten Götterkodex und einen kompakten Charakter-Hub – ohne Zugriff auf Entwürfe oder interne SL-Daten.
 
-### ✨ Funktionen
+### Funktionen
 
-- **GodForge-Dashboard** – alle eigenen Gottheiten in einer übersichtlichen Kartenansicht.
-- **Gottheiten-Editor** – Name, Titel, Beschreibung, Domänen und Gesinnung direkt in Foundry anlegen.
-- **Interaktiver Kodex** – Gottheiten durchsuchen und nach Domänen filtern.
-- **Detailansichten** – Beschreibung, Domänen, passive Boni und Fähigkeiten kompakt darstellen.
-- **Offizielle Gottheiten einbinden** – vorhandene Gottheiten aus System-Kompendien automatisch erkennen.
-- **Ersetzen und Ausblenden** – offizielle Einträge kontextabhängig ersetzen oder ausblenden.
-- **Segnungen und Fähigkeiten** – passive Boni, aktive Fähigkeiten sowie verschachtelte Wahlgruppen modellieren.
-- **Automatisierbare Effekte** – Schaden, Heilung, Modifikatoren, Zustände, Bedingungen und verzweigte Effekte.
-- **Sichere Würfelformeln** – gemischte Formeln wie `3d8 + @actor.level` ohne unsichere Code-Ausführung.
-- **Nutzungen und Abklingzeiten** – Aktionen, Auslöser, Dauer, Cooldowns und unterschiedliche Reset-Zeitpunkte.
-- **Charakteranbindung** – Gottheiten, gewährte Fähigkeiten und verbleibende Nutzungen an Akteuren speichern.
-- **Pathfinder-Klassenintegration** – Unterstützung für gottheitsabhängige Werte von Klerikern und Champions.
-- **Mehrsystem-Architektur** – getrennte Adapter für Pathfinder 2e, Starfinder 1e und Starfinder 2e.
-- **Persistente Speicherung** – eigene Gottheiten werden als Foundry-Journaldaten im jeweiligen Spiel gespeichert.
-- **Import und Export** – versionierte Gottheitsdefinitionen für Backups und Austausch.
-- **Deutsch und Englisch** – Oberfläche und Modultexte sind vollständig zweisprachig angelegt.
+- **Atmosphärisches Verwaltungs-Dashboard** mit Banner, Suche, Navigation, echten Kennzahlen, Systemstatus und zuletzt bearbeiteten Gottheiten.
+- **Gottheiten-Editor** für Porträtpfade, Pantheons, Domänen, alternative Domänen, göttliche Attribute, Font, Fertigkeit, Waffe, Heiligung, Edikte, Anathema und gewährte Zauber.
+- **Veröffentlichungsworkflow** mit Entwurf, Test, Veröffentlicht, Deaktiviert und Archiviert.
+- **Sichtbarkeit pro Datenbereich**: öffentlich, vor Auswahl, nur Anhänger, nur Besitzer, vertrauenswürdig, nur SL oder bis zur Auswahl verborgen.
+- **Spielervorschau** direkt aus dem Editor; nicht berechtigte Felder werden vor dem Rendern aus den Daten entfernt.
+- **Passive Boni** mit systemabhängigen Selektoren, Bonusart, Ziel, Bedingung, Sichtbarkeit, Sortieren und Duplizieren.
+- **Göttliche Wunder** mit getrennten Aktionskosten, Nutzungen, Reset, Abklingzeit und Dauer sowie Effektvorlagen für Erzählung, Heilung, Schaden und Modifikatoren.
+- **Verschachtelte UND/ODER-Gewährungen** einschließlich Auswahlanzahl und Überschreibungen für Name, Beschreibung und Wert.
+- **Götterkodex für Spieler** mit Suche und Domänenfilter; sichtbar sind ausschließlich veröffentlichte und freigegebene Inhalte.
+- **Charakter-Hub und Charakterbogen-Schaltfläche** für die zugewiesene Gottheit, aktive Gewährungen, Wunder und verbleibende Nutzungen.
+- **Native PF2e-/SF2e-Kopplung**: Beim Zuweisen wird ein echtes Gottheiten-Item mit Domänen, Zaubern, Font, Fertigkeit, Waffe, Attributen und Heiligung am Actor synchronisiert.
+- **SFRPG-Unterstützung** über das GodForge-eigene Daten- und Charaktermodell, da Starfinder 1e keinen nativen Gottheiten-Itemtyp besitzt.
+- **Ersetzungsmanager** für offizielle Systemgottheiten mit kontextabhängigem Ersetzen, Ausblenden und selektiver Vererbung.
+- **Zufallstabellen und Glücksräder** mit gewichteten Ergebnissen, Sichtbarkeit, Testziehung und persistenter Weltspeicherung.
+- **Import/Export mit Vorschau** für Gottheiten, Sichtbarkeit, Regeln, Ersetzungen und Zufallsinhalte; alte Definitionen werden migriert.
+- **Harte Rechteprüfung** für Dashboard, Editoren und schreibende APIs. Spieleraktionen werden über eine authentifizierte Socketlib-Absender-ID von der Spielleitung ausgeführt.
+- **Deutsch und Englisch** mit automatisch geprüfter Schlüsselgleichheit.
 
-### 🧩 Unterstützte Systeme
+### Unterstützte Systeme
 
-| System | Unterstützung |
-|---|:---:|
-| Pathfinder 2e | ✅ |
-| Starfinder 1e (`sfrpg`) | ✅ |
-| Starfinder 2e (`sf2e`) | ✅ |
+| System | GodForge | Native Gottheiten-Synchronisierung |
+|---|:---:|:---:|
+| Pathfinder Second Edition (`pf2e`) | ✅ | ✅ |
+| Starfinder Second Edition (`sf2e`) | ✅ | ✅ |
+| Starfinder First Edition (`sfrpg`) | ✅ | Nicht im System vorhanden |
 
-Darkis GodForge ist für **Foundry VTT v14** geprüft und ab **Foundry VTT v13** freigegeben.
+Das Modul ist für **Foundry VTT 14** geprüft und unterstützt **Foundry VTT 13** innerhalb der Kompatibilität des jeweils aktiven Spielsystems.
 
 ### Installation
 
-#### Empfohlen: Installation über die Manifest-URL
-
-1. Öffne Foundry VTT und wechsle zu **Add-on-Module**.
+1. Öffne in Foundry VTT den Bereich **Add-on-Module**.
 2. Klicke auf **Modul installieren**.
-3. Füge diese URL in das Feld **Manifest-URL** ein:
+3. Füge folgende Adresse in **Manifest-URL** ein:
 
 ```text
 https://github.com/Darkiyus/Darkis-Godforge/releases/latest/download/module.json
 ```
 
 4. Klicke auf **Installieren**.
-5. Öffne deine Pathfinder- oder Starfinder-Welt unter **Welten verwalten**.
-6. Aktiviere unter **Module verwalten** das Modul **Darkis GodForge**. `socketlib` kann optional für die GM-Autorisierung installiert werden.
-
-Foundry lädt über diese URL automatisch die passende aktuelle Veröffentlichung. Zukünftige Aktualisierungen können anschließend direkt über die Foundry-Modulverwaltung installiert werden.
+5. Öffne deine Pathfinder- oder Starfinder-Welt und aktiviere **Darkis GodForge** unter **Module verwalten**.
+6. Installiere zusätzlich **socketlib**, wenn Spieler selbst eine Gottheit wählen oder Wunder aus ihrem Hub aktivieren sollen. Der reine Kodex funktioniert auch ohne socketlib.
 
 ### GodForge öffnen
 
-Nach der Aktivierung können Spielleitungen GodForge auf zwei Wegen öffnen:
+Für die Spielleitung:
 
-1. **Spieleinstellungen → Darkis GodForge → GodForge öffnen**
-2. Über die eigene **GodForge-Hammergruppe** in der Szenensteuerung
+- **Spieleinstellungen → Darkis GodForge → GodForge öffnen**
+- oder das **Hammer-Symbol** in der Szenensteuerung
 
-Alternativ steht für Integrationen die Modul-API unter `game.modules.get("darkis-godforge").api` zur Verfügung.
+Für Spieler und Spielleitung:
 
-#### Manuelle Installation
+- **Stern-Symbol**: persönlicher GodForge-Hub des ausgewählten beziehungsweise zugewiesenen Charakters
+- **Buch-Symbol**: Götterkodex
+- Tastatur: `G` für den Hub, `Umschalt+G` für den Kodex
 
-1. Lade die aktuelle ZIP-Datei unter [Releases](https://github.com/Darkiyus/Darkis-Godforge/releases/latest) herunter.
-2. Entpacke sie als Ordner `darkis-godforge` in dein Foundry-Verzeichnis `Data/modules/`.
-3. Starte Foundry neu und aktiviere das Modul in deiner Welt.
+Integrationen erreichen die öffentliche API über:
 
-### Voraussetzungen
+```js
+game.modules.get("darkis-godforge").api
+```
 
-- Foundry VTT 13 oder 14
-- Pathfinder 2e, Starfinder 1e oder Starfinder 2e
-- [socketlib](https://foundryvtt.com/packages/socketlib) – optional empfohlen für GM-Autorisierung
-- [libWrapper](https://foundryvtt.com/packages/lib-wrapper) – empfohlen
+SL-Funktionen bleiben auch über die Konsole geschützt.
+
+### Manuelle Installation
+
+Lade die ZIP-Datei der [aktuellen Veröffentlichung](https://github.com/Darkiyus/Darkis-Godforge/releases/latest) herunter und entpacke sie als `darkis-godforge` in `Data/modules/`. Starte Foundry anschließend neu und aktiviere das Modul in der Welt.
 
 ---
 
 ## English
 
 > [!WARNING]
-> **Alpha release:** Darkis GodForge is under active development. Features, data structures, and interfaces may still change. Back up your world before updating.
+> **Alpha:** Darkis GodForge is under active development. Back up your world before updating; the data model and interface may still change before the stable release.
 
-Darkis GodForge gives Game Masters the tools to manage custom deities directly inside Foundry VTT. Create new divine powers, define domains and abilities, manage blessings, and replace official deities with creations tailored to your world.
+Darkis GodForge is a complete workshop for custom deities. Game Masters define identity, rules, blessings, wonders, and system values directly in Foundry. Players receive a separate Divine Codex and compact character hub without access to drafts or private GM data.
 
-### ✨ Features
+### Features
 
-- **GodForge dashboard** – browse all homebrew deities in a clear card-based overview.
-- **Deity editor** – create names, titles, descriptions, domains, and alignments inside Foundry.
-- **Interactive codex** – search deities and filter the catalog by domain.
-- **Detailed profiles** – display descriptions, domains, passive bonuses, and abilities.
-- **Official deity catalog** – automatically discover deity entries from system compendiums.
-- **Replace or hide entries** – replace official deities or hide them in selected contexts.
-- **Blessings and abilities** – model passive bonuses, active abilities, and nested choice groups.
-- **Automatable effects** – damage, healing, modifiers, conditions, conditional branches, and messages.
-- **Safe dice formulas** – resolve formulas such as `3d8 + @actor.level` without unsafe code execution.
-- **Usage and timing rules** – actions, triggers, durations, cooldowns, and multiple reset events.
-- **Actor integration** – store assigned deities, granted abilities, and remaining uses on actors.
-- **Pathfinder class coupling** – support deity-dependent Cleric and Champion values.
-- **Multi-system architecture** – isolated adapters for Pathfinder 2e, Starfinder 1e, and Starfinder 2e.
-- **Persistent storage** – save custom deity definitions as Foundry journal data in each world.
-- **Import and export** – exchange and back up versioned deity definitions.
-- **German and English** – localized interface and module text for both languages.
+- **Atmospheric management dashboard** with banner, search, navigation, real statistics, system health, and recently edited deities.
+- **Deity editor** for portraits, pantheons, domains, alternate domains, divine attributes, font, skill, weapon, sanctification, edicts, anathema, and granted spells.
+- **Publication workflow** covering draft, test, published, disabled, and archived states.
+- **Field-level visibility** for public, selection, followers, owners, trusted users, GM-only, and hidden-until-selected content.
+- **Player preview** from the editor; unauthorized fields are removed from data before templates render.
+- **Passive bonuses** with system selectors, modifier type, target, condition, visibility, ordering, and duplication.
+- **Divine wonders** with separate action cost, uses, reset, cooldown, and duration plus narrative, healing, damage, and modifier templates.
+- **Nested AND/OR grants** with pick counts and inherited name, description, or value overrides.
+- **Player Divine Codex** with search and domain filters; only published and authorized content is included.
+- **Character hub and sheet control** showing the assigned deity, grants, wonders, and remaining uses.
+- **Native PF2e/SF2e coupling** that synchronizes an actual deity item containing domains, spells, font, skill, weapon, attributes, and sanctification when assigned.
+- **SFRPG support** through GodForge's own deity and character model because Starfinder 1e has no native deity item type.
+- **Replacement manager** for context-aware hiding or replacing official system deities with selective inheritance.
+- **Random tables and fortune wheels** with weighted results, visibility, test draws, and persistent world storage.
+- **Validated import/export preview** for deities, visibility, rules, replacements, and random content, including legacy migration.
+- **Enforced permissions** on dashboards, editors, and write APIs. Player requests use Socketlib's authenticated sender identity for GM-authoritative execution.
+- **German and English localization** with automatically tested key parity.
 
-### 🧩 Supported systems
+### Supported systems
 
-| System | Support |
-|---|:---:|
-| Pathfinder 2e | ✅ |
-| Starfinder 1e (`sfrpg`) | ✅ |
-| Starfinder 2e (`sf2e`) | ✅ |
+| System | GodForge | Native deity synchronization |
+|---|:---:|:---:|
+| Pathfinder Second Edition (`pf2e`) | ✅ | ✅ |
+| Starfinder Second Edition (`sf2e`) | ✅ | ✅ |
+| Starfinder First Edition (`sfrpg`) | ✅ | Not provided by the system |
 
-Darkis GodForge is verified for **Foundry VTT v14** and supports **Foundry VTT v13** or newer within the declared compatibility range.
+The module is verified for **Foundry VTT 14** and supports **Foundry VTT 13** within the active game system's own compatibility range.
 
 ### Installation
 
-#### Recommended: install with the manifest URL
-
-1. Open Foundry VTT and select **Add-on Modules**.
+1. Open **Add-on Modules** in Foundry VTT.
 2. Click **Install Module**.
-3. Paste this address into the **Manifest URL** field:
+3. Paste this address into **Manifest URL**:
 
 ```text
 https://github.com/Darkiyus/Darkis-Godforge/releases/latest/download/module.json
 ```
 
 4. Click **Install**.
-5. Open your Pathfinder or Starfinder world from **Game Worlds**.
-6. Enable **Darkis GodForge** under **Manage Modules**. `socketlib` is optional and can be installed for GM-authorized actions.
-
-Foundry uses this URL to download the current release automatically. Future updates can then be installed directly through Foundry's module manager.
+5. Open your Pathfinder or Starfinder world and enable **Darkis GodForge** under **Manage Modules**.
+6. Install **socketlib** as well if players should select deities or activate wonders from their hub. The read-only Codex works without it.
 
 ### Opening GodForge
 
-After enabling the module, Game Masters can open GodForge in two ways:
+For Game Masters:
 
-1. **Game Settings → Darkis GodForge → Open GodForge**
-2. Select the dedicated **GodForge hammer group** in the Scene Controls
+- **Game Settings → Darkis GodForge → Open GodForge**
+- or the **hammer control** in Scene Controls
 
-Integrations can also access the module API through `game.modules.get("darkis-godforge").api`.
+For players and Game Masters:
 
-#### Manual installation
+- **Star control**: personal GodForge Hub for the selected or assigned character
+- **Book control**: Divine Codex
+- Keyboard: `G` opens the Hub, `Shift+G` opens the Codex
 
-1. Download the latest ZIP archive from [Releases](https://github.com/Darkiyus/Darkis-Godforge/releases/latest).
-2. Extract it as `darkis-godforge` inside your Foundry `Data/modules/` directory.
-3. Restart Foundry and enable the module in your world.
+Integrations can access the public API at:
 
-### Requirements
+```js
+game.modules.get("darkis-godforge").api
+```
 
-- Foundry VTT 13 or 14
-- Pathfinder 2e, Starfinder 1e, or Starfinder 2e
-- [socketlib](https://foundryvtt.com/packages/socketlib) – optional and recommended for GM-authorized actions
-- [libWrapper](https://foundryvtt.com/packages/lib-wrapper) – recommended
+GM-only operations remain protected when called from the browser console.
+
+### Manual installation
+
+Download the ZIP from the [latest release](https://github.com/Darkiyus/Darkis-Godforge/releases/latest), extract it as `darkis-godforge` inside `Data/modules/`, restart Foundry, and enable the module in your world.
 
 ---
 
 ## Entwicklungsstatus / Development status
 
-**Alpha:** Das Modul wird aktiv entwickelt und kann noch inkompatible Änderungen erhalten.<br>
+**Alpha:** Das Modul wird aktiv entwickelt und kann noch inkompatible Änderungen erhalten.  
 **Alpha:** The module is under active development and may still receive breaking changes.
 
 ## Sprachen / Languages
 
-Die verwendete Sprache richtet sich automatisch nach der in Foundry gewählten Sprache.<br>
-The module automatically follows the language selected in Foundry.
-
 - 🇩🇪 Deutsch
 - 🇬🇧 English
+
+Die Sprache folgt Foundry automatisch oder kann in den Moduleinstellungen gewählt werden.  
+The interface follows Foundry automatically or can be selected in module settings.
 
 ## Entwicklung / Development
 
@@ -199,9 +197,8 @@ npm install
 npm run check
 ```
 
-`npm run check` führt Typprüfung, Linting, Tests und den Produktions-Build aus. Das erzeugte `scripts/main.js` wird absichtlich versioniert, da Foundry das veröffentlichte Modulpaket direkt lädt.
-
-`npm run check` runs type checking, linting, tests, and the production build. The generated `scripts/main.js` is intentionally versioned because Foundry loads the published module package directly.
+`npm run check` führt Typprüfung, Linting, Tests, Produktions-Build und Foundry-Bootstrap-Smoke-Test aus.  
+`npm run check` runs type checking, linting, tests, the production build, and the Foundry bootstrap smoke test.
 
 ---
 

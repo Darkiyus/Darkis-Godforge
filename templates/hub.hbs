@@ -1,0 +1,10 @@
+<section class="dg-hub">
+  {{#if deity}}
+    <header><img src="{{deity.image}}" alt=""><div><p class="eyebrow">{{ui.HUB}}</p><h2>{{deity.name}}</h2><p>{{deity.title}}</p></div></header>
+    {{#if grants}}<section><h3>{{ui.ACTIVE_GRANTS}}</h3><div class="dg-tags">{{#each grants}}<i>{{this}}</i>{{/each}}</div></section>{{/if}}
+    <section><div class="dg-section-title"><h3>{{ui.DIVINE_WONDERS}}</h3><span>{{abilities.length}} {{ui.ENTRIES}}</span></div>{{#if abilities.length}}<div class="dg-hub-abilities">{{#each abilities}}<article><div><strong>{{name}}</strong><p>{{description}}</p></div>{{#if uses}}<span class="dg-usage">{{remaining}} / {{uses.max}}</span>{{/if}}<button type="button" class="dg-primary" data-ability="{{id}}" {{#unless available}}disabled{{/unless}}>{{../ui.ACTIVATE}}</button></article>{{/each}}</div>{{else}}<p class="muted">{{ui.NO_WONDERS}}</p>{{/if}}</section>
+    <footer><button type="button" class="dg-secondary" data-action="codex"><i class="fas fa-book-open" aria-hidden="true"></i> {{ui.CODEX}}</button></footer>
+  {{else}}
+    <div class="dg-empty-state"><i class="fas fa-sparkles" aria-hidden="true"></i><h3>{{ui.NO_ASSIGNED_DEITY}}</h3><p>{{ui.NO_ASSIGNED_DEITY_HINT}}</p><button type="button" class="dg-secondary" data-action="codex">{{ui.CODEX}}</button></div>
+  {{/if}}
+</section>

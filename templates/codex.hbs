@@ -1,1 +1,29 @@
-<section class="dg-codex"><div class="dg-codex-title"><p class="eyebrow">{{ui.TITLE}}</p><h2>{{ui.CODEX}}</h2></div><div class="dg-codex-toolbar"><input data-search placeholder="{{ui.SEARCH}}"><select data-filter><option value="">{{ui.ALL_DOMAINS}}</option>{{#each domains}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div><div class="dg-codex-list">{{#each deities}}<article class="dg-codex-entry"><div><h3>{{name}}</h3><p>{{title}}</p></div><span>{{domains}}</span></article>{{/each}}</div></section>
+<section class="dg-codex">
+  <header class="dg-codex-title">
+    <img src="modules/darkis-godforge/assets/logo.png" alt="{{ui.TITLE}}">
+    <div><p class="eyebrow">{{ui.TITLE}}</p><h2>{{ui.CODEX}}</h2>{{#if isPreview}}<span class="dg-preview-badge"><i class="fas fa-eye" aria-hidden="true"></i> {{ui.PLAYER_PREVIEW}}</span>{{/if}}</div>
+  </header>
+  <div class="dg-codex-toolbar"><div class="dg-search"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input data-search placeholder="{{ui.SEARCH}}" aria-label="{{ui.SEARCH}}"></div><select data-filter aria-label="{{ui.DOMAINS}}"><option value="">{{ui.ALL_DOMAINS}}</option>{{#each domains}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div>
+  {{#if deities.length}}
+    <div class="dg-codex-list">
+      {{#each deities}}
+        <article class="dg-codex-entry">
+          {{#if image}}<img src="{{image}}" alt="">{{/if}}
+          <div class="dg-codex-copy">
+            <p class="eyebrow">{{#if pantheonIds}}{{pantheonIds}}{{else}}{{../ui.CODEX}}{{/if}}</p>
+            <h3>{{name}}</h3><h4>{{title}}</h4>
+            {{#if quote}}<blockquote>{{quote}}</blockquote>{{/if}}
+            {{#if description}}<p>{{description}}</p>{{/if}}
+            {{#if domains}}<div class="dg-tags">{{#each domains}}<i>{{this}}</i>{{/each}}</div>{{/if}}
+            {{#if favoredWeapon}}<dl><dt>{{../ui.FAVORED_WEAPON}}</dt><dd>{{favoredWeapon}}</dd></dl>{{/if}}
+            {{#if passiveBonuses}}<section><h5>{{../ui.PASSIVE_BONUSES}}</h5>{{#each passiveBonuses}}<div class="dg-codex-rule"><strong>{{name}}</strong>{{#if value}}<span>{{value}}</span>{{/if}}</div>{{/each}}</section>{{/if}}
+            {{#if abilities}}<section><h5>{{../ui.DIVINE_WONDERS}}</h5>{{#each abilities}}<div class="dg-codex-rule"><strong>{{name}}</strong><p>{{description}}</p></div>{{/each}}</section>{{/if}}
+            {{#if selected}}<span class="dg-selected-deity"><i class="fas fa-circle-check" aria-hidden="true"></i> {{../ui.YOUR_DEITY}}</span>{{else}}{{#if canSelect}}<button type="button" class="dg-primary" data-select-deity="{{id}}">{{../ui.SELECT_DEITY}}</button>{{else}}{{#if requiresChoices}}<p class="muted">{{../ui.SELECTION_REQUIRES_GM}}</p>{{/if}}{{/if}}{{/if}}
+          </div>
+        </article>
+      {{/each}}
+    </div>
+  {{else}}
+    <div class="dg-empty-state"><i class="fas fa-book" aria-hidden="true"></i><h3>{{ui.NO_RESULTS}}</h3></div>
+  {{/if}}
+</section>

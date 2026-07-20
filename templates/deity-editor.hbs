@@ -1,1 +1,137 @@
-<section class="dg-editor"><div class="dg-editor-header"><p class="eyebrow">{{ui.TITLE}}</p><h2>{{ui.NEW_DEITY}}</h2><p class="muted">{{ui.NEW_DEITY_HINT}}</p></div><form><label>{{ui.NAME}}<input name="name" required maxlength="80" placeholder="{{ui.NEW_DEITY_PLACEHOLDER}}"></label><label>{{ui.TITLE_FIELD}}<input name="title" required maxlength="120" placeholder="{{ui.TITLE_PLACEHOLDER}}"></label><label>{{ui.DESCRIPTION}}<textarea name="description" required maxlength="1000" rows="4"></textarea></label><label>{{ui.DOMAINS}}<input name="domains" required placeholder="{{ui.DOMAINS_PLACEHOLDER}}"></label><label>{{ui.ALIGNMENT}}<input name="alignment"></label><div class="dg-editor-actions"><button type="button" data-action="close">{{ui.CANCEL}}</button><button class="dg-primary" type="submit">{{ui.SAVE}}</button></div></form></section>
+<section class="dg-editor">
+  <header class="dg-editor-header">
+    <div>
+      <p class="eyebrow">{{ui.TITLE}}</p>
+      <h2>{{ui.NEW_DEITY}}</h2>
+      <p class="muted">{{ui.NEW_DEITY_HINT}}</p>
+    </div>
+    <button type="button" class="dg-secondary" data-action="preview-player" title="{{ui.PLAYER_PREVIEW}}"><i class="fas fa-eye" aria-hidden="true"></i> {{ui.PLAYER_PREVIEW}}</button>
+  </header>
+
+  <form>
+    <nav class="dg-step-strip" aria-label="{{ui.EDITOR_STEPS}}">
+      <a href="#dg-basic">1 {{ui.BASIC_DATA}}</a><a href="#dg-bonuses">2 {{ui.PASSIVE_BONUSES}}</a><a href="#dg-abilities">3 {{ui.DIVINE_WONDERS}}</a><a href="#dg-grants">4 {{ui.GRANT_GROUPS}}</a><a href="#dg-visibility">5 {{ui.VISIBILITY}}</a>
+    </nav>
+
+    <section id="dg-basic" class="dg-editor-section dg-panel-ornament">
+      <div class="dg-section-title"><h3>{{ui.BASIC_DATA}}</h3><span>{{ui.REQUIRED_FIELDS}}</span></div>
+      <div class="dg-form-grid">
+        <label>{{ui.NAME}}<input name="name" required maxlength="80" placeholder="{{ui.NEW_DEITY_PLACEHOLDER}}"></label>
+        <label>{{ui.TITLE_FIELD}}<input name="title" required maxlength="120" placeholder="{{ui.TITLE_PLACEHOLDER}}"></label>
+        <label>{{ui.STATUS}}<select name="status"><option value="draft">{{ui.STATUS_DRAFT}}</option><option value="test">{{ui.STATUS_TEST}}</option><option value="published">{{ui.STATUS_PUBLISHED}}</option><option value="disabled">{{ui.STATUS_DISABLED}}</option><option value="archived">{{ui.STATUS_ARCHIVED}}</option></select></label>
+        <label>{{ui.ALIGNMENT}}<input name="alignment"></label>
+        <label class="dg-span-2">{{ui.DESCRIPTION}}<textarea name="description" required maxlength="4000" rows="6"></textarea></label>
+        <label class="dg-span-2">{{ui.QUOTE}}<input name="quote" maxlength="300"></label>
+        <label>{{ui.PORTRAIT}}<input name="image" placeholder="{{ui.FILE_PATH}}"></label>
+        <label>{{ui.SYMBOL}}<input name="symbol" placeholder="{{ui.FILE_PATH}}"></label>
+        <label>{{ui.PANTHEONS}}<input name="pantheons" placeholder="{{ui.COMMA_SEPARATED}}"></label>
+        <label>{{ui.DOMAINS}}<input name="domains" required placeholder="{{ui.DOMAINS_PLACEHOLDER}}"></label>
+        <label>{{ui.ALTERNATE_DOMAINS}}<input name="alternateDomains" placeholder="{{ui.DOMAINS_PLACEHOLDER}}"></label>
+        <label>{{ui.DIVINE_ATTRIBUTES}}<input name="divineAttributes"></label>
+        <label>{{ui.TAGS}}<input name="tags" placeholder="{{ui.COMMA_SEPARATED}}"></label>
+        <label>{{ui.FAVORED_WEAPON}}<input name="favoredWeapon"></label>
+        <label>{{ui.DIVINE_FONT}}<input name="font"></label>
+        <label>{{ui.TRAINED_SKILL}}<input name="skill" list="dg-selectors"></label>
+        <label>{{ui.SANCTIFICATION}}<input name="sanctification"></label>
+        <label>{{ui.CHAMPION_CAUSE}}<input name="cause"></label>
+        <label class="dg-span-2">{{ui.CLERIC_SPELLS}}<textarea name="spells" rows="3" placeholder="{{ui.SPELLS_HINT}}"></textarea></label>
+        <label class="dg-span-2">{{ui.EDICTS}}<input name="edicts" placeholder="{{ui.COMMA_SEPARATED}}"></label>
+        <label class="dg-span-2">{{ui.ANATHEMA}}<input name="anathema" placeholder="{{ui.COMMA_SEPARATED}}"></label>
+      </div>
+    </section>
+
+    <section id="dg-bonuses" class="dg-editor-section dg-panel-ornament">
+      <div class="dg-section-title"><div><h3>{{ui.PASSIVE_BONUSES}}</h3><p>{{ui.BONUS_EDITOR_HINT}}</p></div><button type="button" class="dg-secondary" data-action="add-bonus"><i class="fas fa-plus" aria-hidden="true"></i> {{ui.ADD_BONUS}}</button></div>
+      <div class="dg-editor-list" data-bonus-list></div>
+    </section>
+
+    <section id="dg-abilities" class="dg-editor-section dg-panel-ornament">
+      <div class="dg-section-title"><div><h3>{{ui.DIVINE_WONDERS}}</h3><p>{{ui.ABILITY_EDITOR_HINT}}</p></div><button type="button" class="dg-secondary" data-action="add-ability"><i class="fas fa-plus" aria-hidden="true"></i> {{ui.ADD_ABILITY}}</button></div>
+      <div class="dg-editor-list" data-ability-list></div>
+    </section>
+
+    <section id="dg-grants" class="dg-editor-section dg-panel-ornament">
+      <div class="dg-section-title"><div><h3>{{ui.GRANT_GROUPS}}</h3><p>{{ui.GRANT_GROUPS_HINT}}</p></div><button type="button" class="dg-secondary" data-action="add-grant-group"><i class="fas fa-plus" aria-hidden="true"></i> {{ui.ADD_GRANT_GROUP}}</button></div>
+      <div class="dg-editor-list dg-grant-list" data-grant-list></div>
+    </section>
+
+    <section id="dg-visibility" class="dg-editor-section dg-panel-ornament">
+      <div class="dg-section-title"><div><h3>{{ui.VISIBILITY}}</h3><p>{{ui.VISIBILITY_HINT}}</p></div><i class="fas fa-eye" aria-hidden="true"></i></div>
+      <label>{{ui.DEITY_VISIBILITY}}<select name="visibility.deity">{{#each visibilityOptions}}<option value="{{value}}">{{label}}</option>{{/each}}</select></label>
+      <div class="dg-visibility-grid">
+        {{#each visibilityFields}}
+          <label>{{label}}<select name="visibility.fields.{{key}}">{{#each ../visibilityOptions}}<option value="{{value}}">{{label}}</option>{{/each}}</select></label>
+        {{/each}}
+      </div>
+      <label>{{ui.GM_NOTES}}<textarea name="gmNotes" rows="4"></textarea></label>
+    </section>
+
+    <details class="dg-editor-section">
+      <summary>{{ui.REPLACEMENT}}</summary>
+      <div class="dg-form-grid">
+        <label>{{ui.REPLACEMENT_MODE}}<select name="replacement.mode"><option value="none">{{ui.REPLACE_NONE}}</option><option value="hide">{{ui.REPLACE_HIDE}}</option><option value="replace">{{ui.REPLACE_SOURCE}}</option></select></label>
+        <label>{{ui.SOURCE_UUID}}<input name="replacement.sourceUuid"></label>
+        <label class="dg-span-2">{{ui.REPLACEMENT_CONTEXTS}}<input name="replacement.contexts" placeholder="characterBuilder, compendium, leveler"></label>
+      </div>
+      <fieldset class="dg-check-grid"><legend>{{ui.INHERITANCE}}</legend><label><input type="checkbox" name="replacement.inherit.domains"> {{ui.DOMAINS}}</label><label><input type="checkbox" name="replacement.inherit.favoredWeapon"> {{ui.FAVORED_WEAPON}}</label><label><input type="checkbox" name="replacement.inherit.spells"> {{ui.SPELLS}}</label><label><input type="checkbox" name="replacement.inherit.sanctification"> {{ui.SANCTIFICATION}}</label><label><input type="checkbox" name="replacement.inherit.skill"> {{ui.TRAINED_SKILL}}</label><label><input type="checkbox" name="replacement.inherit.edicts"> {{ui.EDICTS}}</label><label><input type="checkbox" name="replacement.inherit.anathema"> {{ui.ANATHEMA}}</label><label><input type="checkbox" name="replacement.keepForExistingActors" checked> {{ui.KEEP_EXISTING_ACTORS}}</label></fieldset>
+    </details>
+
+    <div class="dg-editor-actions"><button type="button" data-action="close">{{ui.CANCEL}}</button><button class="dg-primary" type="submit"><i class="fas fa-floppy-disk" aria-hidden="true"></i> {{ui.SAVE}}</button></div>
+  </form>
+
+  <template data-template="bonus">
+    <article class="dg-editor-card" data-bonus-row>
+      <header><strong>{{ui.PASSIVE_BONUS}}</strong><span class="dg-row-actions"><button type="button" data-action="move-up" title="{{ui.MOVE_UP}}"><i class="fas fa-arrow-up" aria-hidden="true"></i></button><button type="button" data-action="move-down" title="{{ui.MOVE_DOWN}}"><i class="fas fa-arrow-down" aria-hidden="true"></i></button><button type="button" data-action="duplicate-row" title="{{ui.DUPLICATE}}"><i class="fas fa-copy" aria-hidden="true"></i></button><button type="button" data-action="remove-row" title="{{ui.REMOVE}}"><i class="fas fa-trash" aria-hidden="true"></i></button></span></header>
+      <div class="dg-form-grid dg-form-grid-3">
+        <label>{{ui.NAME}}<input name="bonus.name" required></label>
+        <label>{{ui.SELECTOR}}<input name="bonus.selector" required list="dg-selectors"></label>
+        <label>{{ui.VALUE}}<input name="bonus.value" required value="1"></label>
+        <label>{{ui.MODIFIER_TYPE}}<select name="bonus.modifierType"><option value="status">{{ui.MOD_STATUS}}</option><option value="circumstance">{{ui.MOD_CIRCUMSTANCE}}</option><option value="item">{{ui.MOD_ITEM}}</option><option value="untyped">{{ui.MOD_UNTYPED}}</option></select></label>
+        <label>{{ui.APPLIES_TO}}<select name="bonus.appliesTo"><option value="checks">{{ui.CHECKS}}</option><option value="dc">{{ui.DCS}}</option><option value="both">{{ui.BOTH}}</option></select></label>
+        <label>{{ui.VISIBILITY}}<select name="bonus.visibility">{{#each visibilityOptions}}<option value="{{value}}">{{label}}</option>{{/each}}</select></label>
+        <label class="dg-span-3">{{ui.CONDITION}}<input name="bonus.condition" placeholder="{{ui.OPTIONAL_CONDITION}}"></label>
+      </div>
+      <p class="dg-form-warning" data-stacking-warning hidden><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> {{ui.STACKING_WARNING}}</p>
+    </article>
+  </template>
+
+  <template data-template="ability">
+    <article class="dg-editor-card" data-ability-row>
+      <header><strong>{{ui.DIVINE_WONDER}}</strong><span class="dg-row-actions"><button type="button" data-action="move-up" title="{{ui.MOVE_UP}}"><i class="fas fa-arrow-up" aria-hidden="true"></i></button><button type="button" data-action="move-down" title="{{ui.MOVE_DOWN}}"><i class="fas fa-arrow-down" aria-hidden="true"></i></button><button type="button" data-action="duplicate-row" title="{{ui.DUPLICATE}}"><i class="fas fa-copy" aria-hidden="true"></i></button><button type="button" data-action="remove-row" title="{{ui.REMOVE}}"><i class="fas fa-trash" aria-hidden="true"></i></button></span></header>
+      <div class="dg-form-grid dg-form-grid-3">
+        <label>{{ui.NAME}}<input name="ability.name" required></label>
+        <label class="dg-span-2">{{ui.DESCRIPTION}}<textarea name="ability.description" rows="3" required></textarea></label>
+        <label>{{ui.ACTION_COST}}<select name="ability.actionCost"><option value="automatic">{{ui.ACTION_AUTOMATIC}}</option><option value="free">{{ui.ACTION_FREE}}</option><option value="reaction">{{ui.ACTION_REACTION}}</option><option value="actions">{{ui.ACTIONS}}</option><option value="exploration">{{ui.ACTION_EXPLORATION}}</option><option value="downtime">{{ui.ACTION_DOWNTIME}}</option></select></label>
+        <label>{{ui.ACTION_COUNT}}<input type="number" min="0" max="3" name="ability.actions" value="1"></label>
+        <label>{{ui.USAGES}}<input type="number" min="0" name="ability.usageMax" value="1"></label>
+        <label>{{ui.RESET}}<select name="ability.reset"><option value="daily-preparations">{{ui.RESET_DAILY}}</option><option value="ten-minute-rest">{{ui.RESET_TEN_MINUTES}}</option><option value="refocus">{{ui.RESET_REFOCUS}}</option><option value="encounter-end">{{ui.RESET_ENCOUNTER}}</option><option value="scene-change">{{ui.RESET_SCENE}}</option><option value="calendar-day">{{ui.RESET_CALENDAR_DAY}}</option><option value="manual">{{ui.RESET_MANUAL}}</option></select></label>
+        <label>{{ui.COOLDOWN}}<input type="number" min="0" name="ability.cooldownValue" value="0"></label>
+        <label>{{ui.COOLDOWN_UNIT}}<select name="ability.cooldownUnit"><option value="rounds">{{ui.ROUNDS}}</option><option value="minutes">{{ui.MINUTES}}</option><option value="hours">{{ui.HOURS}}</option><option value="days">{{ui.DAYS}}</option></select></label>
+        <label>{{ui.DURATION}}<input type="number" min="0" name="ability.durationValue" value="0"></label>
+        <label>{{ui.DURATION_UNIT}}<select name="ability.durationUnit"><option value="instant">{{ui.INSTANT}}</option><option value="rounds">{{ui.ROUNDS}}</option><option value="minutes">{{ui.MINUTES}}</option><option value="hours">{{ui.HOURS}}</option><option value="encounter">{{ui.ENCOUNTER}}</option><option value="scene">{{ui.SCENE}}</option><option value="until-reset">{{ui.UNTIL_RESET}}</option></select></label>
+        <label>{{ui.EFFECT_TEMPLATE}}<select name="ability.effectType"><option value="message">{{ui.EFFECT_NARRATIVE}}</option><option value="heal">{{ui.EFFECT_HEAL}}</option><option value="damage">{{ui.EFFECT_DAMAGE}}</option><option value="modifier">{{ui.EFFECT_BONUS}}</option></select></label>
+        <label>{{ui.FORMULA_OR_VALUE}}<input name="ability.formula" value="1"></label>
+        <label>{{ui.SELECTOR}}<input name="ability.selector" list="dg-selectors"></label>
+        <label>{{ui.VISIBILITY}}<select name="ability.visibility">{{#each visibilityOptions}}<option value="{{value}}">{{label}}</option>{{/each}}</select></label>
+      </div>
+    </article>
+  </template>
+
+  <template data-template="grant-group">
+    <article class="dg-editor-card dg-grant-group" data-grant-group>
+      <header><strong>{{ui.GRANT_GROUP}}</strong><span class="dg-row-actions"><button type="button" data-action="add-grant-member" title="{{ui.ADD_GRANT}}"><i class="fas fa-link" aria-hidden="true"></i></button><button type="button" data-action="add-subgroup" title="{{ui.ADD_SUBGROUP}}"><i class="fas fa-code-branch" aria-hidden="true"></i></button><button type="button" data-action="move-up" title="{{ui.MOVE_UP}}"><i class="fas fa-arrow-up" aria-hidden="true"></i></button><button type="button" data-action="move-down" title="{{ui.MOVE_DOWN}}"><i class="fas fa-arrow-down" aria-hidden="true"></i></button><button type="button" data-action="remove-row" title="{{ui.REMOVE}}"><i class="fas fa-trash" aria-hidden="true"></i></button></span></header>
+      <input type="hidden" name="grantGroup.id">
+      <div class="dg-form-grid dg-form-grid-3"><label>{{ui.NAME}}<input name="grantGroup.label" required></label><label>{{ui.GROUP_MODE}}<select name="grantGroup.mode"><option value="all">{{ui.ALL_REQUIRED}}</option><option value="any">{{ui.CHOOSE_FROM}}</option></select></label><label>{{ui.PICK_COUNT}}<input type="number" min="1" name="grantGroup.pick" value="1"></label></div>
+      <div class="dg-grant-members" data-grant-members></div>
+    </article>
+  </template>
+
+  <template data-template="grant-member">
+    <article class="dg-editor-card dg-grant-member" data-grant-member>
+      <header><strong>{{ui.GRANT}}</strong><span class="dg-row-actions"><button type="button" data-action="move-up" title="{{ui.MOVE_UP}}"><i class="fas fa-arrow-up" aria-hidden="true"></i></button><button type="button" data-action="move-down" title="{{ui.MOVE_DOWN}}"><i class="fas fa-arrow-down" aria-hidden="true"></i></button><button type="button" data-action="remove-row" title="{{ui.REMOVE}}"><i class="fas fa-trash" aria-hidden="true"></i></button></span></header>
+      <div class="dg-form-grid dg-form-grid-3"><label>{{ui.TYPE}}<select name="grant.type"><option value="ability">{{ui.DIVINE_WONDER}}</option><option value="bonus">{{ui.PASSIVE_BONUS}}</option></select></label><label class="dg-span-2">{{ui.REFERENCE}}<input name="grant.ref" required placeholder="ability-id / bonus-id"></label><label>{{ui.OVERRIDE_NAME}}<input name="grant.overrideName"></label><label>{{ui.OVERRIDE_VALUE}}<input name="grant.overrideValue"></label><label>{{ui.OVERRIDE_DESCRIPTION}}<input name="grant.overrideDescription"></label></div>
+    </article>
+  </template>
+
+  <datalist id="dg-selectors">{{#each selectors}}<option value="{{this}}"></option>{{/each}}</datalist>
+</section>

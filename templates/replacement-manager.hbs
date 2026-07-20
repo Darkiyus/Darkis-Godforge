@@ -1,0 +1,8 @@
+<section class="dg-manager">
+  <header><div><p class="eyebrow">{{ui.INTEGRATION}}</p><h2>{{ui.REPLACEMENTS}}</h2><p>{{ui.REPLACEMENT_MANAGER_HINT}}</p></div><span class="dg-status">{{systemId}}</span></header>
+  {{#if rows.length}}
+    <form><div class="dg-table-wrap"><table><thead><tr><th>{{ui.OFFICIAL_DEITY}}</th><th>{{ui.STATUS}}</th><th>{{ui.HOMEBREW_REPLACEMENT}}</th><th>{{ui.INHERITANCE}}</th></tr></thead><tbody>{{#each rows}}<tr data-source-row data-source-uuid="{{sourceUuid}}" data-mode="{{mappingMode}}"><td><strong>{{name}}</strong><small>{{sourceUuid}}</small></td><td><select name="replacement.mode"><option value="none">{{../ui.REPLACE_NONE}}</option><option value="hide">{{../ui.REPLACE_HIDE}}</option><option value="replace">{{../ui.REPLACE_SOURCE}}</option></select></td><td><select name="replacement.deity"><option value="">—</option>{{#each options}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></td><td><span>{{inheritedCount}} {{../ui.INHERITED_VALUES}}</span></td></tr>{{/each}}</tbody></table></div><footer><button class="dg-primary" type="submit"><i class="fas fa-floppy-disk" aria-hidden="true"></i> {{ui.SAVE}}</button></footer></form>
+  {{else}}
+    <div class="dg-empty-state"><i class="fas fa-link-slash" aria-hidden="true"></i><h3>{{ui.NO_OFFICIAL_DEITIES}}</h3><p>{{ui.NO_OFFICIAL_DEITIES_HINT}}</p></div>
+  {{/if}}
+</section>
