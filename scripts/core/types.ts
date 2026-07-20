@@ -69,3 +69,5 @@ export interface DeityDefinition {
 
 export interface SelectionContext { actor?: unknown; user?: unknown; classId?: string; level?: number; region?: string; pantheonFilter?: string; }
 export interface DeitySummary { id: string; name: string; title: string; image?: string; domains: string[]; alignment?: string; }
+export interface GrantChoiceMap { [groupId: string]: string[]; }
+export interface ActorGodForgeState { deityId: string; grants: string[]; usages: Record<string, { used: number; max: number; lastResetAt: number; reset: ResetType }>; }
