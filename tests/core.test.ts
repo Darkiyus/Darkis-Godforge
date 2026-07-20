@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { readFileSync, readdirSync } from "node:fs";
 import { evaluateCondition } from "../scripts/core/condition-service";
 import { evaluateFormula, evaluateFormulaWithDice, validateFormula } from "../scripts/core/formula-service";
 import { previewGrantGroup, resolveGrantGroup } from "../scripts/core/grant-service";
@@ -43,6 +44,23 @@ describe("security and replacement regressions", () => { it("allows Foundry imag
 describe("socketlib bridge", () => { it("wraps the registered module channel", async () => { let registered = ""; const transport = createSocketlibTransport({ registerModule: () => ({ register: (name: string) => { registered = name; }, executeAsGM: async () => "ok" }) }); expect(transport).not.toBeNull(); transport?.register("activateAbility", async () => undefined); expect(registered).toBe("activateAbility"); }); });
 describe("localization catalogs", () => { it("keeps English and German UI keys in parity", () => { expect(Object.keys(german.DARKIS_GODFORGE.UI).sort()).toEqual(Object.keys(english.DARKIS_GODFORGE.UI).sort()); expect(Object.keys(german.DARKIS_GODFORGE.SETTINGS).sort()).toEqual(Object.keys(english.DARKIS_GODFORGE.SETTINGS).sort()); }); });
 describe("Foundry entry points", () => {
+  it("renders every ApplicationV2 template part as one root element", () => {
+    const voidElements = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]);
+    for (const file of readdirSync("templates").filter((name) => name.endsWith(".hbs"))) {
+      const source = readFileSync(`templates/${file}`, "utf8").replace(/{{[\s\S]*?}}/g, "");
+      let depth = 0;
+      let roots = 0;
+      for (const match of source.matchAll(/<\/?([a-z][\w-]*)(?:\s[^>]*)?>/gi)) {
+        const closing = match[0].startsWith("</");
+        const name = match[1]?.toLowerCase() ?? "";
+        if (closing) depth -= 1;
+        else if (!voidElements.has(name)) { if (depth === 0) roots += 1; depth += 1; }
+      }
+      expect(roots, `${file} must contain exactly one top-level element`).toBe(1);
+      expect(depth, `${file} must contain balanced elements`).toBe(0);
+    }
+  });
+
   it("keeps optional integrations and empty packs from blocking activation", () => {
     expect(moduleManifest.compatibility).not.toHaveProperty("maximum");
     expect(moduleManifest).not.toHaveProperty("packs");
