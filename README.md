@@ -1,6 +1,6 @@
 # Darkis GodForge
 
-Foundry VTT v14 module for configurable homebrew deities. The project follows the implementation plan in `Darkis_GodForge_Codex_Implementierungsplan.md` and keeps canonical definitions system-neutral while isolating PF2e materialization in `scripts/adapters/pf2e/`.
+Foundry VTT v14 module for configurable homebrew deities in Pathfinder 2e and Starfinder 1e/2e. Canonical definitions stay system-neutral while each supported game system is isolated in its own adapter.
 
 ## Development
 
@@ -9,10 +9,8 @@ npm install
 npm run check
 ```
 
-The build writes `scripts/main.js`, which is the module entry declared by `module.json`. Foundry itself is not included in CI; use the manual checklist in `MANUAL-TESTPLAN.md` inside a Foundry v14 world with PF2e and socketlib installed.
+The build writes `scripts/main.js`, which is the module entry declared by `module.json`. Install the module in a Foundry v14 world with the selected supported game system and socketlib enabled.
 
 ## Current scope
 
-The initial release includes the strict TypeScript/Vite module foundation, adapter registry, canonical deity model and service, catalog/replacement API, safe formula and condition evaluators, usage/reset and grant-group logic, PF2e Rule Element generation boundary, localized strings, and an ApplicationV2-compatible dashboard shell styled after the supplied GodForge mockups.
-
-PF2e document materialization and Foundry ApplicationV2 signatures contain explicit `TODO(verify)` markers because they must be checked against the exact installed Foundry/PF2e versions.
+The module includes a strict TypeScript/Vite foundation, adapter registry, canonical deity model, catalog/replacement API, safe formula and condition evaluators, usage/reset and grant-group logic, localized strings, and an ApplicationV2-compatible dashboard shell.

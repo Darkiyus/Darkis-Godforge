@@ -12,7 +12,11 @@
     { "lang": "de", "name": "Deutsch", "path": "lang/de.json" }
   ],
   "relationships": {
-    "systems": [{ "id": "pf2e", "type": "system", "compatibility": { "minimum": "6.0.0" } }],
+    "systems": [
+      { "id": "pf2e", "type": "system", "compatibility": { "minimum": "6.0.0" } },
+      { "id": "sf2e", "type": "system", "compatibility": { "minimum": "1.1.0" } },
+      { "id": "sfrpg", "type": "system" }
+    ],
     "requires": [{ "id": "socketlib", "type": "module" }],
     "recommends": [{ "id": "lib-wrapper", "type": "module" }]
   },
