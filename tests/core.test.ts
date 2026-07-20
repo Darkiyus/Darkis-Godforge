@@ -7,6 +7,7 @@ import { filterCatalog } from "../scripts/core/catalog-service";
 import { AdapterRegistry } from "../scripts/adapters/adapter-registry";
 import { DeityService } from "../scripts/core/deity-service";
 import { GodForgeApi, type GodForgeActor } from "../scripts/api";
+import { JournalDeityRepository } from "../scripts/foundry/journal-repository";
 import type { DeityDefinition } from "../scripts/core/types";
 
 const deity: DeityDefinition = { id: "a", schemaVersion: 1, revision: 1, createdAt: "", updatedAt: "", checksum: "", name: "A", title: "T", description: "D", domains: ["shadow"], passiveBonuses: [], abilities: [], grantGroups: [], replacement: { sourceUuid: "", mode: "none", contexts: [] }, visibility: { library: true, players: true, characterSheet: true } };
@@ -17,3 +18,4 @@ describe("usage", () => { it("consumes and resets daily uses", () => { const sta
 describe("catalog", () => { it("filters hidden and pantheon entries", () => expect(filterCatalog([deity, { ...deity, id: "b", domains: ["fire"] }], { pantheonFilter: "shadow" }, new Set(["a"]))).toEqual([])); });
 describe("system adapters", () => { it("supports Pathfinder and Starfinder only", () => { const registry = new AdapterRegistry(); expect(registry.supports("pf2e")).toBe(true); expect(registry.supports("sf2e")).toBe(true); expect(registry.supports("sfrpg")).toBe(true); expect(registry.supports("dnd5e")).toBe(false); expect(() => registry.get("dnd5e")).toThrow(); }); });
 describe("public API", () => { it("assigns, reads and removes an actor deity", async () => { const service = new DeityService(); service.save(deity); const actor: GodForgeActor = { id: "actor", flags: {}, update: async (data) => { actor.flags = data.flags; } }; const api = new GodForgeApi(service, new AdapterRegistry()); await api.assignDeity(actor, "a"); expect(api.getActorDeity(actor)?.id).toBe("a"); await api.removeDeity(actor); expect(api.getActorDeity(actor)).toBeNull(); }); });
+describe("Foundry journal persistence", () => { it("loads and updates canonical deity flags", async () => { const journal = { id: "j", uuid: "Journal.j", name: "A", flags: { "darkis-godforge": { schemaVersion: 1, deity } }, update: async (data: Record<string, unknown>) => { journal.flags = data.flags as typeof journal.flags; } }; const repository = new JournalDeityRepository({ contents: [journal] }); expect(repository.load()[0]?.id).toBe("a"); await repository.save({ ...deity, revision: 2 }); expect(repository.load()[0]?.revision).toBe(2); }); });
