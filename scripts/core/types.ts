@@ -1,3 +1,5 @@
+import type { Condition } from "./condition-service";
+
 export type GrantGroupMode = "all" | "any";
 export type ModifierType = "item" | "status" | "circumstance" | "untyped";
 export type ResetType = "daily" | "weekly" | "encounter" | "manual";
@@ -20,6 +22,7 @@ export interface AbilityDefinition {
   uses?: { max: number; reset: ResetType };
   duration?: number;
   trigger?: string;
+  condition?: Condition;
   effects: EffectNode[];
 }
 
@@ -27,6 +30,7 @@ export type EffectNode =
   | { type: "heal" | "damage"; formula: string; target: "self" | "target" }
   | { type: "modifier"; selector: string; value: number | string; modifierType: ModifierType; duration?: number }
   | { type: "condition"; condition: string; target: "self" | "target" }
+  | { type: "branch"; condition: Condition; then: EffectNode[]; otherwise?: EffectNode[] }
   | { type: "message"; text: string };
 
 export interface GrantGroup {
