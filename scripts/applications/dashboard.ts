@@ -3,7 +3,7 @@ import { GodForgeApi } from "../api";
 import type { DeityService } from "../core/deity-service";
 import { safeImageUrl } from "../core/sanitize";
 import { validateDeity } from "../core/validation-service";
-import { handlebarsApplicationBase } from "../foundry/application-base";
+import { gmApplicationBase } from "../foundry/application-base";
 import { uiText } from "../foundry/i18n";
 import { requireGM } from "../foundry/permissions";
 import { getFoundryGame } from "../foundry/runtime";
@@ -13,15 +13,24 @@ import { GodForgeDeityEditor } from "./deity-editor";
 import { GodForgeReplacementManager } from "./replacement-manager";
 import { GodForgeDataManager } from "./data-manager";
 import { RandomContentService } from "../core/random-service";
+import { CURRENT_SCHEMA_VERSION } from "../core/migration-service";
 import { GodForgeRandomManager } from "./random-manager";
 import { GodForgeCharacterManager } from "./character-manager";
 
-export class GodForgeDashboard extends handlebarsApplicationBase() {
+export class GodForgeDashboard extends gmApplicationBase() {
   static DEFAULT_OPTIONS = { id: "darkis-godforge-dashboard", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: true }, position: { width: 1440, height: 900 } };
   static PARTS = { main: { template: "modules/darkis-godforge/templates/dashboard.hbs" } };
   private searchTerm = "";
   private sectionFilter: "overview" | "deities" | "pantheons" | "abilities" | "bonuses" = "overview";
   private searchTimer: ReturnType<typeof setTimeout> | null = null;
+  private keydownRoot: HTMLElement | null = null;
+  private readonly handleRootKeydown = (event: KeyboardEvent): void => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLocaleLowerCase() === "k") {
+      event.preventDefault();
+      const search = this.element?.querySelector<HTMLInputElement>("[data-search]");
+      search?.focus(); search?.select();
+    }
+  };
 
   constructor(private readonly deityService: DeityService, private readonly adapters = new AdapterRegistry(), private readonly api = new GodForgeApi(deityService, adapters), private readonly randomContent = new RandomContentService()) { super(); }
 
@@ -42,7 +51,7 @@ export class GodForgeDashboard extends handlebarsApplicationBase() {
     const deities = allDeities.filter((deity) => this.matchesSection(deity) && (!query || `${deity.name} ${deity.title} ${deity.domains.join(" ")}`.toLocaleLowerCase().includes(query)));
     const assignedActors = getFoundryGame()?.actors?.contents?.filter(hasAssignedDeity).length ?? 0;
     const game = getFoundryGame();
-    const moduleVersion = game?.modules?.get("darkis-godforge")?.version ?? "0.2.0";
+    const moduleVersion = game?.modules?.get("darkis-godforge")?.version ?? "—";
     const systemId = game?.system?.id ?? "—";
     return {
       ui,
@@ -66,7 +75,7 @@ export class GodForgeDashboard extends handlebarsApplicationBase() {
         systemVersion: game?.system?.version ?? "—",
         moduleVersion,
         adapter: this.adapters.tryGet(systemId)?.id ?? "—",
-        schema: 2
+        schema: CURRENT_SCHEMA_VERSION
       }
     };
   }
@@ -80,10 +89,11 @@ export class GodForgeDashboard extends handlebarsApplicationBase() {
     root.querySelectorAll<HTMLElement>("[data-action='player-preview']").forEach((button) => button.addEventListener("click", () => new GodForgeCodex(this.deityService, undefined, undefined, undefined, undefined, { isGM: false, selection: true }).render(true)));
     root.querySelectorAll<HTMLElement>("[data-section]").forEach((button) => button.addEventListener("click", () => { const section = button.dataset.section; if (section === "overview" || section === "deities" || section === "pantheons" || section === "abilities" || section === "bonuses") { this.sectionFilter = section; void this.render(true); } }));
     root.querySelector<HTMLElement>("[data-manager='replacements']")?.addEventListener("click", () => void new GodForgeReplacementManager(this.deityService, this.adapters).render(true));
-    root.querySelectorAll<HTMLElement>("[data-manager='data']").forEach((button) => button.addEventListener("click", () => void new GodForgeDataManager(this.deityService, this.api, this.randomContent).render(true)));
-    root.querySelectorAll<HTMLElement>("[data-manager='random']").forEach((button) => button.addEventListener("click", () => void new GodForgeRandomManager(this.randomContent).render(true)));
+    root.querySelectorAll<HTMLElement>("[data-manager='data']").forEach((button) => button.addEventListener("click", () => { const mode = button.dataset.managerMode === "migration" ? "migration" : "transfer"; void new GodForgeDataManager(this.deityService, this.api, this.randomContent, mode).render(true); }));
+    root.querySelectorAll<HTMLElement>("[data-manager='random']").forEach((button) => button.addEventListener("click", () => { const value = button.dataset.managerMode; const mode = value === "wheels" || value === "test" ? value : "tables"; void new GodForgeRandomManager(this.randomContent, mode).render(true); }));
     root.querySelector<HTMLElement>("[data-manager='characters']")?.addEventListener("click", () => void new GodForgeCharacterManager(this.deityService, this.api).render(true));
     root.querySelector<HTMLElement>("[data-action='toggle-context']")?.addEventListener("click", () => root.querySelector<HTMLElement>(".dg-app-shell")?.classList.toggle("context-open"));
+    root.querySelector<HTMLElement>("[data-action='settings']")?.addEventListener("click", () => this.openSettings());
     root.querySelectorAll<HTMLElement>("[data-scroll]").forEach((button) => button.addEventListener("click", () => root.querySelector<HTMLElement>(`[data-section-target='${button.dataset.scroll ?? ""}']`)?.scrollIntoView({ behavior: "smooth", block: "start" })));
     root.querySelectorAll<HTMLElement>("[data-deity]").forEach((card) => card.addEventListener("click", () => { const deity = this.deityService.get(card.dataset.deity ?? ""); if (deity) void new GodForgeDeityDetail(deity, this.deityService, this.adapters).render(true); }));
     const search = root.querySelector<HTMLInputElement>("[data-search]");
@@ -93,9 +103,28 @@ export class GodForgeDashboard extends handlebarsApplicationBase() {
       if (this.searchTimer) clearTimeout(this.searchTimer);
       this.searchTimer = setTimeout(() => void this.render(true), 140);
     });
-    root.addEventListener("keydown", (event) => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLocaleLowerCase() === "k") { event.preventDefault(); search?.focus(); search?.select(); }
-    });
+    if (this.keydownRoot !== root) {
+      this.keydownRoot?.removeEventListener("keydown", this.handleRootKeydown);
+      root.addEventListener("keydown", this.handleRootKeydown);
+      this.keydownRoot = root;
+    }
+  }
+
+  _onClose(): void {
+    if (this.searchTimer) clearTimeout(this.searchTimer);
+    this.searchTimer = null;
+    this.keydownRoot?.removeEventListener("keydown", this.handleRootKeydown);
+    this.keydownRoot = null;
+  }
+
+  private openSettings(): void {
+    type Renderable = { render(force?: boolean): Promise<unknown> };
+    type SettingsConstructor = new (options?: Record<string, unknown>) => Renderable;
+    const runtime = globalThis as unknown as { foundry?: { applications?: { settings?: { SettingsConfig?: SettingsConstructor } } }; SettingsConfig?: SettingsConstructor };
+    const SettingsConfig = runtime.foundry?.applications?.settings?.SettingsConfig ?? runtime.SettingsConfig;
+    if (SettingsConfig) { void new SettingsConfig({ initialCategory: "darkis-godforge" }).render(true); return; }
+    const settingsSheet = (getFoundryGame()?.settings as { sheet?: Renderable } | undefined)?.sheet;
+    if (settingsSheet) void settingsSheet.render(true);
   }
 
   private matchesSection(deity: { pantheonIds?: string[]; abilities: unknown[]; passiveBonuses: unknown[] }): boolean { if (this.sectionFilter === "pantheons") return Boolean(deity.pantheonIds?.length); if (this.sectionFilter === "abilities") return deity.abilities.length > 0; if (this.sectionFilter === "bonuses") return deity.passiveBonuses.length > 0; return true; }

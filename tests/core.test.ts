@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { readFileSync, readdirSync } from "node:fs";
 import { evaluateCondition } from "../scripts/core/condition-service";
 import { evaluateFormula, evaluateFormulaWithDice, validateFormula } from "../scripts/core/formula-service";
@@ -25,12 +25,16 @@ import { DEFAULT_VISIBILITY, type DeityDefinition } from "../scripts/core/types"
 import { addDashboardSceneControl, createDashboardSettingsMenu, registerFoundryBootstrap } from "../scripts/foundry/bootstrap";
 import { migrateDefinition } from "../scripts/core/migration-service";
 import { redactForViewer } from "../scripts/core/visibility-service";
-import { requireGM } from "../scripts/foundry/permissions";
+import { currentViewerContext, requireGM } from "../scripts/foundry/permissions";
 import { buildPf2eDeityData } from "../scripts/adapters/pf2e/deity-materializer";
 import { Starfinder1eAdapter } from "../scripts/adapters/starfinder/starfinder1e-adapter";
 import { Starfinder2eAdapter } from "../scripts/adapters/starfinder/starfinder2e-adapter";
+import { collectGrantChoiceGroups, hasGrantChoices } from "../scripts/core/grant-choice-service";
 
 const deity: DeityDefinition = { id: "a", schemaVersion: 2, revision: 1, createdAt: "", updatedAt: "", checksum: "", status: "published", name: "A", title: "T", description: "D", domains: ["shadow"], passiveBonuses: [], abilities: [], grantGroups: [], replacement: { sourceUuid: "", mode: "none", contexts: [] }, visibility: structuredClone(DEFAULT_VISIBILITY) };
+
+beforeEach(() => vi.stubGlobal("game", { user: { id: "gm", isGM: true } }));
+afterEach(() => vi.unstubAllGlobals());
 
 function localizationLeafKeys(value: unknown, prefix = ""): string[] { if (!value || typeof value !== "object") return [prefix]; return Object.entries(value).flatMap(([key, child]) => localizationLeafKeys(child, prefix ? `${prefix}.${key}` : key)).sort(); }
 
@@ -38,6 +42,7 @@ describe("formula service", () => { it("evaluates whitelisted facts", () => expe
 describe("conditions and grants", () => { it("evaluates nested boolean conditions", () => expect(evaluateCondition({ type: "and", children: [{ type: "fact", key: "level", equals: 5 }, { type: "not", child: { type: "fact", key: "dead", equals: true } }] }, { level: 5, dead: false })).toBe(true)); it("requires an exact pick", () => expect(resolveGrantGroup({ id: "g", mode: "any", pick: 1, label: "", grants: [{ type: "bonus", ref: "a" }] }, { groupId: "g", refs: ["a"] })).toEqual(["a"])); });
 describe("nested grants", () => { it("previews nested AND/OR groups and preserves overrides", () => { const group = { id: "root", mode: "all" as const, label: "", grants: [{ type: "ability" as const, ref: "a", overrides: { name: "Renamed" } }, { id: "choice", mode: "any" as const, pick: 1, label: "", grants: [{ type: "bonus" as const, ref: "b" }, { type: "bonus" as const, ref: "c" }] }] }; expect(previewGrantGroup(group)).toEqual(["a", "b", "c"]); }); });
 describe("nested grant resolution", () => { it("resolves a selected AND subgroup inside an OR group", () => { const group = { id: "root", mode: "any" as const, pick: 1, label: "", grants: [{ id: "combined", mode: "all" as const, label: "", grants: [{ type: "ability" as const, ref: "a" }, { type: "bonus" as const, ref: "b" }] }, { type: "ability" as const, ref: "c" }] }; expect(resolveGrantGroup(group, [{ groupId: "root", refs: ["combined"] }])).toEqual(["a", "b"]); }); });
+describe("grant choice views", () => { it("finds nested OR groups below AND groups", () => { const group = { id: "root", mode: "all" as const, label: "Root", grants: [{ id: "nested", mode: "any" as const, pick: 1, label: "Nested", grants: [{ type: "ability" as const, ref: "a" }] }] }; expect(hasGrantChoices([group])).toBe(true); expect(collectGrantChoiceGroups(group)).toEqual([{ id: "nested", label: "Nested", pick: 1, options: [{ id: "a", label: "a" }], requirements: [] }]); }); it("marks choices in unselected OR branches as conditional", () => { const group = { id: "root", mode: "any" as const, pick: 1, label: "Root", grants: [{ id: "branch", mode: "any" as const, pick: 1, label: "Branch", grants: [{ type: "ability" as const, ref: "a" }] }, { type: "ability" as const, ref: "b" }] }; expect(collectGrantChoiceGroups(group)[1]?.requirements).toEqual([{ groupId: "root", optionId: "branch" }]); }); });
 describe("usage", () => { it("consumes and resets daily uses", () => { const state = { used: 0, max: 1, lastResetAt: 0, reset: "daily" as const }; expect(canUse(state, 0)).toBe(true); expect(consume(state, 0).used).toBe(1); expect(shouldReset({ ...state, used: 1 }, 86400000)).toBe(true); }); });
 describe("catalog", () => { it("filters hidden and pantheon entries", () => expect(filterCatalog([deity, { ...deity, id: "b", domains: ["fire"] }], { pantheonFilter: "shadow" }, new Set(["a"]))).toEqual([])); });
 describe("visibility model", () => {
@@ -76,7 +81,7 @@ describe("visibility model", () => {
   });
 });
 describe("system adapters", () => { it("supports Pathfinder and Starfinder only", () => { const registry = new AdapterRegistry(); expect(registry.supports("pf2e")).toBe(true); expect(registry.supports("sf2e")).toBe(true); expect(registry.supports("sfrpg")).toBe(true); expect(registry.supports("dnd5e")).toBe(false); expect(() => registry.get("dnd5e")).toThrow(); }); });
-describe("public API", () => { it("assigns, reads and removes an actor deity", async () => { const service = new DeityService(); service.save(deity); const actor: GodForgeActor = { id: "actor", flags: {}, update: async (data) => { actor.flags = data.flags; } }; const api = new GodForgeApi(service, new AdapterRegistry()); await api.assignDeity(actor, "a"); expect(api.getActorDeity(actor)?.id).toBe("a"); await api.removeDeity(actor); expect(api.getActorDeity(actor)).toBeNull(); }); });
+describe("public API", () => { it("assigns, reads and removes an actor deity", async () => { vi.stubGlobal("game", { user: { id: "gm", isGM: true } }); const service = new DeityService(); service.save(deity); const actor: GodForgeActor = { id: "actor", flags: {}, update: async (data) => { actor.flags = data.flags; } }; const api = new GodForgeApi(service, new AdapterRegistry()); await api.assignDeity(actor, "a"); expect(api.getActorDeity(actor)?.id).toBe("a"); await api.removeDeity(actor); expect(api.getActorDeity(actor)).toBeNull(); vi.unstubAllGlobals(); }); });
 describe("Foundry journal persistence", () => { it("loads and updates canonical deity flags", async () => { const journal = { id: "j", uuid: "Journal.j", name: "A", flags: { "darkis-godforge": { schemaVersion: 1, deity } }, update: async (data: Record<string, unknown>) => { journal.flags = data.flags as typeof journal.flags; } }; const repository = new JournalDeityRepository({ contents: [journal] }); expect(repository.load()[0]?.id).toBe("a"); await repository.save({ ...deity, revision: 2 }); expect(repository.load()[0]?.revision).toBe(2); }); });
 describe("GM authority", () => { it("rejects a duplicate activation request", async () => { const service = new DeityService(); service.save({ ...deity, abilities: [{ id: "a1", name: "A", description: "", effects: [{ type: "message", text: "ok" }] }] }); const actor: GodForgeActor = { id: "actor", flags: { "darkis-godforge": { deityId: "a", grants: [], usages: {} } }, update: async () => undefined }; const authority: AuthorityContext = { currentUserId: "gm", isGM: true, isGMUser: (userId) => userId === "gm", ownsActor: (_actor, userId) => userId === "player", resolveActor: () => actor }; const handlers = new Map<string, (payload: unknown, senderId: string) => Promise<unknown>>(); const transport: SocketTransport = { register: (name, callback) => { handlers.set(name, callback); }, executeAsGM: async () => undefined }; const router = new SocketRouter(new GodForgeApi(service, new AdapterRegistry()), authority, transport); router.register(); const payload = { activationId: "fixed", actorId: "actor", userId: "forged", abilityId: "a1", options: {} }; await handlers.get("activateAbility")?.(payload, "player"); await expect(handlers.get("activateAbility")?.(payload, "player")).rejects.toThrow("already been processed"); expect(router.status("fixed")).toBe("completed"); }); it("ignores a forged payload user id and authorizes only the authenticated sender", async () => { const service = new DeityService(); service.save({ ...deity, abilities: [{ id: "a1", name: "A", description: "", effects: [] }] }); const actor: GodForgeActor = { id: "actor", flags: { "darkis-godforge": { deityId: "a", grants: [], usages: {} } }, update: async () => undefined }; const authority: AuthorityContext = { currentUserId: "gm", isGM: true, isGMUser: (userId) => userId === "gm", ownsActor: (_actor, userId) => userId === "owner", resolveActor: () => actor }; const handlers = new Map<string, (payload: unknown, senderId: string) => Promise<unknown>>(); const transport: SocketTransport = { register: (name, callback) => { handlers.set(name, callback); }, executeAsGM: async () => undefined }; const router = new SocketRouter(new GodForgeApi(service, new AdapterRegistry()), authority, transport); router.register(); await expect(handlers.get("activateAbility")?.({ activationId: "spoof", actorId: "actor", userId: "owner", abilityId: "a1", options: {} }, "attacker")).rejects.toThrow("not allowed"); }); });
 describe("GM-authoritative deity assignment", () => { it("allows an owning player to select published content and rejects drafts", async () => { const service = new DeityService(); service.save(deity); service.save({ ...deity, id: "draft", status: "draft" }); const actor: GodForgeActor = { id: "actor", flags: {}, update: async (data) => { actor.flags = data.flags; } }; const authority: AuthorityContext = { currentUserId: "gm", isGM: true, isGMUser: (userId) => userId === "gm", ownsActor: (_actor, userId) => userId === "player", resolveActor: () => actor }; const handlers = new Map<string, (payload: unknown, senderId: string) => Promise<unknown>>(); const transport: SocketTransport = { register: (name, callback) => { handlers.set(name, callback); }, executeAsGM: async () => undefined }; const router = new SocketRouter(new GodForgeApi(service, new AdapterRegistry()), authority, transport); router.register(); await handlers.get("assignDeity")?.({ activationId: "assign-ok", actorId: "actor", deityId: "a", choices: {} }, "player"); expect((actor.flags?.["darkis-godforge"] as { deityId: string }).deityId).toBe("a"); await expect(handlers.get("assignDeity")?.({ activationId: "assign-draft", actorId: "actor", deityId: "draft", choices: {} }, "player")).rejects.toThrow("not available"); }); });
@@ -93,6 +98,54 @@ describe("API data workflows", () => { it("exports schema 2, imports deity data 
 describe("security and replacement regressions", () => { it("allows Foundry image paths and blocks unsafe schemes", () => { expect(escapeHtml(`<img src=x onerror=alert(1)>`)).toContain("&lt;img"); expect(safeImageUrl("worlds/noclaris/gods/tenebris.webp")).toBe("worlds/noclaris/gods/tenebris.webp"); expect(safeImageUrl("modules/darkis-godforge/assets/a.png")).toBe("modules/darkis-godforge/assets/a.png"); expect(safeImageUrl("assets/a.png")).toBe("assets/a.png"); expect(safeImageUrl("https://x.com/a&b.png")).toBe("https://x.com/a&b.png"); expect(safeImageUrl("javascript:alert(1)")).toBe("icons/svg/eye.svg"); }); it("hides an official Compendium UUID only in the configured context", async () => { const sourceUuid = "Compendium.pf2e.deities.Item.abc123"; vi.stubGlobal("game", { system: { id: "pf2e" }, packs: { contents: [{ collection: "pf2e.deities", documentName: "Item", metadata: { system: "pf2e" }, getIndex: async () => [{ _id: "abc123", name: "Official", type: "deity", system: { domains: ["sun"] } }] }] } }); const service = new DeityService(); service.save({ ...deity, id: "homebrew", replacement: { sourceUuid, mode: "hide", contexts: ["characterBuilder"] } }); const api = new GodForgeApi(service, new AdapterRegistry()); expect((await api.getSelectableDeities({ systemId: "pf2e", catalogContext: "characterBuilder" })).map((entry) => entry.sourceUuid)).not.toContain(sourceUuid); expect((await api.getSelectableDeities({ systemId: "pf2e", catalogContext: "compendium" })).map((entry) => entry.sourceUuid)).toContain(sourceUuid); vi.unstubAllGlobals(); }); });
 describe("socketlib bridge", () => { it("forwards Socketlib's authenticated sender instead of payload identity", async () => { let registered = ""; let socketHandler: ((this: { socketdata?: { userId?: string } }, payload: unknown) => Promise<unknown>) | undefined; const transport = createSocketlibTransport({ registerModule: () => ({ register: (name: string, handler: typeof socketHandler) => { registered = name; socketHandler = handler; }, executeAsGM: async () => "ok" }) }); expect(transport).not.toBeNull(); const receiver = vi.fn(); transport?.register("activateAbility", receiver); expect(registered).toBe("activateAbility"); await socketHandler?.call({ socketdata: { userId: "authenticated-player" } }, { userId: "forged-gm" }); expect(receiver).toHaveBeenCalledWith({ userId: "forged-gm" }, "authenticated-player"); }); });
 describe("localization catalogs", () => { it("keeps every English and German localization key in parity", () => { expect(localizationLeafKeys(german)).toEqual(localizationLeafKeys(english)); }); });
+describe("permission defaults", () => {
+  it("fails closed when Foundry has not provided a user", () => {
+    vi.unstubAllGlobals();
+    expect(() => requireGM()).toThrow("GM only");
+  });
+
+  it("does not infer actor ownership from the presence of a character", () => {
+    vi.stubGlobal("game", { user: { id: "player", isGM: false, character: { id: "actor" } } });
+    expect(currentViewerContext().ownsActor).toBe(false);
+  });
+});
+
+describe("dashboard markup regressions", () => {
+  it("wires each enabled dashboard route to an implemented handler", () => {
+    const template = readFileSync("templates/dashboard.hbs", "utf8");
+    const implementation = readFileSync("scripts/applications/dashboard.ts", "utf8");
+    const actions = [...template.matchAll(/data-action="([^"]+)"/g)].map((match) => match[1] ?? "");
+    const managers = [...template.matchAll(/data-manager="([^"]+)"/g)].map((match) => match[1] ?? "");
+    for (const action of new Set(actions)) expect(implementation, `missing data-action handler for ${action}`).toContain(`data-action='${action}'`);
+    for (const manager of new Set(managers)) expect(implementation, `missing data-manager handler for ${manager}`).toContain(`data-manager='${manager}'`);
+    expect([...template.matchAll(/data-manager="random" data-manager-mode="([^"]+)"/g)].map((match) => match[1])).toEqual(["tables", "wheels", "test"]);
+    expect([...template.matchAll(/data-manager="data" data-manager-mode="([^"]+)"/g)].map((match) => match[1])).toEqual(["transfer", "migration", "transfer"]);
+  });
+
+  it("does not repeat the same rail heading as eyebrow and h2", () => {
+    const template = readFileSync("templates/dashboard.hbs", "utf8");
+    expect(template).not.toMatch(/<p class="eyebrow">{{ui\.([A-Z_]+)}}<\/p><h2>{{ui\.\1}}<\/h2>/);
+  });
+
+  it("keeps interactive typography below Foundry's window content", () => {
+    const css = readFileSync("styles/godforge.css", "utf8");
+    expect(css).not.toMatch(/\.darkis-godforge\s+:where\(/);
+    expect(css).not.toMatch(/\.darkis-godforge\s+button\s*{/);
+    expect(css).toContain(".darkis-godforge .window-content :where(button, input, select, textarea)");
+  });
+
+  it("provides a picker and preview for every deity image field", () => {
+    const template = readFileSync("templates/deity-editor.hbs", "utf8");
+    const implementation = readFileSync("scripts/applications/deity-editor.ts", "utf8");
+    for (const field of ["image", "icon", "symbol", "banner"]) {
+      expect(template).toContain(`data-image-field="${field}"`);
+      expect(template).toContain(`data-target="${field}" data-type="image"`);
+      expect(template).toContain(`data-image-preview="${field}"`);
+    }
+    expect(implementation).toContain("foundry?.applications?.apps?.FilePicker");
+    expect(implementation).toContain("FilePicker.fromButton");
+  });
+});
 describe("Foundry entry points", () => {
   it("renders every ApplicationV2 template part as one root element", () => {
     const voidElements = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]);

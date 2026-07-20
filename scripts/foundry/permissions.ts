@@ -4,12 +4,14 @@ import { localize } from "./i18n";
 import { getFoundryGame, getFoundryUi } from "./runtime";
 
 export function requireGM(): void {
-  const game = getFoundryGame();
-  if (!game || game.user?.isGM === true) return;
-  const message = localize("DARKIS_GODFORGE.ERROR.GM_ONLY");
-  getFoundryUi()?.notifications?.warn?.(message);
+  if (isCurrentUserGM()) return;
+  notifyGMOnly();
   throw new Error("GodForge: GM only.");
 }
+
+export function isCurrentUserGM(): boolean { return getFoundryGame()?.user?.isGM === true; }
+
+export function notifyGMOnly(): void { getFoundryUi()?.notifications?.warn?.(localize("DARKIS_GODFORGE.ERROR.GM_ONLY")); }
 
 export function currentViewerContext(selection = false): ViewerContext {
   const user = getFoundryGame()?.user;
@@ -20,6 +22,6 @@ export function currentViewerContext(selection = false): ViewerContext {
     isTrusted: user?.isTrusted === true || (typeof user?.role === "number" && user.role >= 2),
     selection,
     actorDeityId: typeof state?.deityId === "string" ? state.deityId : undefined,
-    ownsActor: actor?.testUserPermission?.(user, "OWNER") ?? Boolean(actor)
+    ownsActor: Boolean(user && actor?.testUserPermission?.(user, "OWNER") === true)
   };
 }

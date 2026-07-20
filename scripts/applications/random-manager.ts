@@ -1,21 +1,34 @@
 import type { RandomContentService, RandomEntry } from "../core/random-service";
 import type { VisibilityLevel } from "../core/types";
-import { handlebarsApplicationBase } from "../foundry/application-base";
+import { gmApplicationBase } from "../foundry/application-base";
 import { uiText } from "../foundry/i18n";
 import { requireGM } from "../foundry/permissions";
 import { reportActionError } from "../foundry/error-reporting";
 
-export class GodForgeRandomManager extends handlebarsApplicationBase() {
+export class GodForgeRandomManager extends gmApplicationBase() {
   static DEFAULT_OPTIONS = { id: "darkis-godforge-random-manager", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.RANDOM_TABLES", resizable: true }, position: { width: 1100, height: 800 } };
   static PARTS = { main: { template: "modules/darkis-godforge/templates/random-manager.hbs" } };
   private result: { label: string; description?: string; category?: string } | null = null;
   private error = "";
-  constructor(private readonly randomContent: RandomContentService) { super(); }
+  constructor(private readonly randomContent: RandomContentService, private readonly mode: "tables" | "wheels" | "test" = "tables") { super(); }
 
   async _prepareContext(): Promise<Record<string, unknown>> {
     requireGM();
     const tables = this.randomContent.listTables();
-    return { ui: uiText(), tables, wheels: this.randomContent.listWheels().map((wheel) => ({ ...wheel, tableName: tables.find((table) => table.id === wheel.tableId)?.name ?? "—" })), result: this.result, error: this.error };
+    const ui = uiText();
+    return {
+      ui,
+      tables,
+      wheels: this.randomContent.listWheels().map((wheel) => ({ ...wheel, tableName: tables.find((table) => table.id === wheel.tableId)?.name ?? "—" })),
+      result: this.result,
+      error: this.error,
+      showTableEditor: this.mode === "tables",
+      showWheelEditor: this.mode === "wheels",
+      showTables: this.mode !== "wheels",
+      showWheels: this.mode !== "tables",
+      isTestLab: this.mode === "test",
+      managerTitle: this.mode === "tables" ? ui.RANDOM_TABLES : this.mode === "wheels" ? ui.FORTUNE_WHEELS : ui.TEST_LAB
+    };
   }
 
   _onRender(): void {

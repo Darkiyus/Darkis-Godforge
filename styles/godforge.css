@@ -25,13 +25,13 @@
   --dg-shadow: rgba(0, 0, 0, .55);
 }
 
-.darkis-godforge .window-content { padding: 0; overflow: hidden; background: var(--dg-bg-deep); color: var(--dg-text-primary); }
-.darkis-godforge :where(button, input, select, textarea) { font: inherit; }
-.darkis-godforge :where(button, input, select, textarea, a):focus-visible { outline: 2px solid var(--dg-focus); outline-offset: 2px; }
-.darkis-godforge button { color: var(--dg-text-primary); }
-.darkis-godforge h1, .darkis-godforge h2, .darkis-godforge h3, .darkis-godforge h4 { font-family: "GodForge Display", "Cinzel", Georgia, serif; font-weight: 500; letter-spacing: .025em; }
-.eyebrow { margin: 0 0 6px; color: #c9a2ff; font-size: 11px; font-weight: 700; letter-spacing: .17em; text-transform: uppercase; }
-.muted { color: var(--dg-text-secondary); }
+.darkis-godforge .window-content { display: block; padding: 0; overflow: hidden; background: var(--dg-bg-deep); color: var(--dg-text-primary); }
+.darkis-godforge .window-content :where(button, input, select, textarea) { font: inherit; }
+.darkis-godforge .window-content :where(button, input, select, textarea, a):focus-visible { outline: 2px solid var(--dg-focus); outline-offset: 2px; }
+.darkis-godforge .window-content button { color: var(--dg-text-primary); }
+.darkis-godforge .window-content :where(h1, h2, h3, h4) { font-family: "GodForge Display", "Cinzel", Georgia, serif; font-weight: 500; letter-spacing: .025em; }
+.darkis-godforge .window-content .eyebrow { margin: 0 0 6px; color: #c9a2ff; font-size: 11px; font-weight: 700; letter-spacing: .17em; text-transform: uppercase; }
+.darkis-godforge .window-content .muted { color: var(--dg-text-secondary); }
 
 .dg-primary, .dg-secondary {
   min-height: 40px;
@@ -47,7 +47,7 @@
 .dg-secondary:hover { border-color: var(--dg-accent); background: var(--dg-accent-soft); }
 
 /* Dashboard shell */
-.dg-app-shell { position: relative; display: grid; grid-template-columns: 236px minmax(0, 1fr); height: 100%; min-height: 700px; overflow: hidden; background: radial-gradient(circle at 72% 4%, rgba(85, 32, 130, .16), transparent 31%), var(--dg-bg-base); font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif; }
+.dg-app-shell { position: relative; display: grid; grid-template-columns: 236px minmax(0, 1fr); height: 100%; min-height: 0; overflow: hidden; background: radial-gradient(circle at 72% 4%, rgba(85, 32, 130, .16), transparent 31%), var(--dg-bg-base); font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif; }
 .dg-sidebar { display: flex; flex-direction: column; min-width: 0; overflow: auto; border-right: 1px solid var(--dg-border-soft); background: linear-gradient(180deg, #0c0d15, #07080d); }
 .dg-brand { display: grid; place-items: center; gap: 2px; padding: 22px 12px 18px; border-bottom: 1px solid var(--dg-border-soft); font-family: "GodForge Display", "Cinzel", Georgia, serif; font-size: 15px; letter-spacing: .12em; text-transform: uppercase; }
 .dg-brand img { width: 130px; height: 100px; object-fit: contain; filter: drop-shadow(0 7px 18px rgba(143, 56, 232, .2)); }
@@ -56,9 +56,12 @@
 .dg-sidebar nav > button { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; width: 100%; min-height: 36px; margin: 2px 0; border: 1px solid transparent; border-radius: 6px; padding: 7px 10px; background: transparent; color: var(--dg-text-secondary); text-align: left; cursor: pointer; }
 .dg-sidebar nav > button:hover { color: var(--dg-text-primary); background: rgba(255, 255, 255, .035); }
 .dg-sidebar nav > button.active { border-color: rgba(143, 56, 232, .25); background: linear-gradient(90deg, var(--dg-accent-soft), transparent); color: var(--dg-text-primary); box-shadow: inset 2px 0 var(--dg-accent); }
+.dg-sidebar nav > button:disabled { color: var(--dg-text-disabled); cursor: not-allowed; opacity: .72; }
+.dg-sidebar nav > button:disabled i { color: var(--dg-text-disabled); }
 .dg-sidebar nav > button i { color: #a970dc; text-align: center; }
 .dg-sidebar nav > button b { min-width: 22px; border: 1px solid var(--dg-border-soft); border-radius: 12px; padding: 1px 5px; color: var(--dg-text-muted); font-size: 10px; text-align: center; }
-.dg-sidebar-footer { display: flex; align-items: center; gap: 10px; padding: 15px 20px; border-top: 1px solid var(--dg-border-soft); color: var(--dg-text-secondary); }
+.dg-sidebar-footer { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; border-top: 1px solid var(--dg-border-soft); border-radius: 0; padding: 15px 20px; background: transparent; color: var(--dg-text-secondary); text-align: left; cursor: pointer; }
+.dg-sidebar-footer:hover { background: rgba(255, 255, 255, .035); color: var(--dg-text-primary); }
 
 .dg-dashboard-main { min-width: 0; height: 100%; overflow: auto; padding: 24px; }
 .dg-hero { position: relative; display: flex; align-items: flex-end; gap: 20px; min-height: 210px; overflow: hidden; border: 1px solid var(--dg-border-ornament); border-radius: 12px; padding: 28px; background: url("../assets/banner.png") center 46% / cover no-repeat; box-shadow: 0 20px 45px var(--dg-shadow); }
@@ -114,7 +117,7 @@
 .dg-recent td:first-child { display: grid; gap: 2px; color: var(--dg-text-primary); }
 .dg-recent td small { color: var(--dg-text-muted); }
 
-.dg-context-rail { display: none; height: 100%; overflow: auto; border-left: 1px solid var(--dg-border-soft); padding: 24px 16px; background: rgba(7, 8, 13, .98); }
+.dg-context-rail { display: none; height: 100%; min-height: 0; overflow: auto; border-left: 1px solid var(--dg-border-soft); padding: 24px 16px; background: rgba(7, 8, 13, .98); }
 .dg-context-rail section { margin-bottom: 16px; border: 1px solid var(--dg-border-soft); border-radius: 9px; padding: 15px; background: var(--dg-surface-1); }
 .dg-context-rail h2 { margin: 0 0 13px; font-size: 17px; }
 .dg-context-rail section > button { display: flex; align-items: center; gap: 11px; width: 100%; margin: 6px 0; border: 1px solid transparent; border-radius: 7px; padding: 10px; background: transparent; text-align: left; cursor: pointer; }
@@ -156,6 +159,11 @@
 .dg-editor :where(input, textarea, select), .dg-codex :where(input, select) { width: 100%; min-height: 42px; box-sizing: border-box; border: 1px solid var(--dg-border-strong); border-radius: 7px; padding: 12px 14px; background: #080a10; color: var(--dg-text-primary); }
 .dg-editor textarea { min-height: 92px; resize: vertical; }
 .dg-editor :where(input, textarea, select):focus, .dg-codex :where(input, select):focus { border-color: var(--dg-focus); box-shadow: 0 0 0 3px rgba(200, 131, 255, .08); outline: 0; }
+.dg-file-control { display: grid; grid-template-columns: minmax(0, 1fr) 42px; gap: 7px; }
+.dg-file-control > button { display: grid; place-items: center; border: 1px solid var(--dg-border-strong); border-radius: 7px; background: var(--dg-surface-2); cursor: pointer; }
+.dg-file-control > button:hover { border-color: var(--dg-accent); background: var(--dg-accent-soft); }
+.dg-image-field > img { width: 100%; height: 128px; box-sizing: border-box; border: 1px solid var(--dg-border-soft); border-radius: 7px; padding: 4px; background: #05060a; object-fit: contain; }
+.dg-image-field > img[hidden] { display: none; }
 .dg-span-2 { grid-column: span 2; }
 .dg-span-3 { grid-column: span 3; }
 .dg-editor-list { display: grid; gap: 12px; }
@@ -194,6 +202,13 @@
 .dg-codex-rule p { margin: 0; color: var(--dg-text-secondary); }
 .dg-codex-copy > .dg-primary { margin-top: 18px; }
 .dg-selected-deity { display: inline-flex; align-items: center; gap: 7px; margin-top: 18px; border: 1px solid rgba(95, 207, 134, .5); border-radius: 15px; padding: 6px 10px; color: #8ee6aa; }
+.dg-choice-groups { display: grid; gap: 14px; margin: 18px 0; }
+.dg-choice-groups fieldset { display: grid; gap: 8px; border: 1px solid var(--dg-border-strong); border-radius: 8px; padding: 14px; }
+.dg-choice-groups fieldset[hidden] { display: none; }
+.dg-choice-groups legend { padding: 0 7px; font-family: "GodForge Display", "Cinzel", Georgia, serif; }
+.dg-choice-groups legend span { margin-left: 8px; color: var(--dg-text-muted); font: 500 11px Inter, system-ui, sans-serif; }
+.dg-choice-groups label { display: flex; align-items: center; gap: 9px; border-radius: 6px; padding: 8px; color: var(--dg-text-secondary); cursor: pointer; }
+.dg-choice-groups label:hover { background: var(--dg-accent-soft); color: var(--dg-text-primary); }
 
 /* Existing detail view */
 .dg-detail-grid { display: grid; grid-template-columns: 310px minmax(0, 1fr); gap: 28px; height: 100%; overflow: auto; box-sizing: border-box; padding: 28px; background: radial-gradient(circle at 70% 0, rgba(95, 35, 145, .18), transparent 34%), var(--dg-bg-base); color: var(--dg-text-primary); font-family: Inter, system-ui, sans-serif; }
@@ -253,6 +268,7 @@
 .dg-validation p { margin: 4px 0 0; }
 .dg-import-preview .dg-stat-grid { grid-template-columns: repeat(5, 1fr); }
 .dg-random-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.dg-random-layout:empty { display: none; }
 .dg-random-layout form { display: grid; gap: 14px; }
 .dg-random-entry-head { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
 .dg-random-entry { display: grid; grid-template-columns: 1.2fr 90px 130px 1.5fr 34px; gap: 7px; }
@@ -266,6 +282,9 @@
 .dg-wheel-result > i { color: #cf9dff; font-size: 24px; animation: dg-spin-result 850ms ease-out; }
 .dg-wheel-result > span { display: grid; }
 .dg-wheel-result small { color: var(--dg-text-secondary); }
+.dg-migration-status { margin: 0; }
+.dg-migration-status div { display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--dg-border-soft); padding: 10px 0; }
+.dg-migration-status dd { margin: 0; color: var(--dg-text-primary); }
 @keyframes dg-spin-result { from { transform: rotate(-720deg); } to { transform: rotate(0); } }
 
 @media (min-width: 1500px) {
@@ -331,5 +350,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .darkis-godforge *, .darkis-godforge *::before, .darkis-godforge *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+  .darkis-godforge .window-content *, .darkis-godforge .window-content *::before, .darkis-godforge .window-content *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }

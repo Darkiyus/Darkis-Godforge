@@ -1,9 +1,12 @@
 <section class="dg-manager dg-data-manager">
-  <header><div><p class="eyebrow">{{ui.TOOLS}}</p><h2>{{ui.IMPORT_EXPORT}}</h2><p>{{ui.DATA_MANAGER_HINT}}</p></div><span class="dg-status">{{deityCount}} {{ui.DEITIES}}</span></header>
+  <header><div><p class="eyebrow">{{ui.TOOLS}}</p><h2>{{#if isMigration}}{{ui.MIGRATIONS}}{{else}}{{ui.IMPORT_EXPORT}}{{/if}}</h2><p>{{#if isMigration}}{{ui.MIGRATION_MANAGER_HINT}}{{else}}{{ui.DATA_MANAGER_HINT}}{{/if}}</p></div><span class="dg-status">{{deityCount}} {{ui.DEITIES}}</span></header>
+  {{#if isTransfer}}
   <div class="dg-tool-grid">
     <article class="dg-tool-card"><i class="fas fa-file-export" aria-hidden="true"></i><h3>{{ui.EXPORT_PACKAGE}}</h3><p>{{ui.EXPORT_HINT}}</p><button type="button" class="dg-primary" data-action="export">{{ui.EXPORT}}</button></article>
     <article class="dg-tool-card"><i class="fas fa-file-import" aria-hidden="true"></i><h3>{{ui.IMPORT_PACKAGE}}</h3><p>{{ui.IMPORT_HINT}}</p><label class="dg-file-picker">{{ui.CHOOSE_FILE}}<input type="file" accept="application/json,.json" data-import-file></label></article>
   </div>
   {{#if error}}<div class="dg-validation dg-validation-error"><i class="fas fa-circle-exclamation" aria-hidden="true"></i><div><strong>{{ui.IMPORT_INVALID}}</strong><p>{{error}}</p></div></div>{{/if}}
   {{#if preview}}<section class="dg-import-preview"><h3>{{ui.IMPORT_PREVIEW}}</h3><div class="dg-stat-grid"><article><strong>{{preview.total}}</strong><span>{{ui.DEITIES}}</span></article><article><strong>{{preview.created}}</strong><span>{{ui.NEW_CONTENT}}</span></article><article><strong>{{preview.updated}}</strong><span>{{ui.UPDATED_CONTENT}}</span></article><article><strong>{{preview.tables}}</strong><span>{{ui.RANDOM_TABLES}}</span></article><article><strong>{{preview.wheels}}</strong><span>{{ui.FORTUNE_WHEELS}}</span></article></div><p>{{ui.IMPORT_APPLY_HINT}}</p><button type="button" class="dg-primary" data-action="apply-import">{{ui.APPLY_IMPORT}}</button></section>{{/if}}
+  {{/if}}
+  {{#if isMigration}}<section class="dg-editor-section"><div class="dg-section-title"><h3>{{ui.MIGRATION_STATUS}}</h3></div><dl class="dg-migration-status"><div><dt>{{ui.CURRENT_SCHEMA}}</dt><dd>{{currentSchema}}</dd></div><div><dt>{{ui.PENDING_MIGRATIONS}}</dt><dd>{{pendingMigrations}}</dd></div></dl>{{#if pendingMigrations}}<p>{{ui.MIGRATION_RELOAD_HINT}}</p>{{else}}<p class="dg-health"><i class="fas fa-circle-check" aria-hidden="true"></i> {{ui.MIGRATION_COMPLETE}}</p>{{/if}}</section>{{/if}}
 </section>

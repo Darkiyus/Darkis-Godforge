@@ -1,4 +1,5 @@
 import { getFoundryRuntime } from "./runtime";
+import { isCurrentUserGM, notifyGMOnly } from "./permissions";
 
 export interface FoundryApplicationInstance { render(force?: boolean): Promise<unknown>; close?(): Promise<unknown>; element?: HTMLElement; }
 type ApplicationConstructor = new (...args: never[]) => FoundryApplicationInstance;
@@ -13,4 +14,14 @@ export function handlebarsApplicationBase(): ApplicationConstructor {
     return class { render(): Promise<never> { return Promise.reject(new Error(message)); } };
   }
   return class { render(): Promise<unknown> { return Promise.resolve(this); } };
+}
+
+export function gmApplicationBase(): ApplicationConstructor {
+  const Base = handlebarsApplicationBase();
+  return class extends Base {
+    override render(force?: boolean): Promise<unknown> {
+      if (!isCurrentUserGM()) { notifyGMOnly(); return Promise.resolve(this); }
+      return super.render(force);
+    }
+  };
 }

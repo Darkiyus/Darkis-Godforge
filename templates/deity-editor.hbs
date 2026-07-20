@@ -3,7 +3,6 @@
     <div>
       <p class="eyebrow">{{ui.TITLE}}</p>
       <h2>{{ui.NEW_DEITY}}</h2>
-      <p class="muted">{{ui.NEW_DEITY_HINT}}</p>
     </div>
     <button type="button" class="dg-secondary" data-action="preview-player" title="{{ui.PLAYER_PREVIEW}}"><i class="fas fa-eye" aria-hidden="true"></i> {{ui.PLAYER_PREVIEW}}</button>
   </header>
@@ -22,8 +21,10 @@
         <label>{{ui.ALIGNMENT}}<input name="alignment"></label>
         <label class="dg-span-2">{{ui.DESCRIPTION}}<textarea name="description" required maxlength="4000" rows="6"></textarea></label>
         <label class="dg-span-2">{{ui.QUOTE}}<input name="quote" maxlength="300"></label>
-        <label>{{ui.PORTRAIT}}<input name="image" placeholder="{{ui.FILE_PATH}}"></label>
-        <label>{{ui.SYMBOL}}<input name="symbol" placeholder="{{ui.FILE_PATH}}"></label>
+        <label class="dg-image-field" data-image-field="image">{{ui.PORTRAIT}}<span class="dg-file-control"><input name="image" data-image-input placeholder="{{ui.FILE_PATH}}"><button type="button" data-action="browse-image" data-target="image" data-type="image" title="{{ui.BROWSE_FILES}}"><i class="fas fa-folder-open" aria-hidden="true"></i></button></span><img data-image-preview="image" alt="" hidden></label>
+        <label class="dg-image-field" data-image-field="icon">{{ui.ICON}}<span class="dg-file-control"><input name="icon" data-image-input placeholder="{{ui.FILE_PATH}}"><button type="button" data-action="browse-image" data-target="icon" data-type="image" title="{{ui.BROWSE_FILES}}"><i class="fas fa-folder-open" aria-hidden="true"></i></button></span><img data-image-preview="icon" alt="" hidden></label>
+        <label class="dg-image-field" data-image-field="symbol">{{ui.SYMBOL}}<span class="dg-file-control"><input name="symbol" data-image-input placeholder="{{ui.FILE_PATH}}"><button type="button" data-action="browse-image" data-target="symbol" data-type="image" title="{{ui.BROWSE_FILES}}"><i class="fas fa-folder-open" aria-hidden="true"></i></button></span><img data-image-preview="symbol" alt="" hidden></label>
+        <label class="dg-image-field" data-image-field="banner">{{ui.BANNER}}<span class="dg-file-control"><input name="banner" data-image-input placeholder="{{ui.FILE_PATH}}"><button type="button" data-action="browse-image" data-target="banner" data-type="image" title="{{ui.BROWSE_FILES}}"><i class="fas fa-folder-open" aria-hidden="true"></i></button></span><img data-image-preview="banner" alt="" hidden></label>
         <label>{{ui.PANTHEONS}}<input name="pantheons" placeholder="{{ui.COMMA_SEPARATED}}"></label>
         <label>{{ui.DOMAINS}}<input name="domains" required placeholder="{{ui.DOMAINS_PLACEHOLDER}}"></label>
         <label>{{ui.ALTERNATE_DOMAINS}}<input name="alternateDomains" placeholder="{{ui.DOMAINS_PLACEHOLDER}}"></label>
@@ -46,7 +47,7 @@
     </section>
 
     <section id="dg-abilities" class="dg-editor-section dg-panel-ornament">
-      <div class="dg-section-title"><div><h3>{{ui.DIVINE_WONDERS}}</h3><p>{{ui.ABILITY_EDITOR_HINT}}</p></div><button type="button" class="dg-secondary" data-action="add-ability"><i class="fas fa-plus" aria-hidden="true"></i> {{ui.ADD_ABILITY}}</button></div>
+      <div class="dg-section-title"><h3>{{ui.DIVINE_WONDERS}}</h3><button type="button" class="dg-secondary" data-action="add-ability"><i class="fas fa-plus" aria-hidden="true"></i> {{ui.ADD_ABILITY}}</button></div>
       <div class="dg-editor-list" data-ability-list></div>
     </section>
 

@@ -6,7 +6,6 @@ import type { SocketRouter } from "./socket-router";
 import { createSocketlibTransport } from "./socketlib-transport";
 import { loadLanguage } from "./i18n";
 import { GodForgeDashboard } from "../applications/dashboard";
-import { requireGM } from "./permissions";
 import type { RandomContentService, RandomContentSnapshot } from "../core/random-service";
 import type { GodForgeActor } from "../api";
 import { addGodForgeSheetButton } from "./sheet-integration";
@@ -82,7 +81,7 @@ function exposeModuleApi(game: FoundryGame, api: GodForgeApi, openDashboard: () 
   const moduleEntry = game.modules?.get(namespace);
   if (!moduleEntry) { console.error("Darkis GodForge | Module entry is unavailable; public API could not be exposed."); return; }
   const exposedApi = api as GodForgeApi & { openDashboard: () => void; openCodex: () => void; openHub?: (actor?: GodForgeActor) => void };
-  exposedApi.openDashboard = () => { requireGM(); openDashboard(); };
+  exposedApi.openDashboard = openDashboard;
   exposedApi.openCodex = openCodex;
   if (openHub) exposedApi.openHub = openHub;
   moduleEntry.api = exposedApi;

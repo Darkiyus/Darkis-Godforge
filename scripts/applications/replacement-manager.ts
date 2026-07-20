@@ -1,11 +1,11 @@
 import type { AdapterRegistry } from "../adapters/adapter-registry";
 import type { DeityService } from "../core/deity-service";
-import { handlebarsApplicationBase } from "../foundry/application-base";
+import { gmApplicationBase } from "../foundry/application-base";
 import { uiText } from "../foundry/i18n";
 import { requireGM } from "../foundry/permissions";
 import { getFoundryGame } from "../foundry/runtime";
 
-export class GodForgeReplacementManager extends handlebarsApplicationBase() {
+export class GodForgeReplacementManager extends gmApplicationBase() {
   static DEFAULT_OPTIONS = { id: "darkis-godforge-replacements", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.REPLACEMENTS", resizable: true }, position: { width: 1100, height: 760 } };
   static PARTS = { main: { template: "modules/darkis-godforge/templates/replacement-manager.hbs" } };
   constructor(private readonly deities: DeityService, private readonly adapters: AdapterRegistry) { super(); }

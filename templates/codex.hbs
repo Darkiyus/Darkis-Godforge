@@ -18,7 +18,7 @@
             {{#if favoredWeapon}}<dl><dt>{{../ui.FAVORED_WEAPON}}</dt><dd>{{favoredWeapon}}</dd></dl>{{/if}}
             {{#if passiveBonuses}}<section><h5>{{../ui.PASSIVE_BONUSES}}</h5>{{#each passiveBonuses}}<div class="dg-codex-rule"><strong>{{name}}</strong>{{#if value}}<span>{{value}}</span>{{/if}}</div>{{/each}}</section>{{/if}}
             {{#if abilities}}<section><h5>{{../ui.DIVINE_WONDERS}}</h5>{{#each abilities}}<div class="dg-codex-rule"><strong>{{name}}</strong><p>{{description}}</p></div>{{/each}}</section>{{/if}}
-            {{#if selected}}<span class="dg-selected-deity"><i class="fas fa-circle-check" aria-hidden="true"></i> {{../ui.YOUR_DEITY}}</span>{{else}}{{#if canSelect}}<button type="button" class="dg-primary" data-select-deity="{{id}}">{{../ui.SELECT_DEITY}}</button>{{else}}{{#if requiresChoices}}<p class="muted">{{../ui.SELECTION_REQUIRES_GM}}</p>{{/if}}{{/if}}{{/if}}
+            {{#if selected}}<span class="dg-selected-deity"><i class="fas fa-circle-check" aria-hidden="true"></i> {{../ui.YOUR_DEITY}}</span>{{else}}{{#if canSelect}}<button type="button" class="dg-primary" data-select-deity="{{id}}">{{#if requiresChoices}}{{../ui.CHOOSE_AND_SELECT}}{{else}}{{../ui.SELECT_DEITY}}{{/if}}</button>{{/if}}{{/if}}
           </div>
         </article>
       {{/each}}

@@ -1,0 +1,15 @@
+<section class="dg-manager dg-grant-choice-dialog">
+  <header><div><p class="eyebrow">{{ui.CHOOSE_GRANTS}}</p><h2>{{deityName}}</h2><p>{{ui.CHOOSE_GRANTS_HINT}}</p></div></header>
+  {{#if error}}<div class="dg-validation dg-validation-error"><i class="fas fa-circle-exclamation" aria-hidden="true"></i><p>{{error}}</p></div>{{/if}}
+  <form>
+    <div class="dg-choice-groups">
+      {{#each groups}}
+        <fieldset data-choice-group="{{@index}}"><legend>{{label}} <span>{{../ui.PICK_COUNT}}: {{pick}}</span></legend>
+          {{#each requirements}}<span data-choice-requirement data-name="{{name}}" data-token="{{token}}" hidden></span>{{/each}}
+          {{#each options}}<label><input type="{{../inputType}}" name="choice-{{@../index}}" value="{{token}}"> <span>{{label}}</span></label>{{/each}}
+        </fieldset>
+      {{/each}}
+    </div>
+    <div class="dg-editor-actions"><button type="button" data-action="cancel">{{ui.CANCEL}}</button><button type="submit" class="dg-primary">{{ui.ASSIGN_DEITY}}</button></div>
+  </form>
+</section>

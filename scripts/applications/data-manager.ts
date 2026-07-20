@@ -1,21 +1,22 @@
 import type { GodForgeApi } from "../api";
 import type { DeityService } from "../core/deity-service";
 import { importDefinitions } from "../core/import-export-service";
-import { handlebarsApplicationBase } from "../foundry/application-base";
+import { gmApplicationBase } from "../foundry/application-base";
 import { uiText } from "../foundry/i18n";
 import { requireGM } from "../foundry/permissions";
 import { getFoundryUi } from "../foundry/runtime";
 import { validateRandomContentSnapshot, type RandomContentService, type RandomContentSnapshot } from "../core/random-service";
+import { CURRENT_SCHEMA_VERSION } from "../core/migration-service";
 
-export class GodForgeDataManager extends handlebarsApplicationBase() {
+export class GodForgeDataManager extends gmApplicationBase() {
   static DEFAULT_OPTIONS = { id: "darkis-godforge-data-manager", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.IMPORT_EXPORT", resizable: true }, position: { width: 900, height: 700 } };
   static PARTS = { main: { template: "modules/darkis-godforge/templates/data-manager.hbs" } };
   private pendingImport: unknown;
   private preview: { total: number; created: number; updated: number; tables: number; wheels: number } | null = null;
   private error = "";
-  constructor(private readonly deities: DeityService, private readonly api: GodForgeApi, private readonly randomContent: RandomContentService) { super(); }
+  constructor(private readonly deities: DeityService, private readonly api: GodForgeApi, private readonly randomContent: RandomContentService, private readonly mode: "transfer" | "migration" = "transfer") { super(); }
 
-  async _prepareContext(): Promise<Record<string, unknown>> { requireGM(); return { ui: uiText(), preview: this.preview, error: this.error, deityCount: this.deities.list().length }; }
+  async _prepareContext(): Promise<Record<string, unknown>> { requireGM(); const definitions = this.deities.list(); return { ui: uiText(), preview: this.preview, error: this.error, deityCount: definitions.length, isTransfer: this.mode === "transfer", isMigration: this.mode === "migration", currentSchema: CURRENT_SCHEMA_VERSION, pendingMigrations: definitions.filter((deity) => deity.schemaVersion < CURRENT_SCHEMA_VERSION).length }; }
 
   _onRender(): void {
     requireGM();

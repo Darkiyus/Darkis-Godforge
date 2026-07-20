@@ -8,7 +8,7 @@ import { registerFoundryBootstrap } from "./foundry/bootstrap";
 import { SocketRouter } from "./foundry/socket-router";
 import type { GodForgeActor } from "./api";
 import { getFoundryGame, getFoundryRuntime, getFoundryUi } from "./foundry/runtime";
-import { requireGM } from "./foundry/permissions";
+import { isCurrentUserGM, notifyGMOnly } from "./foundry/permissions";
 import { RandomContentService } from "./core/random-service";
 import { localize } from "./foundry/i18n";
 
@@ -19,7 +19,7 @@ const randomContentService = new RandomContentService();
 
 let dashboard: GodForgeDashboard | null = null;
 function openDashboard(): void {
-  requireGM();
+  if (!isCurrentUserGM()) { notifyGMOnly(); return; }
   dashboard ??= new GodForgeDashboard(deityService, registry, api, randomContentService);
   void dashboard.render(true).catch((error: unknown) => {
     console.error("Darkis GodForge | Could not open dashboard.", error);

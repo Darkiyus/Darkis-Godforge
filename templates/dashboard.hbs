@@ -3,25 +3,25 @@
     <div class="dg-brand"><img src="modules/darkis-godforge/assets/logo.png" alt="{{ui.TITLE}}"><span>{{ui.TITLE}}</span></div>
     <nav>
       <p>{{ui.OVERVIEW}}</p>
-      <button class="{{#if nav.overview}}active{{/if}}" type="button" data-section="overview"><i class="fas fa-grid-2" aria-hidden="true"></i><span>{{ui.OVERVIEW}}</span></button>
-      <button class="{{#if nav.deities}}active{{/if}}" type="button" data-section="deities"><i class="fas fa-sparkles" aria-hidden="true"></i><span>{{ui.DEITIES}}</span><b>{{stats.deities}}</b></button>
+      <button class="{{#if nav.overview}}active{{/if}}" type="button" data-section="overview"><i class="fas fa-table-cells-large" aria-hidden="true"></i><span>{{ui.OVERVIEW}}</span></button>
+      <button class="{{#if nav.deities}}active{{/if}}" type="button" data-section="deities"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i><span>{{ui.DEITIES}}</span><b>{{stats.deities}}</b></button>
       <button class="{{#if nav.pantheons}}active{{/if}}" type="button" data-section="pantheons"><i class="fas fa-landmark" aria-hidden="true"></i><span>{{ui.PANTHEONS}}</span><b>{{stats.pantheons}}</b></button>
       <button class="{{#if nav.abilities}}active{{/if}}" type="button" data-section="abilities"><i class="fas fa-bolt" aria-hidden="true"></i><span>{{ui.DIVINE_WONDERS}}</span><b>{{stats.abilities}}</b></button>
       <button class="{{#if nav.bonuses}}active{{/if}}" type="button" data-section="bonuses"><i class="fas fa-shield-halved" aria-hidden="true"></i><span>{{ui.PASSIVE_BONUSES}}</span><b>{{stats.bonuses}}</b></button>
-      <button type="button" data-manager="random"><i class="fas fa-dice-d20" aria-hidden="true"></i><span>{{ui.RANDOM_TABLES}}</span></button>
-      <button type="button" data-manager="random"><i class="fas fa-dharmachakra" aria-hidden="true"></i><span>{{ui.FORTUNE_WHEELS}}</span></button>
+      <button type="button" data-manager="random" data-manager-mode="tables"><i class="fas fa-dice-d20" aria-hidden="true"></i><span>{{ui.RANDOM_TABLES}}</span></button>
+      <button type="button" data-manager="random" data-manager-mode="wheels"><i class="fas fa-dharmachakra" aria-hidden="true"></i><span>{{ui.FORTUNE_WHEELS}}</span></button>
       <p>{{ui.INTEGRATION}}</p>
       <button type="button" data-manager="replacements"><i class="fas fa-code-compare" aria-hidden="true"></i><span>{{ui.REPLACEMENTS}}</span></button>
       <button type="button" data-manager="characters"><i class="fas fa-users" aria-hidden="true"></i><span>{{ui.CHARACTERS}}</span><b>{{stats.assignedActors}}</b></button>
       <button type="button" data-action="codex"><i class="fas fa-book-open" aria-hidden="true"></i><span>{{ui.CODEX}}</span></button>
       <button type="button" data-action="player-preview"><i class="fas fa-eye" aria-hidden="true"></i><span>{{ui.PLAYER_VIEW}}</span></button>
       <p>{{ui.TOOLS}}</p>
-      <button type="button" data-manager="random"><i class="fas fa-flask" aria-hidden="true"></i><span>{{ui.TEST_LAB}}</span></button>
-      <button type="button" data-manager="data"><i class="fas fa-file-import" aria-hidden="true"></i><span>{{ui.IMPORT_EXPORT}}</span></button>
-      <button type="button" data-manager="data"><i class="fas fa-clock-rotate-left" aria-hidden="true"></i><span>{{ui.MIGRATIONS}}</span></button>
-      <button type="button" data-scroll="recent"><i class="fas fa-list-check" aria-hidden="true"></i><span>{{ui.AUDIT_LOG}}</span></button>
+      <button type="button" data-manager="random" data-manager-mode="test"><i class="fas fa-flask" aria-hidden="true"></i><span>{{ui.TEST_LAB}}</span></button>
+      <button type="button" data-manager="data" data-manager-mode="transfer"><i class="fas fa-file-import" aria-hidden="true"></i><span>{{ui.IMPORT_EXPORT}}</span></button>
+      <button type="button" data-manager="data" data-manager-mode="migration"><i class="fas fa-clock-rotate-left" aria-hidden="true"></i><span>{{ui.MIGRATIONS}}</span></button>
+      <button type="button" disabled title="{{ui.PLANNED}}"><i class="fas fa-list-check" aria-hidden="true"></i><span>{{ui.AUDIT_LOG}}</span></button>
     </nav>
-    <div class="dg-sidebar-footer"><i class="fas fa-gear" aria-hidden="true"></i><span>{{ui.SETTINGS}}</span></div>
+    <button type="button" class="dg-sidebar-footer" data-action="settings"><i class="fas fa-gear" aria-hidden="true"></i><span>{{ui.SETTINGS}}</span></button>
   </aside>
 
   <main class="dg-dashboard-main">
@@ -55,7 +55,7 @@
     </section>
 
     <section class="dg-stat-grid" aria-label="{{ui.OVERVIEW}}">
-      <article><i class="fas fa-sparkles" aria-hidden="true"></i><strong>{{stats.deities}}</strong><span>{{ui.DEITIES}}</span></article>
+      <article><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i><strong>{{stats.deities}}</strong><span>{{ui.DEITIES}}</span></article>
       <article><i class="fas fa-circle-check" aria-hidden="true"></i><strong>{{stats.published}}</strong><span>{{ui.PUBLISHED}}</span></article>
       <article><i class="fas fa-shield-halved" aria-hidden="true"></i><strong>{{stats.bonuses}}</strong><span>{{ui.PASSIVE_BONUSES}}</span></article>
       <article><i class="fas fa-bolt" aria-hidden="true"></i><strong>{{stats.abilities}}</strong><span>{{ui.DIVINE_WONDERS}}</span></article>
@@ -72,7 +72,7 @@
   </main>
 
   <aside class="dg-context-rail">
-    <section><p class="eyebrow">{{ui.QUICK_ACCESS}}</p><h2>{{ui.QUICK_ACCESS}}</h2><button data-action="create"><i class="fas fa-plus" aria-hidden="true"></i><span><strong>{{ui.CREATE}}</strong><small>{{ui.NEW_DEITY_HINT}}</small></span></button><button data-action="player-preview"><i class="fas fa-eye" aria-hidden="true"></i><span><strong>{{ui.PLAYER_PREVIEW}}</strong><small>{{ui.VISIBILITY_HINT}}</small></span></button><button data-manager="data"><i class="fas fa-file-import" aria-hidden="true"></i><span><strong>{{ui.IMPORT_EXPORT}}</strong><small>{{ui.EMPTY_HINT}}</small></span></button></section>
-    <section><p class="eyebrow">{{ui.SYSTEM_STATUS}}</p><h2>{{ui.SYSTEM_STATUS}}</h2><dl><div><dt>Foundry</dt><dd>{{systemInfo.foundry}}</dd></div><div><dt>{{ui.SYSTEM}}</dt><dd>{{systemInfo.system}} {{systemInfo.systemVersion}}</dd></div><div><dt>GodForge</dt><dd>{{systemInfo.moduleVersion}}</dd></div><div><dt>{{ui.ADAPTER}}</dt><dd>{{systemInfo.adapter}}</dd></div><div><dt>{{ui.SCHEMA}}</dt><dd>{{systemInfo.schema}}</dd></div></dl><span class="dg-health"><i class="fas fa-circle-check" aria-hidden="true"></i> {{ui.DIAGNOSTICS_OK}}</span></section>
+    <section><h2>{{ui.QUICK_ACCESS}}</h2><button data-action="create"><i class="fas fa-plus" aria-hidden="true"></i><span><strong>{{ui.CREATE}}</strong></span></button><button data-action="player-preview"><i class="fas fa-eye" aria-hidden="true"></i><span><strong>{{ui.PLAYER_PREVIEW}}</strong><small>{{ui.VISIBILITY_HINT}}</small></span></button><button data-manager="data" data-manager-mode="transfer"><i class="fas fa-file-import" aria-hidden="true"></i><span><strong>{{ui.IMPORT_EXPORT}}</strong><small>{{ui.IMPORT_EXPORT_HINT}}</small></span></button></section>
+    <section><h2>{{ui.SYSTEM_STATUS}}</h2><dl><div><dt>Foundry</dt><dd>{{systemInfo.foundry}}</dd></div><div><dt>{{ui.SYSTEM}}</dt><dd>{{systemInfo.system}} {{systemInfo.systemVersion}}</dd></div><div><dt>GodForge</dt><dd>{{systemInfo.moduleVersion}}</dd></div><div><dt>{{ui.ADAPTER}}</dt><dd>{{systemInfo.adapter}}</dd></div><div><dt>{{ui.SCHEMA}}</dt><dd>{{systemInfo.schema}}</dd></div></dl><span class="dg-health"><i class="fas fa-circle-check" aria-hidden="true"></i> {{ui.DIAGNOSTICS_OK}}</span></section>
   </aside>
 </div>

@@ -1,15 +1,17 @@
 import { AdapterRegistry } from "../adapters/adapter-registry";
 import type { DeityService } from "../core/deity-service";
 import { DEFAULT_VISIBILITY, type AbilityDefinition, type DeityDefinition, type GrantGroup, type GrantMember, type PassiveBonusDefinition, type VisibilityFields, type VisibilityLevel } from "../core/types";
-import { handlebarsApplicationBase } from "../foundry/application-base";
+import { gmApplicationBase } from "../foundry/application-base";
 import { uiText } from "../foundry/i18n";
 import { requireGM } from "../foundry/permissions";
 import { getFoundryGame } from "../foundry/runtime";
 import { GodForgeCodex } from "./codex";
+import { safeImageUrl } from "../core/sanitize";
+import { CURRENT_SCHEMA_VERSION } from "../core/migration-service";
 
 const visibilityFields = Object.keys(DEFAULT_VISIBILITY.fields) as Array<keyof VisibilityFields>;
 
-export class GodForgeDeityEditor extends handlebarsApplicationBase() {
+export class GodForgeDeityEditor extends gmApplicationBase() {
   static DEFAULT_OPTIONS = { id: "darkis-godforge-deity-editor", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.NEW_DEITY", resizable: true }, position: { width: 780, height: "auto" } };
   static PARTS = { main: { template: "modules/darkis-godforge/templates/deity-editor.hbs" } };
 
@@ -38,6 +40,11 @@ export class GodForgeDeityEditor extends handlebarsApplicationBase() {
     const root = this.element;
     const form = root?.querySelector<HTMLFormElement>("form");
     if (root && form && this.existing) this.populateForm(root, form, this.existing);
+    root?.querySelectorAll<HTMLButtonElement>("[data-action='browse-image']").forEach((button) => button.addEventListener("click", () => this.openFilePicker(root, button)));
+    root?.querySelectorAll<HTMLElement>("[data-image-field]").forEach((field) => {
+      field.addEventListener("dragover", (event) => { event.preventDefault(); event.dataTransfer!.dropEffect = "copy"; });
+      field.addEventListener("drop", (event) => this.handleImageDrop(event, field));
+    });
     root?.querySelector<HTMLElement>("[data-action='close']")?.addEventListener("click", () => void this.close?.());
     root?.querySelector<HTMLElement>("[data-action='add-bonus']")?.addEventListener("click", () => this.appendTemplate(root, "bonus", "[data-bonus-list]"));
     root?.querySelector<HTMLElement>("[data-action='add-ability']")?.addEventListener("click", () => this.appendTemplate(root, "ability", "[data-ability-list]"));
@@ -54,7 +61,8 @@ export class GodForgeDeityEditor extends handlebarsApplicationBase() {
       if (button.dataset.action === "move-down" && card.nextElementSibling) card.parentElement?.insertBefore(card.nextElementSibling, card);
       this.updateStackingWarnings(root);
     });
-    root?.addEventListener("input", () => this.updateStackingWarnings(root));
+    root?.addEventListener("input", (event) => { this.updateStackingWarnings(root); const input = event.target as HTMLInputElement; if (input.matches("[data-image-input]")) this.updateImagePreview(root, input.name, input.value); });
+    root?.querySelectorAll<HTMLInputElement>("[data-image-input]").forEach((input) => this.updateImagePreview(root, input.name, input.value));
     root?.querySelector<HTMLElement>("[data-action='preview-player']")?.addEventListener("click", () => {
       if (!form?.reportValidity()) return;
       const deity = this.previewDefinition(form);
@@ -81,12 +89,12 @@ export class GodForgeDeityEditor extends handlebarsApplicationBase() {
 
   private previewDefinition(form: HTMLFormElement): DeityDefinition {
     const now = new Date().toISOString();
-    return { ...this.readInput(form), id: "preview", schemaVersion: 2, revision: 1, createdAt: now, updatedAt: now, checksum: "preview" };
+    return { ...this.readInput(form), id: "preview", schemaVersion: CURRENT_SCHEMA_VERSION, revision: 1, createdAt: now, updatedAt: now, checksum: "preview" };
   }
 
   private populateForm(root: HTMLElement, form: HTMLFormElement, deity: DeityDefinition): void {
     const values: Record<string, string> = {
-      name: deity.name, title: deity.title, status: deity.status, description: deity.description, quote: deity.quote ?? "", image: deity.image ?? "", symbol: deity.symbol ?? "",
+      name: deity.name, title: deity.title, status: deity.status, description: deity.description, quote: deity.quote ?? "", image: deity.image ?? "", icon: deity.icon ?? "", symbol: deity.symbol ?? "", banner: deity.banner ?? "",
       pantheons: (deity.pantheonIds ?? []).join(", "), domains: deity.domains.join(", "), alternateDomains: (deity.alternateDomains ?? []).join(", "), divineAttributes: (deity.divineAttributes ?? []).join(", "), spells: this.formatSpells(deity.spells), tags: (deity.tags ?? []).join(", "), alignment: deity.alignment ?? "", favoredWeapon: deity.favoredWeapon ?? "",
       font: deity.font ?? "", skill: deity.skill ?? "", sanctification: deity.sanctification ?? "", cause: deity.cause ?? "",
       edicts: (deity.edicts ?? []).join(", "), anathema: (deity.anathema ?? []).join(", "), gmNotes: deity.gmNotes ?? "", "replacement.mode": deity.replacement.mode,
@@ -130,7 +138,9 @@ export class GodForgeDeityEditor extends handlebarsApplicationBase() {
       description: this.text(data.get("description")),
       quote: this.optional(data.get("quote")),
       image: this.optional(data.get("image")),
+      icon: this.optional(data.get("icon")),
       symbol: this.optional(data.get("symbol")),
+      banner: this.optional(data.get("banner")),
       domains: this.list(data.get("domains")),
       alternateDomains: this.list(data.get("alternateDomains")),
       divineAttributes: this.list(data.get("divineAttributes")),
@@ -152,6 +162,44 @@ export class GodForgeDeityEditor extends handlebarsApplicationBase() {
       replacement: { sourceUuid: this.text(data.get("replacement.sourceUuid")), mode: this.replacementMode(data.get("replacement.mode")), contexts: this.list(data.get("replacement.contexts")), inherit: { domains: data.has("replacement.inherit.domains"), favoredWeapon: data.has("replacement.inherit.favoredWeapon"), spells: data.has("replacement.inherit.spells"), sanctification: data.has("replacement.inherit.sanctification"), skill: data.has("replacement.inherit.skill"), edicts: data.has("replacement.inherit.edicts"), anathema: data.has("replacement.inherit.anathema") }, keepForExistingActors: data.has("replacement.keepForExistingActors") },
       visibility
     };
+  }
+
+  private openFilePicker(root: HTMLElement | undefined, button: HTMLButtonElement): void {
+    if (!root) return;
+    const target = button.dataset.target ?? "";
+    const input = root.querySelector<HTMLInputElement>(`[name='${target}']`);
+    if (!input) return;
+    type Picker = { callback?: ((path: string) => void) | null; render(force?: boolean): Promise<unknown> };
+    type PickerConstructor = { new(options?: Record<string, unknown>): Picker; fromButton?: (button: HTMLButtonElement) => Picker };
+    const runtime = globalThis as unknown as { foundry?: { applications?: { apps?: { FilePicker?: PickerConstructor } } }; FilePicker?: PickerConstructor };
+    const FilePicker = runtime.foundry?.applications?.apps?.FilePicker ?? runtime.FilePicker;
+    if (!FilePicker) return;
+    const select = (path: string): void => { input.value = path; input.dispatchEvent(new Event("input", { bubbles: true })); };
+    const picker = FilePicker.fromButton ? FilePicker.fromButton(button) : new FilePicker({ type: "image", current: input.value, callback: select });
+    picker.callback = select;
+    void picker.render(true);
+  }
+
+  private handleImageDrop(event: DragEvent, field: HTMLElement): void {
+    event.preventDefault();
+    const raw = event.dataTransfer?.getData("text/plain")?.trim();
+    if (!raw) return;
+    let path = raw;
+    try { const parsed = JSON.parse(raw) as { path?: unknown; src?: unknown }; path = typeof parsed.path === "string" ? parsed.path : typeof parsed.src === "string" ? parsed.src : ""; } catch { /* Plain Foundry file path. */ }
+    if (!path) return;
+    const input = field.querySelector<HTMLInputElement>("[data-image-input]");
+    if (!input) return;
+    input.value = path;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  private updateImagePreview(root: HTMLElement, field: string, value: string): void {
+    const preview = root.querySelector<HTMLImageElement>(`[data-image-preview='${field}']`);
+    if (!preview) return;
+    const path = value.trim();
+    preview.hidden = !path;
+    if (path) preview.src = safeImageUrl(path);
+    else preview.removeAttribute("src");
   }
 
   private readBonuses(form: HTMLFormElement): PassiveBonusDefinition[] {
