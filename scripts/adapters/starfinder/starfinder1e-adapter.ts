@@ -2,6 +2,7 @@ import type { GodForgeSystemAdapter, MaterializationContext } from "../adapter.i
 import type { DeityDefinition, PassiveBonusDefinition } from "../../core/types";
 import type { ClassGrantResult } from "../../core/class-coupling";
 import { listOfficialDeitiesFromPacks } from "../official-catalog";
+import { loadSystemEditorCatalog } from "../system-catalog";
 
 // ref: https://github.com/foundryvtt-starfinder/foundryvtt-starfinder
 export class Starfinder1eAdapter implements GodForgeSystemAdapter {
@@ -10,6 +11,7 @@ export class Starfinder1eAdapter implements GodForgeSystemAdapter {
   async materialize(_deity: DeityDefinition, _context?: MaterializationContext): Promise<string | null> { return null; }
   async listOfficialDeities() { return listOfficialDeitiesFromPacks(this.id); }
   listSkills(): string[] { const skills = (globalThis as unknown as { CONFIG?: { SFRPG?: { skills?: Record<string, unknown> } } }).CONFIG?.SFRPG?.skills; return skills ? Object.keys(skills).sort() : [...this.capabilities.selectors]; }
+  listEditorCatalog() { return loadSystemEditorCatalog(this.id, this.listSkills()); }
   buildPassiveBonus(bonus: PassiveBonusDefinition): object { return { key: "Modifier", selector: bonus.selector, value: bonus.value, type: bonus.modifierType, slug: bonus.id }; }
   buildClassCoupling(_result: ClassGrantResult): object | null { return null; }
 }

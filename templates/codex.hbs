@@ -8,7 +8,7 @@
     <div class="dg-codex-list">
       {{#each deities}}
         <article class="dg-codex-entry">
-          {{#if image}}<img src="{{image}}" alt="">{{/if}}
+          {{#if image}}<img src="{{image}}" alt="" style="object-fit:{{imageFit}};object-position:{{imagePosition}}">{{/if}}
           <div class="dg-codex-copy">
             <p class="eyebrow">{{#if pantheonIds}}{{pantheonIds}}{{else}}{{../ui.CODEX}}{{/if}}</p>
             <h3>{{name}}</h3><h4>{{title}}</h4>

@@ -20,14 +20,14 @@ Homebrew-Gottheiten für Pathfinder und Starfinder in Foundry VTT.
 > [!WARNING]
 > **Alpha:** Sichere deine Foundry-Welt vor Aktualisierungen. Datenmodell und Bedienung können sich bis zur stabilen Version noch ändern.
 
-Darkis GodForge verwaltet eigene Gottheiten direkt in Foundry. Die Spielleitung erstellt Regeln und sichtbare Inhalte; Spieler verwenden den Götterkodex und den persönlichen Charakter-Hub, ohne Entwürfe oder interne SL-Daten zu erhalten.
+Darkis GodForge verwaltet eigene Gottheiten direkt in Foundry. Die Spielleitung erstellt Regeln und sichtbare Inhalte; Spieler verwenden den Götterkodex und den persönlichen Anhänger-Hub, ohne Entwürfe oder interne SL-Daten zu erhalten.
 
 ### Funktionen
 
-- **Gottheiten-Editor:** Identität, Porträt, Icon, Symbol, Banner, Pantheone, Domänen, Zauber, Waffe, Edikte, Anathema und weitere Systemwerte – inklusive Foundry-Dateibrowser und Bildvorschau.
-- **Regeln und Gewährungen:** passive Boni, göttliche Wunder, Nutzungen, Zurücksetzungen sowie verschachtelte UND-/ODER-Auswahlen, die Spieler bei der Zuweisung selbst treffen können.
+- **Gottheiten-Editor:** Identität, Bilder mit Fokuspunkt und Darstellungsmodus, echte Pantheon-Gruppen sowie durchsuchbare Systemauswahlen für Fertigkeiten, Waffen, Zauber, Font, Heiligung und offizielle Vorlagen.
+- **Regeln und Gewährungen:** Göttliche Fertigkeitsausbildung und zusätzliche Anhängerboni sind klar getrennt. Grafische Effektketten unterstützen Heilung, Schaden, Boni, Würfe, Rettungswürfe, Bewegung, Teleport, Zustände, Aktionsverlust, Kontrolle, Ressourcen, Informationen, Auswahlvarianten, Zähler und verknüpfte Glücksräder.
 - **Veröffentlichung und Sichtbarkeit:** Entwurf, Test, veröffentlicht, deaktiviert oder archiviert; jeder Datenbereich kann getrennt für Auswahl, Anhänger, Besitzer, vertrauenswürdige Spieler oder nur die SL freigegeben werden.
-- **Götterkodex und Charakter-Hub:** Suche, Domänenfilter, Spielerwahl, zugewiesene Gottheit, aktive Gewährungen, Wunder und verbleibende Nutzungen.
+- **Götterkodex und Anhänger-Hub:** Der Kodex ist ohne Token verfügbar; der charaktergebundene Hub wählt kontrollierte oder eigene Charaktere verständlich aus und zeigt Gottheit, Boni, Wunder und Nutzungen.
 - **Pathfinder-/Starfinder-Integration:** native Gottheiten-Items für PF2e und SF2e sowie das GodForge-eigene Charaktermodell für Starfinder 1e.
 - **Ersetzungen und Zufallsinhalte:** offizielle Gottheiten kontextabhängig ausblenden oder ersetzen, ohne Kompendien zu verändern; gewichtete Zufallstabellen und Glücksräder sind ebenfalls enthalten.
 - **Werkzeuge und Sicherheit:** validierter Import/Export, automatische Schemamigration, deutscher und englischer UI-Text sowie SL- und Besitzerprüfungen für alle schreibenden Aktionen.
@@ -59,7 +59,7 @@ https://github.com/Darkiyus/Darkis-Godforge/releases/latest/download/module.json
 
 Die Spielleitung öffnet das Dashboard über **Spieleinstellungen → Darkis GodForge → GodForge öffnen** oder über das **Hammer-Symbol** in der Szenensteuerung.
 
-Das **Buch-Symbol** öffnet den Götterkodex. Das **Stern-Symbol** öffnet den Hub des ausgewählten oder zugewiesenen Charakters. Alternativ: `G` für den Hub und `Umschalt+G` für den Kodex.
+Das **Buch-Symbol** öffnet den Götterkodex für alle – dafür ist kein Token nötig. Das **Stern-Symbol** öffnet den Anhänger-Hub des kontrollierten, zugewiesenen oder ausgewählten eigenen Charakters. Alternativ: `G` für den Anhänger-Hub und `Umschalt+G` für den Kodex.
 
 ## English
 
@@ -70,10 +70,10 @@ Darkis GodForge manages custom deities directly in Foundry. Game Masters create 
 
 ### Features
 
-- **Deity editor:** identity, portrait, icon, symbol, banner, pantheons, domains, spells, weapon, edicts, anathema, and other system values, with Foundry's file browser and live image previews.
-- **Rules and grants:** passive bonuses, divine wonders, uses, resets, and nested AND/OR choices that players can select during assignment.
+- **Deity editor:** identity, per-image focus and fit controls, managed pantheon groups, and searchable system choices for skills, weapons, spells, divine font, sanctification, and official templates.
+- **Rules and grants:** Divine skill training is separate from additional follower bonuses. Graphical effect chains cover healing, damage, modifiers, rolls, saves, movement, teleportation, conditions, action loss, control, resources, information, choices, counters, and linked fortune wheels.
 - **Publication and visibility:** draft, test, published, disabled, or archived; each data area can be exposed separately for selection, followers, owners, trusted players, or the GM only.
-- **Divine Codex and character hub:** search, domain filters, player selection, assigned deity, active grants, wonders, and remaining uses.
+- **Divine Codex and Follower Hub:** the Codex works without a token; the character-bound Hub guides users through controlled or owned character selection and displays deity, bonuses, wonders, and remaining uses.
 - **Pathfinder/Starfinder integration:** native deity items for PF2e and SF2e plus GodForge's own character model for Starfinder 1e.
 - **Replacements and random content:** hide or replace official deities by context without modifying compendiums; weighted random tables and fortune wheels are included.
 - **Tools and security:** validated import/export, automatic schema migration, German and English UI, and GM/owner checks for every write action.
@@ -105,7 +105,7 @@ https://github.com/Darkiyus/Darkis-Godforge/releases/latest/download/module.json
 
 Game Masters open the dashboard through **Game Settings → Darkis GodForge → Open GodForge** or the **hammer control** in Scene Controls.
 
-The **book control** opens the Divine Codex. The **star control** opens the hub for the selected or assigned character. Keyboard shortcuts: `G` for the Hub and `Shift+G` for the Codex.
+The **book control** opens the Divine Codex for everyone without requiring a token. The **star control** opens the Follower Hub for a controlled, assigned, or selected owned character. Keyboard shortcuts: `G` for the Follower Hub and `Shift+G` for the Codex.
 
 ## Entwicklungsstatus / Development status
 

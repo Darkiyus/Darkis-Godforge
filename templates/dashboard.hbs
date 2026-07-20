@@ -39,7 +39,7 @@
         <div class="dg-deity-grid">
           {{#each deities}}
             <button class="dg-deity-card" type="button" data-deity="{{id}}">
-              <span class="dg-card-art"><img src="{{image}}" alt=""><i class="dg-pantheon-gem" aria-hidden="true"></i><em class="dg-status dg-status-{{status}}">{{statusLabel}}</em></span>
+              <span class="dg-card-art"><img src="{{image}}" alt="" style="object-fit:{{imageFit}};object-position:{{imagePosition}}"><i class="dg-pantheon-gem" aria-hidden="true"></i><em class="dg-status dg-status-{{status}}">{{statusLabel}}</em></span>
               <span class="dg-card-copy"><strong>{{name}}</strong><small>{{title}}</small><span class="dg-tags">{{#each domains}}<i>{{this}}</i>{{/each}}</span></span>
             </button>
           {{/each}}

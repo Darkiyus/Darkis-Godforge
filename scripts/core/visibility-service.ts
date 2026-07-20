@@ -13,6 +13,8 @@ export interface PlayerDeityView {
   name: string;
   title?: string;
   image?: string;
+  symbol?: string;
+  imagePresentation?: DeityDefinition["imagePresentation"];
   description?: string;
   quote?: string;
   pantheonIds?: string[];
@@ -50,23 +52,25 @@ export function redactForViewer(deity: DeityDefinition, context: ViewerContext):
   const fields = deity.visibility.fields;
   const view: PlayerDeityView = { id: deity.id, name: deity.name, title: deity.title };
   if (canViewLevel(fields.portrait, deity.id, context)) view.image = deity.image;
+  if (canViewLevel(fields.portrait, deity.id, context)) { view.symbol = deity.symbol; view.imagePresentation = structuredClone(deity.imagePresentation ?? {}); }
   if (canViewLevel(fields.description, deity.id, context)) view.description = deity.description;
   if (canViewLevel(fields.quote, deity.id, context)) view.quote = deity.quote;
   if (canViewLevel(fields.pantheon, deity.id, context)) view.pantheonIds = structuredClone(deity.pantheonIds ?? []);
-  if (canViewLevel(fields.domains, deity.id, context)) { view.domains = structuredClone(deity.domains); view.alternateDomains = structuredClone(deity.alternateDomains ?? []); }
-  if (canViewLevel(fields.spells, deity.id, context)) view.spells = structuredClone(deity.spells ?? {});
-  if (canViewLevel(fields.favoredWeapon, deity.id, context)) view.favoredWeapon = deity.favoredWeapon;
+  const selectionMechanics = context.selection === true && deity.visibility.showMechanicsInSelection === true;
+  if (canViewLevel(fields.domains, deity.id, context) || selectionMechanics) { view.domains = structuredClone(deity.domains); view.alternateDomains = structuredClone(deity.alternateDomains ?? []); }
+  if (canViewLevel(fields.spells, deity.id, context) || selectionMechanics) view.spells = structuredClone(deity.spells ?? {});
+  if (canViewLevel(fields.favoredWeapon, deity.id, context) || selectionMechanics) view.favoredWeapon = deity.favoredWeapon;
   if (canViewLevel(fields.edicts, deity.id, context)) view.edicts = structuredClone(deity.edicts ?? []);
   if (canViewLevel(fields.anathema, deity.id, context)) view.anathema = structuredClone(deity.anathema ?? []);
-  if (canViewLevel(fields.bonuses, deity.id, context)) {
+  if (canViewLevel(fields.bonuses, deity.id, context) || selectionMechanics) {
     view.passiveBonuses = deity.passiveBonuses
       .filter((bonus) => bonus.enabled !== false && canViewLevel(bonus.visibility ?? "followers", deity.id, context))
-      .map((bonus) => redactNumericBonus(bonus, canViewLevel(fields.numericValues, deity.id, context)));
+      .map((bonus) => redactNumericBonus(bonus, selectionMechanics || canViewLevel(fields.numericValues, deity.id, context)));
   }
-  if (canViewLevel(fields.abilities, deity.id, context)) {
+  if (canViewLevel(fields.abilities, deity.id, context) || selectionMechanics) {
     view.abilities = deity.abilities
       .filter((ability) => ability.enabled !== false && canViewLevel(ability.visibility ?? "followers", deity.id, context))
-      .map((ability) => redactAbility(ability, canViewLevel(fields.numericValues, deity.id, context)));
+      .map((ability) => redactAbility(ability, selectionMechanics || canViewLevel(fields.numericValues, deity.id, context)));
   }
   return view;
 }

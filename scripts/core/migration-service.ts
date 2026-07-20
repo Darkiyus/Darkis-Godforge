@@ -1,6 +1,6 @@
 import { DEFAULT_VISIBILITY, type DeityDefinition, type VisibilityConfiguration, type VisibilityLevel } from "./types";
 
-export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SCHEMA_VERSION = 3;
 
 export interface MigrationResult { definition: DeityDefinition; migrated: boolean; warnings: string[]; }
 
@@ -14,7 +14,7 @@ export function migrateDefinition(input: unknown): MigrationResult {
   const legacyVisibility = source.visibility && typeof source.visibility === "object"
     ? source.visibility as Record<string, unknown>
     : {};
-  const visibility = normalizeVisibility(legacyVisibility);
+  const visibility = normalizeVisibility(legacyVisibility, schemaVersion < 3);
   const status = normalizeStatus(source.status, legacyVisibility.players);
   const definition = {
     ...source,
@@ -28,7 +28,8 @@ export function migrateDefinition(input: unknown): MigrationResult {
     passiveBonuses: Array.isArray(source.passiveBonuses) ? source.passiveBonuses.map(normalizeBonus) : [],
     abilities: Array.isArray(source.abilities) ? source.abilities.map(normalizeAbility) : [],
     grantGroups: Array.isArray(source.grantGroups) ? source.grantGroups : [],
-    replacement: source.replacement && typeof source.replacement === "object" ? source.replacement : { sourceUuid: "", mode: "none", contexts: [] },
+    replacement: normalizeReplacement(source.replacement),
+    imagePresentation: normalizeImagePresentation(source.imagePresentation),
     domains: Array.isArray(source.domains) ? source.domains : []
   } as unknown as DeityDefinition;
 
@@ -36,19 +37,51 @@ export function migrateDefinition(input: unknown): MigrationResult {
   return { definition, migrated: schemaVersion < CURRENT_SCHEMA_VERSION, warnings };
 }
 
-function normalizeVisibility(value: Record<string, unknown>): VisibilityConfiguration {
+function normalizeVisibility(value: Record<string, unknown>, secureSystemDefaults = false): VisibilityConfiguration {
   if (typeof value.deity === "string" && value.fields && typeof value.fields === "object") {
     const fields = value.fields as Record<string, unknown>;
-    return {
+    const normalized = {
       deity: visibilityLevel(value.deity, DEFAULT_VISIBILITY.deity),
-      fields: Object.fromEntries(Object.entries(DEFAULT_VISIBILITY.fields).map(([key, fallback]) => [key, visibilityLevel(fields[key], fallback)])) as unknown as VisibilityConfiguration["fields"]
+      fields: Object.fromEntries(Object.entries(DEFAULT_VISIBILITY.fields).map(([key, fallback]) => [key, visibilityLevel(fields[key], fallback)])) as unknown as VisibilityConfiguration["fields"],
+      showMechanicsInSelection: value.showMechanicsInSelection === true
     };
+    if (secureSystemDefaults) { normalized.fields.domains = "followers"; normalized.fields.spells = "followers"; normalized.fields.favoredWeapon = "followers"; normalized.fields.gmNotes = "gm"; }
+    return normalized;
   }
   const visibleToPlayers = value.players !== false;
   const deity: VisibilityLevel = value.library === false || !visibleToPlayers ? "gm" : "public";
   const followerOnly: VisibilityLevel = value.characterSheet === false ? "gm" : "followers";
   return { ...structuredClone(DEFAULT_VISIBILITY), deity, fields: { ...structuredClone(DEFAULT_VISIBILITY.fields), bonuses: followerOnly, abilities: followerOnly } };
 }
+
+function normalizeReplacement(value: unknown): DeityDefinition["replacement"] {
+  if (!value || typeof value !== "object") return { sourceUuid: "", mode: "none", contexts: [] };
+  const replacement = value as Record<string, unknown>;
+  const sourceUuid = typeof replacement.sourceUuid === "string" ? replacement.sourceUuid.trim() : "";
+  const mode = replacement.mode === "hide" ? "hide" : replacement.mode === "replace" || sourceUuid ? "replace" : "none";
+  return { ...replacement, sourceUuid, mode, contexts: Array.isArray(replacement.contexts) ? replacement.contexts.filter((item): item is string => typeof item === "string") : [] } as DeityDefinition["replacement"];
+}
+
+function normalizeImagePresentation(value: unknown): DeityDefinition["imagePresentation"] {
+  if (!value || typeof value !== "object") return undefined;
+  const normalized: NonNullable<DeityDefinition["imagePresentation"]> = {};
+  for (const key of ["image", "icon", "symbol", "banner"] as const) {
+    const entry = (value as Record<string, unknown>)[key];
+    if (!entry || typeof entry !== "object") continue;
+    const source = entry as Record<string, unknown>;
+    normalized[key] = {
+      fit: source.fit === "contain" ? "contain" : "cover",
+      focusX: clampPercent(source.focusX, 50),
+      focusY: clampPercent(source.focusY, 25),
+      zoom: clampNumber(source.zoom, 1, 1, 3),
+      rotation: clampNumber(source.rotation, 0, -180, 180)
+    };
+  }
+  return normalized;
+}
+
+function clampPercent(value: unknown, fallback: number): number { return clampNumber(value, fallback, 0, 100); }
+function clampNumber(value: unknown, fallback: number, min: number, max: number): number { const number = Number(value); return Number.isFinite(number) ? Math.min(max, Math.max(min, number)) : fallback; }
 
 function normalizeStatus(value: unknown, legacyPlayers: unknown): DeityDefinition["status"] {
   return value === "draft" || value === "test" || value === "published" || value === "disabled" || value === "archived"

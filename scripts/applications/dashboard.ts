@@ -42,6 +42,8 @@ export class GodForgeDashboard extends gmApplicationBase() {
       return {
         ...deity,
         image: safeImageUrl(deity.image),
+        imagePosition: `${deity.imagePresentation?.image?.focusX ?? 50}% ${deity.imagePresentation?.image?.focusY ?? 25}%`,
+        imageFit: deity.imagePresentation?.image?.fit === "contain" ? "contain" : "cover",
         errors,
         statusLabel: ui[`STATUS_${deity.status.toUpperCase()}`] ?? deity.status,
         updatedLabel: formatDate(deity.updatedAt)

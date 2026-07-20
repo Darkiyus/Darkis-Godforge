@@ -85,10 +85,10 @@
 .dg-section-title h2, .dg-section-title h3, .dg-section-title p { margin: 0; }
 .dg-section-title > span { color: var(--dg-text-muted); font-size: 12px; }
 .dg-deity-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 14px; }
-.dg-deity-card { min-width: 0; overflow: hidden; border: 1px solid var(--dg-border-soft); border-radius: 9px; padding: 0; background: var(--dg-surface-2); text-align: left; cursor: pointer; transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease; }
+.dg-deity-card { display: block; width: 100%; height: auto !important; min-width: 0; min-height: 250px; overflow: hidden; border: 1px solid var(--dg-border-soft); border-radius: 9px; padding: 0; background: var(--dg-surface-2); text-align: left; white-space: normal; cursor: pointer; transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease; }
 .dg-deity-card:hover { transform: translateY(-3px); border-color: var(--dg-accent); box-shadow: 0 9px 24px rgba(0, 0, 0, .4), 0 0 20px rgba(143, 56, 232, .12); }
-.dg-card-art { position: relative; display: block; aspect-ratio: 4 / 3; overflow: hidden; background: radial-gradient(circle, #49246c, var(--dg-surface-1) 68%); }
-.dg-card-art > img { width: 100%; height: 100%; object-fit: cover; }
+.dg-card-art { position: relative; display: block; width: 100%; min-height: 150px; aspect-ratio: 4 / 3; overflow: hidden; background: radial-gradient(circle, #49246c, var(--dg-surface-1) 68%); }
+.dg-card-art > img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 25%; }
 .dg-card-art::after { content: ""; position: absolute; inset: auto 0 0; height: 42%; background: linear-gradient(transparent, var(--dg-surface-2)); }
 .dg-pantheon-gem { position: absolute; z-index: 2; left: 12px; bottom: 10px; width: 13px; height: 13px; transform: rotate(45deg); border: 1px solid #d4b2f8; background: var(--dg-accent); box-shadow: 0 0 12px var(--dg-accent-glow); }
 .dg-card-copy { display: grid; gap: 4px; padding: 13px 14px 15px; }
@@ -144,6 +144,8 @@
 .dg-editor-header h2 { margin: 0; font-size: 27px; }
 .dg-editor-header p:last-child { margin: 6px 0 0; }
 .dg-editor form { display: grid; gap: 20px; margin-top: 20px; }
+.dg-step-nav { position: sticky; z-index: 5; top: -24px; display: grid; grid-template-columns: 34px minmax(0, 1fr) 34px; align-items: stretch; gap: 5px; }
+.dg-step-nav > button { border: 1px solid var(--dg-border-soft); border-radius: 7px; background: rgba(9, 11, 17, .97); color: var(--dg-text-secondary); cursor: pointer; }
 .dg-step-strip { position: sticky; z-index: 5; top: -24px; display: flex; gap: 4px; overflow: auto; border: 1px solid var(--dg-border-soft); border-radius: 8px; padding: 6px; background: rgba(9, 11, 17, .97); }
 .dg-step-strip button { display: flex; flex: 1; align-items: center; justify-content: center; gap: 7px; min-width: fit-content; border: 0; border-radius: 5px; padding: 8px 10px; background: transparent; color: var(--dg-text-secondary); text-align: center; cursor: pointer; }
 .dg-step-strip button b { display: grid; place-items: center; width: 20px; height: 20px; border: 1px solid var(--dg-border-strong); border-radius: 50%; font-size: 10px; }
@@ -174,6 +176,23 @@
 .dg-file-control > button:hover { border-color: var(--dg-accent); background: var(--dg-accent-soft); }
 .dg-image-field > img { width: 100%; height: 128px; box-sizing: border-box; border: 1px solid var(--dg-border-soft); border-radius: 7px; padding: 4px; background: #05060a; object-fit: contain; }
 .dg-image-field > img[hidden] { display: none; }
+.dg-image-variants { margin: 0 0 18px; border: 1px solid var(--dg-border-ornament); border-radius: 8px; padding: 14px; background: rgba(143, 56, 232, .06); }
+.dg-image-variants p { margin: 3px 0 10px; color: var(--dg-text-secondary); font-size: 11px; }
+.dg-image-variants > div { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; }
+.dg-image-variants label { display: flex; align-items: center; gap: 6px; }
+.dg-image-variants input { width: auto; min-height: 0; }
+.dg-image-variants > small { margin-left: 10px; color: var(--dg-text-secondary); }
+.dg-crop-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; border: 1px solid var(--dg-border-soft); border-radius: 7px; padding: 8px; background: rgba(0, 0, 0, .2); }
+.dg-crop-controls > select { grid-column: span 2; }
+.dg-crop-controls label { min-width: 0; gap: 3px; font-size: 9px; }
+.dg-crop-controls input[type="range"] { min-height: 24px; padding: 0; }
+.dg-pantheon-picker { border: 1px solid var(--dg-border-soft); border-radius: 8px; padding: 14px; }
+.dg-pantheon-picker > small { display: block; margin-bottom: 10px; color: var(--dg-text-muted); }
+.dg-chip-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.dg-chip-picker label { display: flex; align-items: center; gap: 6px; border: 1px solid var(--pantheon-color, var(--dg-border-strong)); border-radius: 16px; padding: 6px 10px; background: rgba(255, 255, 255, .025); }
+.dg-chip-picker input, .dg-mechanics-master input { width: auto; min-height: 0; }
+.dg-mechanics-master { display: grid !important; grid-template-columns: auto 1fr; align-items: center; gap: 4px 9px !important; margin: 10px 0 16px; border: 1px solid rgba(95, 207, 134, .3); border-radius: 8px; padding: 12px; }
+.dg-mechanics-master small { grid-column: 2; min-height: 0 !important; }
 .dg-span-2 { grid-column: span 2; }
 .dg-span-3 { grid-column: span 3; }
 .dg-editor-list { display: grid; gap: 12px; }
@@ -181,6 +200,11 @@
 .dg-editor-card > header { display: flex; justify-content: space-between; margin-bottom: 14px; }
 .dg-editor-card > header button { border: 0; background: transparent; color: var(--dg-text-secondary); cursor: pointer; }
 .dg-editor-card > header button[data-action="remove-row"] { color: var(--dg-danger); }
+.dg-effect-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 16px 0 10px; border-top: 1px solid var(--dg-border-soft); padding-top: 14px; }
+.dg-effect-row { margin-left: 18px; border-left: 3px solid var(--dg-accent); background: #0b0e15; }
+[data-formula-status][data-valid="true"] { color: var(--dg-success); }
+[data-formula-status][data-valid="false"] { color: var(--dg-danger); }
+.dg-code-editor { tab-size: 2; background: #05070b !important; color: #d7c5e8 !important; font-family: "JetBrains Mono", Consolas, monospace !important; font-size: 11px !important; line-height: 1.55; white-space: pre; }
 .dg-row-actions { display: flex; gap: 3px; }
 .dg-form-warning { margin: 12px 0 0; border: 1px solid rgba(233, 184, 95, .35); border-radius: 6px; padding: 9px; color: #efca82; font-size: 11px; }
 .dg-grant-members { display: grid; gap: 10px; margin-top: 14px; border-left: 2px solid var(--dg-border-ornament); padding-left: 14px; }
@@ -320,6 +344,16 @@
   .dg-context-rail { position: absolute; z-index: 20; top: 0; right: 0; display: none; width: 292px; box-shadow: -18px 0 45px var(--dg-shadow); }
   .dg-app-shell.context-open .dg-context-rail { display: block; }
   .dg-stat-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 760px) {
+  .dg-editor { padding: 14px; }
+  .dg-step-strip button { flex: 0 0 auto; max-width: 96px; }
+  .dg-step-strip button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dg-form-grid, .dg-form-grid-3, .dg-visibility-grid { grid-template-columns: 1fr; }
+  .dg-span-2, .dg-span-3 { grid-column: span 1; }
+  .dg-editor-actions { flex-wrap: wrap; bottom: -14px; }
+  .dg-wizard-progress { order: -1; width: 100%; margin: 0; text-align: center; }
 }
 
 @media (max-width: 1099px) {

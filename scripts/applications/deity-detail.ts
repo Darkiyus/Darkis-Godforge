@@ -11,6 +11,6 @@ export class GodForgeDeityDetail extends gmApplicationBase() {
   static DEFAULT_OPTIONS = { id: "darkis-godforge-deity-detail", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: true }, position: { width: 1200, height: 820 } };
   static PARTS = { main: { template: "modules/darkis-godforge/templates/deity-detail.hbs" } };
   constructor(private deity: DeityDefinition, private readonly deityService?: DeityService, private readonly adapters?: AdapterRegistry) { super(); }
-  async _prepareContext(): Promise<Record<string, unknown>> { requireGM(); return { ui: uiText(), deity: { ...this.deity, image: safeImageUrl(this.deity.image) } }; }
+  async _prepareContext(): Promise<Record<string, unknown>> { requireGM(); return { ui: uiText(), deity: { ...this.deity, image: safeImageUrl(this.deity.image), imageFit: this.deity.imagePresentation?.image?.fit === "contain" ? "contain" : "cover", imagePosition: `${this.deity.imagePresentation?.image?.focusX ?? 50}% ${this.deity.imagePresentation?.image?.focusY ?? 25}%` } }; }
   _onRender(): void { this.element?.querySelector<HTMLElement>("[data-action='edit']")?.addEventListener("click", () => { if (!this.deityService) return; void new GodForgeDeityEditor(this.deityService, (deity) => { this.deity = deity; void this.render(true); }, this.adapters, this.deity).render(true); }); }
 }

@@ -41,11 +41,13 @@ export function buildPf2eDeityData(deity: DeityDefinition, definitionUuid: strin
 }
 
 function parseDivineFont(value: string | undefined): Array<"harm" | "heal"> {
+  if (value === "heal-harm") return ["heal", "harm"];
   const fonts = value?.split(",").map((item) => item.trim().toLocaleLowerCase()).filter((item): item is "harm" | "heal" => item === "harm" || item === "heal") ?? [];
   return [...new Set(fonts)];
 }
 
 function parseSanctification(value: string | undefined): Pf2eDeityData["system"]["sanctification"] {
+  if (value === "holy-unholy") return { modal: "can", what: ["holy", "unholy"] };
   const what = value?.split(",").map((item) => item.trim().toLocaleLowerCase()).filter((item): item is "holy" | "unholy" => item === "holy" || item === "unholy") ?? [];
   return what.length ? { modal: "can", what: [...new Set(what)] } : null;
 }
