@@ -73,6 +73,15 @@ https://github.com/Darkiyus/Darkis-Godforge/releases/latest/download/module.json
 
 Foundry lädt über diese URL automatisch die passende aktuelle Veröffentlichung. Zukünftige Aktualisierungen können anschließend direkt über die Foundry-Modulverwaltung installiert werden.
 
+### GodForge öffnen
+
+Nach der Aktivierung können Spielleitungen GodForge auf zwei Wegen öffnen:
+
+1. **Spieleinstellungen → Darkis GodForge → GodForge öffnen**
+2. Über das **Hammer-Symbol** in den Token-Werkzeugen der Szenensteuerung
+
+Alternativ steht für Integrationen die Modul-API unter `game.modules.get("darkis-godforge").api` zur Verfügung.
+
 #### Manuelle Installation
 
 1. Lade die aktuelle ZIP-Datei unter [Releases](https://github.com/Darkiyus/Darkis-Godforge/releases/latest) herunter.
@@ -138,6 +147,15 @@ https://github.com/Darkiyus/Darkis-Godforge/releases/latest/download/module.json
 6. Enable **Darkis GodForge** and **socketlib** under **Manage Modules**.
 
 Foundry uses this URL to download the current release automatically. Future updates can then be installed directly through Foundry's module manager.
+
+### Opening GodForge
+
+After enabling the module, Game Masters can open GodForge in two ways:
+
+1. **Game Settings → Darkis GodForge → Open GodForge**
+2. Select the **hammer icon** in the Token tools of the Scene Controls
+
+Integrations can also access the module API through `game.modules.get("darkis-godforge").api`.
 
 #### Manual installation
 
