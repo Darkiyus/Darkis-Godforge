@@ -5,7 +5,7 @@ import { DeityService } from "./core/deity-service";
 import { registerFoundryBootstrap } from "./foundry/bootstrap";
 import { SocketRouter } from "./foundry/socket-router";
 import type { GodForgeActor } from "./api";
-import { getFoundryRuntime, getFoundryUi, type FoundryRuntime } from "./foundry/runtime";
+import { getFoundryGame, getFoundryRuntime, getFoundryUi } from "./foundry/runtime";
 
 const deityService = new DeityService();
 const registry = new AdapterRegistry();
@@ -20,9 +20,8 @@ function openDashboard(): void {
   });
 }
 const runtime = getFoundryRuntime();
-const runtimeGame = runtime?.game as (FoundryRuntime["game"] & { actors?: { get: (id: string) => GodForgeActor | null } }) | undefined;
-const socketRouter = new SocketRouter(api, { currentUserId: runtimeGame?.user?.id ?? "unknown", isGM: runtimeGame?.user?.isGM ?? false, ownsActor: (actor, userId) => { const candidate = actor as GodForgeActor & { testUserPermission?: (user: unknown, permission: string) => boolean }; return candidate.testUserPermission?.({ id: userId }, "OWNER") ?? false; }, resolveActor: (actorId) => runtimeGame?.actors?.get(actorId) ?? null });
-if (runtime) { const systemId = runtime.game?.system?.id; if (systemId && !registry.supports(systemId)) runtime.Hooks.once("ready", () => { getFoundryUi()?.notifications?.warn?.(`Darkis GodForge does not support ${systemId}.`); }); else registerFoundryBootstrap(api, deityService, openDashboard, socketRouter); }
+const socketRouter = new SocketRouter(api, { get currentUserId() { return getFoundryGame()?.user?.id ?? "unknown"; }, get isGM() { return getFoundryGame()?.user?.isGM ?? false; }, ownsActor: (actor, userId) => { const candidate = actor as GodForgeActor & { testUserPermission?: (user: unknown, permission: string) => boolean }; return candidate.testUserPermission?.({ id: userId }, "OWNER") ?? false; }, resolveActor: (actorId) => (getFoundryGame()?.actors?.get(actorId) as GodForgeActor | null | undefined) ?? null });
+if (runtime) { registerFoundryBootstrap(api, deityService, openDashboard, socketRouter); runtime.Hooks.once("ready", () => { const systemId = getFoundryGame()?.system?.id; if (systemId && !registry.supports(systemId)) getFoundryUi()?.notifications?.warn?.(`Darkis GodForge does not support ${systemId}.`); }); }
 else if (typeof document !== "undefined") openDashboard();
 
 export { api, deityService, registry, socketRouter, GodForgeDashboard };

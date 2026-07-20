@@ -4,6 +4,7 @@ import { evaluateFormula, evaluateFormulaWithDice, validateFormula } from "../sc
 import { previewGrantGroup, resolveGrantGroup } from "../scripts/core/grant-service";
 import english from "../lang/en.json";
 import german from "../lang/de.json";
+import moduleManifest from "../module.json";
 import { canUse, consume, shouldReset } from "../scripts/core/usage-service";
 import { filterCatalog } from "../scripts/core/catalog-service";
 import { AdapterRegistry } from "../scripts/adapters/adapter-registry";
@@ -41,4 +42,42 @@ describe("API data workflows", () => { it("exports and imports deity data and ca
 describe("security and replacement regressions", () => { it("allows Foundry image paths and blocks unsafe schemes", () => { expect(escapeHtml(`<img src=x onerror=alert(1)>`)).toContain("&lt;img"); expect(safeImageUrl("worlds/noclaris/gods/tenebris.webp")).toBe("worlds/noclaris/gods/tenebris.webp"); expect(safeImageUrl("modules/darkis-godforge/assets/a.png")).toBe("modules/darkis-godforge/assets/a.png"); expect(safeImageUrl("assets/a.png")).toBe("assets/a.png"); expect(safeImageUrl("https://x.com/a&b.png")).toBe("https://x.com/a&b.png"); expect(safeImageUrl("javascript:alert(1)")).toBe("icons/svg/eye.svg"); }); it("hides an official Compendium UUID only in the configured context", async () => { const sourceUuid = "Compendium.pf2e.deities.Item.abc123"; vi.stubGlobal("game", { system: { id: "pf2e" }, packs: { contents: [{ collection: "pf2e.deities", documentName: "Item", metadata: { system: "pf2e" }, getIndex: async () => [{ _id: "abc123", name: "Official", type: "deity", system: { domains: ["sun"] } }] }] } }); const service = new DeityService(); service.save({ ...deity, id: "homebrew", replacement: { sourceUuid, mode: "hide", contexts: ["characterBuilder"] } }); const api = new GodForgeApi(service, new AdapterRegistry()); expect((await api.getSelectableDeities({ systemId: "pf2e", catalogContext: "characterBuilder" })).map((entry) => entry.sourceUuid)).not.toContain(sourceUuid); expect((await api.getSelectableDeities({ systemId: "pf2e", catalogContext: "compendium" })).map((entry) => entry.sourceUuid)).toContain(sourceUuid); vi.unstubAllGlobals(); }); });
 describe("socketlib bridge", () => { it("wraps the registered module channel", async () => { let registered = ""; const transport = createSocketlibTransport({ registerModule: () => ({ register: (name: string) => { registered = name; }, executeAsGM: async () => "ok" }) }); expect(transport).not.toBeNull(); transport?.register("activateAbility", async () => undefined); expect(registered).toBe("activateAbility"); }); });
 describe("localization catalogs", () => { it("keeps English and German UI keys in parity", () => { expect(Object.keys(german.DARKIS_GODFORGE.UI).sort()).toEqual(Object.keys(english.DARKIS_GODFORGE.UI).sort()); expect(Object.keys(german.DARKIS_GODFORGE.SETTINGS).sort()).toEqual(Object.keys(english.DARKIS_GODFORGE.SETTINGS).sort()); }); });
-describe("Foundry entry points", () => { it("registers a v13/v14 token control that opens the dashboard", () => { const openDashboard = vi.fn(); const controls = { tokens: { name: "tokens", tools: { select: { name: "select" } } } }; addDashboardSceneControl(controls, openDashboard, true); const tool = controls.tokens.tools["darkis-godforge" as keyof typeof controls.tokens.tools] as unknown as { visible: boolean; onChange: (event: Event, active: boolean) => void }; expect(tool.visible).toBe(true); tool.onChange(new Event("click"), false); expect(openDashboard).toHaveBeenCalledOnce(); }); it("provides a no-argument ApplicationV2 settings menu type", () => { const Menu = createDashboardSettingsMenu(new DeityService()); expect(new Menu()).toBeDefined(); }); it("registers the GodForge dashboard in Game Settings", () => { const initCallbacks: Array<() => void> = []; const registerMenu = vi.fn(); vi.stubGlobal("Hooks", { once: (event: string, callback: () => void) => { if (event === "init") initCallbacks.push(callback); }, on: vi.fn(), callAll: vi.fn() }); vi.stubGlobal("game", { user: { isGM: true }, settings: { register: vi.fn(), registerMenu }, keybindings: { register: vi.fn() }, modules: { get: () => ({ languages: [] }) } }); const service = new DeityService(); registerFoundryBootstrap(new GodForgeApi(service, new AdapterRegistry()), service, vi.fn()); initCallbacks[0]?.(); expect(registerMenu).toHaveBeenCalledWith("darkis-godforge", "dashboard", expect.objectContaining({ restricted: true, icon: "fas fa-hammer" })); vi.unstubAllGlobals(); }); });
+describe("Foundry entry points", () => {
+  it("keeps optional integrations and empty packs from blocking activation", () => {
+    expect(moduleManifest.compatibility).not.toHaveProperty("maximum");
+    expect(moduleManifest).not.toHaveProperty("packs");
+    expect(moduleManifest.relationships).not.toHaveProperty("requires");
+    expect(moduleManifest.relationships.recommends.map((entry) => entry.id)).toContain("socketlib");
+  });
+
+  it("registers a dedicated v13/v14 GodForge control that opens the dashboard", () => {
+    const openDashboard = vi.fn();
+    const controls = { tokens: { name: "tokens", order: 0, tools: { select: { name: "select" } } } };
+    addDashboardSceneControl(controls, openDashboard, true);
+    const control = controls["darkis-godforge" as keyof typeof controls] as unknown as { visible: boolean; tools: { dashboard: { visible: boolean; onChange: (event: Event, active: boolean) => void } } };
+    expect(control.visible).toBe(true);
+    expect(control.tools.dashboard.visible).toBe(true);
+    control.tools.dashboard.onChange(new Event("click"), false);
+    expect(openDashboard).toHaveBeenCalledOnce();
+  });
+
+  it("provides a no-argument ApplicationV2 settings menu type", () => {
+    const Menu = createDashboardSettingsMenu(new DeityService());
+    expect(new Menu()).toBeDefined();
+  });
+
+  it("resolves game during init instead of caching an undefined module-load snapshot", () => {
+    const initCallbacks: Array<() => void> = [];
+    const registerMenu = vi.fn();
+    const moduleEntry: { api?: unknown; languages: never[] } = { languages: [] };
+    vi.stubGlobal("Hooks", { once: (event: string, callback: () => void) => { if (event === "init") initCallbacks.push(callback); }, on: vi.fn(), callAll: vi.fn() });
+    vi.stubGlobal("game", undefined);
+    const service = new DeityService();
+    registerFoundryBootstrap(new GodForgeApi(service, new AdapterRegistry()), service, vi.fn());
+    vi.stubGlobal("game", { user: { isGM: true }, settings: { register: vi.fn(), registerMenu }, keybindings: { register: vi.fn() }, modules: { get: () => moduleEntry } });
+    initCallbacks[0]?.();
+    expect(registerMenu).toHaveBeenCalledWith("darkis-godforge", "dashboard", expect.objectContaining({ restricted: true, icon: "fas fa-hammer" }));
+    expect(moduleEntry.api).toEqual(expect.objectContaining({ openDashboard: expect.any(Function) }));
+    vi.unstubAllGlobals();
+  });
+});

@@ -1,6 +1,6 @@
 {
   "name": "darkis-godforge",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,7 +8,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
-    "check": "npm run typecheck && npm run lint && npm test && npm run build"
+    "smoke": "node tests/foundry-bootstrap-smoke.mjs",
+    "check": "npm run typecheck && npm run lint && npm test && npm run build && npm run smoke"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
