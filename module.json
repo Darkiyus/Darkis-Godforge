@@ -1,0 +1,20 @@
+{
+  "id": "darkis-godforge",
+  "title": "Darkis GodForge",
+  "description": "Frei konfigurierbare Homebrew-Gottheiten, die offizielle Gottheiten ersetzen.",
+  "version": "0.1.0",
+  "compatibility": { "minimum": "13", "verified": "14", "maximum": "14" },
+  "authors": [{ "name": "Darkis" }],
+  "esmodules": ["scripts/main.js"],
+  "styles": ["styles/godforge.css"],
+  "languages": [
+    { "lang": "en", "name": "English", "path": "lang/en.json" },
+    { "lang": "de", "name": "Deutsch", "path": "lang/de.json" }
+  ],
+  "relationships": {
+    "systems": [{ "id": "pf2e", "type": "system", "compatibility": { "minimum": "6.0.0" } }],
+    "requires": [{ "id": "socketlib", "type": "module" }],
+    "recommends": [{ "id": "lib-wrapper", "type": "module" }]
+  },
+  "flags": {}
+}

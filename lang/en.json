@@ -1,0 +1,3 @@
+{
+  "DARKIS_GODFORGE": { "UI": { "TITLE": "Darkis GodForge", "CREATE": "Create new deity", "SEARCH": "Search deities...", "OVERVIEW": "Overview", "DOMAINS": "Domains", "ABILITIES": "Abilities", "VISIBILITY": "Visibility" }, "ERROR": { "NO_USES": "No uses remaining." } }
+}
