@@ -37,9 +37,10 @@ export function addDashboardSceneControl(controls: unknown, openDashboard: () =>
 
 export function registerFoundryBootstrap(api: GodForgeApi, deityService: DeityService, openDashboard: () => void, socketRouter?: SocketRouter): void {
   const runtime = getFoundryRuntime(); if (!runtime) return;
+  exposeModuleApi(runtime, api, openDashboard);
   runtime.Hooks.once("init", () => {
     const languages = runtime.game?.modules?.get(namespace)?.languages ?? [{ lang: "de", name: "Deutsch" }, { lang: "en", name: "English" }]; const choices = Object.fromEntries([["auto", "DARKIS_GODFORGE.SETTINGS.AUTO"], ...languages.map((language) => [language.lang, language.name])]);
-    runtime.game?.settings?.registerMenu?.(namespace, "dashboard", { name: "DARKIS_GODFORGE.SETTINGS.MENU_NAME", label: "DARKIS_GODFORGE.SETTINGS.MENU_LABEL", hint: "DARKIS_GODFORGE.SETTINGS.MENU_HINT", icon: "fas fa-hammer", type: createDashboardSettingsMenu(deityService), restricted: true });
+    try { runtime.game?.settings?.registerMenu?.(namespace, "dashboard", { name: "DARKIS_GODFORGE.SETTINGS.MENU_NAME", label: "DARKIS_GODFORGE.SETTINGS.MENU_LABEL", hint: "DARKIS_GODFORGE.SETTINGS.MENU_HINT", icon: "fas fa-hammer", type: createDashboardSettingsMenu(deityService), restricted: true }); } catch (error) { console.error("Darkis GodForge | Could not register dashboard settings menu.", error); }
     runtime.game?.settings?.register(namespace, "language", { name: "DARKIS_GODFORGE.SETTINGS.LANGUAGE", hint: "DARKIS_GODFORGE.SETTINGS.LANGUAGE_HINT", scope: "client", config: true, type: String, default: "auto", choices, onChange: (language: unknown) => { if (typeof language !== "string" || language === "auto") return; const entry = languages.find((item) => item.lang === language); if (entry?.path) void loadLanguage(language, `modules/${namespace}/${entry.path}`); } });
     runtime.game?.keybindings?.register(namespace, "open-dashboard", { name: "DARKIS_GODFORGE.UI.OPEN_DASHBOARD", editable: [], onDown: () => { if (runtime.game?.user?.isGM !== true) return false; openDashboard(); return true; } });
   });
@@ -50,6 +51,13 @@ export function registerFoundryBootstrap(api: GodForgeApi, deityService: DeitySe
     const selectedLanguage = runtime.game?.settings?.get?.(namespace, "language"); const languageEntry = runtime.game?.modules?.get(namespace)?.languages?.find((entry) => entry.lang === selectedLanguage); if (typeof selectedLanguage === "string" && languageEntry?.path) await loadLanguage(selectedLanguage, `modules/${namespace}/${languageEntry.path}`);
     const collection = runtime.game?.journal; if (collection) for (const deity of new JournalDeityRepository(collection).load()) deityService.save(deity);
     const transport = createSocketlibTransport(runtime.game?.modules?.get("socketlib")?.api); if (transport && socketRouter) { socketRouter.setTransport(transport); socketRouter.register(); }
-    const module = runtime.game?.modules?.get(namespace); if (module) { const exposedApi = api as GodForgeApi & { openDashboard: () => void }; exposedApi.openDashboard = openDashboard; module.api = exposedApi; }
+    exposeModuleApi(runtime, api, openDashboard);
   });
+}
+
+function exposeModuleApi(runtime: NonNullable<ReturnType<typeof getFoundryRuntime>>, api: GodForgeApi, openDashboard: () => void): void {
+  const module = runtime.game?.modules?.get(namespace); if (!module) return;
+  const exposedApi = api as GodForgeApi & { openDashboard: () => void };
+  exposedApi.openDashboard = openDashboard;
+  module.api = exposedApi;
 }
