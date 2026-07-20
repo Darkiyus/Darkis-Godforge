@@ -8,6 +8,7 @@ import { resolveGrantGroup } from "./core/grant-service";
 import { canUse, consume, reset } from "./core/usage-service";
 import { executeAbility, type EffectContext, type EffectTarget } from "./core/effect-engine";
 import { resolveClassGrants, type ClassGrantResult } from "./core/class-coupling";
+import { buildCharacterWidgetData, type CharacterWidgetData } from "./core/character-widget";
 
 export interface GodForgeActor { id: string; uuid?: string; flags?: { [namespace: string]: unknown }; update(data: { flags: { "darkis-godforge": ActorGodForgeState | null } }): Promise<unknown>; }
 export interface ActivationOptions { target?: EffectTarget; facts?: EffectContext["facts"]; rollDice?: EffectContext["rollDice"]; }
@@ -19,6 +20,7 @@ export class GodForgeApi {
   async materializeDeity(deityId: string, systemId: string, context?: MaterializationContext): Promise<string | null> { const deity = this.getDeity(deityId); if (!deity) throw new Error(`Unknown deity: ${deityId}`); return this.adapters.get(systemId).materialize(deity, context); }
   getDeity(id: string): DeityDefinition | null { return this.deities.get(id); }
   getActorDeity(actor: GodForgeActor): DeityDefinition | null { const state = actor.flags?.["darkis-godforge"]; if (!state || typeof state !== "object" || !("deityId" in state) || typeof state.deityId !== "string") return null; return this.getDeity(state.deityId); }
+  getCharacterWidgetData(actor: GodForgeActor): CharacterWidgetData { const value = actor.flags?.["darkis-godforge"]; const state = value && typeof value === "object" && "deityId" in value && "grants" in value && "usages" in value ? value as ActorGodForgeState : null; return buildCharacterWidgetData(this.getActorDeity(actor), state); }
   getGrantChoices(deityId: string, _context: SelectionContext) { return this.getDeity(deityId)?.grantGroups ?? null; }
   getClassGrants(deityId: string, classId: string, selections: { groupId: string; refs: string[] }[] = []): ClassGrantResult { const deity = this.getDeity(deityId); if (!deity) throw new Error(`Unknown deity: ${deityId}`); return resolveClassGrants(deity, classId, selections); }
   buildClassCoupling(deityId: string, classId: string, systemId: string, selections: { groupId: string; refs: string[] }[] = []): object | null { return this.adapters.get(systemId).buildClassCoupling(this.getClassGrants(deityId, classId, selections)); }

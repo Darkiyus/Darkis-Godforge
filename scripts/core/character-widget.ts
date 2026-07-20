@@ -1,0 +1,4 @@
+import type { DeityDefinition, ActorGodForgeState } from "./types";
+
+export interface CharacterWidgetData { deity: { id: string; name: string; title: string; image?: string } | null; grants: string[]; abilities: Array<{ id: string; name: string; description: string; uses?: { used: number; max: number } }>; }
+export function buildCharacterWidgetData(deity: DeityDefinition | null, state: ActorGodForgeState | null): CharacterWidgetData { if (!deity || !state) return { deity: null, grants: [], abilities: [] }; return { deity: { id: deity.id, name: deity.name, title: deity.title, image: deity.image }, grants: state.grants, abilities: deity.abilities.map((ability) => ({ id: ability.id, name: ability.name, description: ability.description, uses: ability.uses ? { used: state.usages[ability.id]?.used ?? 0, max: ability.uses.max } : undefined })) }; }
