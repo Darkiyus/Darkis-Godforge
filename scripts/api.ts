@@ -9,13 +9,19 @@ import { canUse, consume, reset } from "./core/usage-service";
 import { executeAbility, type EffectContext, type EffectTarget } from "./core/effect-engine";
 import { resolveClassGrants, type ClassGrantResult } from "./core/class-coupling";
 import { buildCharacterWidgetData, type CharacterWidgetData } from "./core/character-widget";
+import { exportDefinitions, importDefinitions } from "./core/import-export-service";
+import { drawWeighted, type RandomDraw } from "./core/random-service";
 
 export interface GodForgeActor { id: string; uuid?: string; flags?: { [namespace: string]: unknown }; update(data: { flags: { "darkis-godforge": ActorGodForgeState | null } }): Promise<unknown>; }
 export interface ActivationOptions { target?: EffectTarget; facts?: EffectContext["facts"]; rollDice?: EffectContext["rollDice"]; }
 
 export class GodForgeApi {
+  private catalogCache: { key: string; result: ReturnType<typeof filterCatalog> } | null = null;
   constructor(private readonly deities: DeityService, private readonly adapters: AdapterRegistry) {}
-  getSelectableDeities(context: SelectionContext) { return filterCatalog(this.deities.list(), context, new Set()); }
+  getSelectableDeities(context: SelectionContext) { const source = this.deities.list(); const key = JSON.stringify([source.map((deity) => [deity.id, deity.revision]), context]); if (this.catalogCache?.key === key) return this.catalogCache.result; const result = filterCatalog(source, context, new Set()); this.catalogCache = { key, result }; return result; }
+  exportDeities(now?: string) { return exportDefinitions(this.deities.list(), now); }
+  importDeities(value: unknown): number { const imported = importDefinitions(value); for (const deity of imported) this.deities.save(deity); this.catalogCache = null; return imported.length; }
+  drawRandomDeity(random = Math.random): RandomDraw { return drawWeighted(this.deities.list().map((deity) => ({ id: deity.id, label: deity.name, weight: 1 })), random); }
   getAdapterCapabilities(systemId: string) { return this.adapters.get(systemId).capabilities; }
   async materializeDeity(deityId: string, systemId: string, context?: MaterializationContext): Promise<string | null> { const deity = this.getDeity(deityId); if (!deity) throw new Error(`Unknown deity: ${deityId}`); return this.adapters.get(systemId).materialize(deity, context); }
   getDeity(id: string): DeityDefinition | null { return this.deities.get(id); }
