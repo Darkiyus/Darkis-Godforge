@@ -14,7 +14,7 @@ export class GodForgeReplacementManager extends gmApplicationBase() {
     requireGM();
     const systemId = getFoundryGame()?.system?.id ?? "";
     const official = await (this.adapters.tryGet(systemId)?.listOfficialDeities() ?? Promise.resolve([]));
-    const homebrew = this.deities.list();
+    const homebrew = this.deities.list().filter((deity) => deity.kind !== "lore");
     const rows = official.map((source) => {
       const mapping = homebrew.find((deity) => deity.replacement.sourceUuid === source.sourceUuid && deity.replacement.mode !== "none");
       return { ...source, mappingMode: mapping?.replacement.mode ?? "none", inheritedCount: Object.values(mapping?.replacement.inherit ?? {}).filter(Boolean).length, options: homebrew.map((deity) => ({ id: deity.id, name: deity.name, selected: deity.id === mapping?.id })) };

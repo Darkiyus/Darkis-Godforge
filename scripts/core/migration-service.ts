@@ -24,11 +24,12 @@ export function migrateDefinition(input: unknown): MigrationResult {
     updatedAt: schemaVersion < CURRENT_SCHEMA_VERSION ? new Date().toISOString() : String(source.updatedAt ?? new Date().toISOString()),
     checksum: typeof source.checksum === "string" ? source.checksum : "pending",
     status,
+    kind: source.kind === "lore" ? "lore" : "selectable",
     visibility,
-    passiveBonuses: Array.isArray(source.passiveBonuses) ? source.passiveBonuses.map(normalizeBonus) : [],
-    abilities: Array.isArray(source.abilities) ? source.abilities.map(normalizeAbility) : [],
-    grantGroups: Array.isArray(source.grantGroups) ? source.grantGroups : [],
-    replacement: normalizeReplacement(source.replacement),
+    passiveBonuses: source.kind === "lore" ? [] : Array.isArray(source.passiveBonuses) ? source.passiveBonuses.map(normalizeBonus) : [],
+    abilities: source.kind === "lore" ? [] : Array.isArray(source.abilities) ? source.abilities.map(normalizeAbility) : [],
+    grantGroups: source.kind === "lore" ? [] : Array.isArray(source.grantGroups) ? source.grantGroups : [],
+    replacement: source.kind === "lore" ? { sourceUuid: "", mode: "none", contexts: [] } : normalizeReplacement(source.replacement),
     imagePresentation: normalizeImagePresentation(source.imagePresentation),
     domains: Array.isArray(source.domains) ? source.domains : []
   } as unknown as DeityDefinition;

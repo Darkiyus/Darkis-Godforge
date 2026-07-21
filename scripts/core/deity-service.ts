@@ -4,10 +4,13 @@ import type { DeityDefinition } from "./types";
 export class DeityService {
   private readonly definitions = new Map<string, DeityDefinition>();
   private persistDefinition?: (definition: DeityDefinition) => Promise<unknown>;
+  private persistenceQueue: Promise<void> = Promise.resolve();
+  private persistenceError: unknown = null;
   setPersistence(handler: (definition: DeityDefinition) => Promise<unknown>): void { this.persistDefinition = handler; }
   list(): DeityDefinition[] { return [...this.definitions.values()]; }
   get(id: string): DeityDefinition | null { return this.definitions.get(id) ?? null; }
-  save(definition: DeityDefinition): DeityDefinition { const normalized = migrateDefinition(definition).definition; this.definitions.set(normalized.id, structuredClone(normalized)); if (this.persistDefinition) void this.persistDefinition(structuredClone(normalized)).catch((error: unknown) => console.error("Darkis GodForge | Could not persist deity.", error)); return normalized; }
+  save(definition: DeityDefinition): DeityDefinition { const normalized = migrateDefinition(definition).definition; this.definitions.set(normalized.id, structuredClone(normalized)); if (this.persistDefinition) { const persist = this.persistDefinition; this.persistenceQueue = this.persistenceQueue.then(async () => { try { await persist(structuredClone(normalized)); } catch (error) { this.persistenceError ??= error; console.error("Darkis GodForge | Could not persist deity.", error); } }); } return normalized; }
+  async flushPersistence(): Promise<void> { await this.persistenceQueue; if (this.persistenceError) { const error = this.persistenceError; this.persistenceError = null; throw error; } }
   create(input: Omit<DeityDefinition, "id" | "schemaVersion" | "revision" | "createdAt" | "updatedAt" | "checksum">): DeityDefinition {
     const now = new Date().toISOString();
     const definition: DeityDefinition = { ...structuredClone(input), id: crypto.randomUUID(), schemaVersion: CURRENT_SCHEMA_VERSION, revision: 1, createdAt: now, updatedAt: now, checksum: "pending" };

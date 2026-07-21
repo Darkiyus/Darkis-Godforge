@@ -11,7 +11,7 @@
           {{#if image}}<img src="{{image}}" alt="" style="object-fit:{{imageFit}};object-position:{{imagePosition}}">{{/if}}
           <div class="dg-codex-copy">
             <p class="eyebrow">{{#if pantheonIds}}{{pantheonIds}}{{else}}{{../ui.CODEX}}{{/if}}</p>
-            <h3>{{name}}</h3><h4>{{title}}</h4>
+            <h3>{{name}} {{#if lore}}<span class="dg-lore-badge"><i class="fas fa-book-open" aria-hidden="true"></i> {{../ui.LORE_BADGE}}</span>{{/if}}</h3><h4>{{title}}</h4>
             {{#if quote}}<blockquote>{{quote}}</blockquote>{{/if}}
             {{#if description}}<p>{{description}}</p>{{/if}}
             {{#if domains}}<div class="dg-tags">{{#each domains}}<i>{{this}}</i>{{/each}}</div>{{/if}}

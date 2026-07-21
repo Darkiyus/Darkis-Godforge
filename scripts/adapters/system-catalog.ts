@@ -22,7 +22,7 @@ async function buildCatalog(systemId: string, fallbackSkills: string[]): Promise
   const weapons: SystemChoice[] = [];
   const spells: SystemChoice[] = [];
   for (const pack of itemPacks) {
-    const index = await pack.getIndex({ fields: ["type", "img", "system.slug", "system.category", "system.group", "system.traits", "system.level", "system.rank"] });
+    const index = await pack.getIndex({ fields: ["type", "img", "system.slug", "system.category", "system.group", "system.traits", "system.level", "system.rank", "system.publication.remaster"] });
     for (const entry of index) {
       if (!entry._id || !entry.name || !pack.collection || (entry.type !== "weapon" && entry.type !== "spell")) continue;
       const system = entry.system ?? {};
@@ -35,7 +35,9 @@ async function buildCatalog(systemId: string, fallbackSkills: string[]): Promise
         group: stringValue(system.group),
         traits: stringArray((system.traits as { value?: unknown } | undefined)?.value ?? system.traits),
         source: pack.metadata?.label ?? pack.collection,
-        rank: numberValue(system.rank ?? (system.level as { value?: unknown } | undefined)?.value ?? system.level)
+        rank: numberValue(system.rank ?? (system.level as { value?: unknown } | undefined)?.value ?? system.level),
+        remaster: (system.publication as { remaster?: unknown } | undefined)?.remaster === true,
+        available: true
       };
       if (entry.type === "weapon") weapons.push(choice); else spells.push(choice);
     }

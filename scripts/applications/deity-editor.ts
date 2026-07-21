@@ -1,7 +1,7 @@
 import { AdapterRegistry } from "../adapters/adapter-registry";
 import type { DeityService } from "../core/deity-service";
 import { DEFAULT_VISIBILITY, type AbilityDefinition, type DeityDefinition, type EffectNode, type GrantGroup, type GrantMember, type ImagePresentation, type PassiveBonusDefinition, type VisibilityFields, type VisibilityLevel } from "../core/types";
-import type { SystemEditorCatalog } from "../adapters/adapter.interface";
+import type { SystemChoice, SystemEditorCatalog } from "../adapters/adapter.interface";
 import { evaluateFormula } from "../core/formula-service";
 import { gmApplicationBase } from "../foundry/application-base";
 import { uiText } from "../foundry/i18n";
@@ -10,12 +10,16 @@ import { getFoundryGame } from "../foundry/runtime";
 import { GodForgeCodex } from "./codex";
 import { safeImageUrl } from "../core/sanitize";
 import { CURRENT_SCHEMA_VERSION } from "../core/migration-service";
+import { GodForgePickerDialog } from "./picker-dialog";
+import { reportActionError } from "../foundry/error-reporting";
 
 const visibilityFields = Object.keys(DEFAULT_VISIBILITY.fields) as Array<keyof VisibilityFields>;
 
 export class GodForgeDeityEditor extends gmApplicationBase() {
   static DEFAULT_OPTIONS = { id: "darkis-godforge-deity-editor", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.NEW_DEITY", resizable: true }, position: { width: 980, height: 760 } };
   static PARTS = { main: { template: "modules/darkis-godforge/templates/deity-editor.hbs" } };
+  private systemCatalog: SystemEditorCatalog = { skills: [], domains: [], weapons: [], spells: [], fonts: [], sanctifications: [], attributes: [] };
+  private officialChoices: SystemChoice[] = [];
 
   constructor(
     private readonly deityService: DeityService,
@@ -35,6 +39,8 @@ export class GodForgeDeityEditor extends gmApplicationBase() {
     catch (error) { console.error("Darkis GodForge | Could not load official deities for the editor.", error); }
     try { if (adapter) systemCatalog = await adapter.listEditorCatalog(); }
     catch (error) { console.error("Darkis GodForge | Could not load system choices for the editor.", error); }
+    this.systemCatalog = systemCatalog;
+    this.officialChoices = officialDeities.map((deity) => ({ value: deity.sourceUuid ?? deity.id, label: deity.name, img: deity.image, category: deity.pantheon, group: deity.skill ?? deity.alignment, traits: deity.domains, source: systemId.toUpperCase(), details: deity.favoredWeapon ? `Waffe: ${deity.favoredWeapon}` : undefined, available: true }));
     const selectedSource = this.existing?.replacement.sourceUuid ?? "";
     const officialOptions = officialDeities.map((deity) => ({ ...deity, selected: deity.sourceUuid === selectedSource }));
     if (selectedSource && !officialOptions.some((deity) => deity.sourceUuid === selectedSource)) officialOptions.push({ id: selectedSource, sourceUuid: selectedSource, official: true, name: selectedSource, title: selectedSource, domains: [], selected: true });
@@ -57,6 +63,7 @@ export class GodForgeDeityEditor extends gmApplicationBase() {
     let dirty = false;
     if (root && form && this.existing) this.populateForm(root, form, this.existing);
     if (root && form) this.setupWizard(root, form);
+    if (form) this.refreshPickerControls(form);
     root?.querySelectorAll<HTMLButtonElement>("[data-action='browse-image']").forEach((button) => button.addEventListener("click", () => this.openFilePicker(root, button)));
     root?.querySelectorAll<HTMLElement>("[data-image-field]").forEach((field) => {
       field.addEventListener("dragover", (event) => { event.preventDefault(); event.dataTransfer!.dropEffect = "copy"; });
@@ -69,7 +76,7 @@ export class GodForgeDeityEditor extends gmApplicationBase() {
     root?.addEventListener("click", (event) => {
       const button = (event.target as HTMLElement).closest<HTMLElement>("[data-action]");
       if (!button) return;
-      if (button.dataset.action === "add-catalog-spell" && form) { this.addCatalogSpell(form); return; }
+      if (button.dataset.action === "open-system-picker" && form) { this.openSystemPicker(form, button); return; }
       if (button.dataset.action === "generate-image-variants" && form) { void this.generateImageVariants(form, button as HTMLButtonElement); return; }
       if (button.dataset.action === "scroll-steps-left" || button.dataset.action === "scroll-steps-right") { root.querySelector<HTMLElement>(".dg-step-strip")?.scrollBy({ left: button.dataset.action.endsWith("right") ? 260 : -260, behavior: "smooth" }); return; }
       const card = button?.closest<HTMLElement>(".dg-editor-card");
@@ -84,7 +91,7 @@ export class GodForgeDeityEditor extends gmApplicationBase() {
       this.updateStackingWarnings(root);
       if (form) this.updateWizardPreview(root, form);
     });
-    root?.addEventListener("input", (event) => { dirty = true; this.updateStackingWarnings(root); const input = event.target as HTMLInputElement; if (input.matches("[data-image-input]")) this.updateImagePreview(root, input.name, input.value); if (input.matches("[data-formula]")) this.validateFormulaField(input); if (input.matches("[data-catalog-search]")) this.filterCatalog(input); if (form) this.updateWizardPreview(root, form); });
+    root?.addEventListener("input", (event) => { dirty = true; this.updateStackingWarnings(root); const input = event.target as HTMLInputElement; if (input.matches("[data-image-input]")) this.updateImagePreview(root, input.name, input.value); if (input.matches("[data-formula]")) this.validateFormulaField(input); if (form) this.updateWizardPreview(root, form); });
     root?.addEventListener("change", (event) => {
       dirty = true;
       const target = event.target as HTMLInputElement | HTMLSelectElement;
@@ -113,11 +120,11 @@ export class GodForgeDeityEditor extends gmApplicationBase() {
     root?.querySelector<HTMLElement>("[data-action='save-draft']")?.addEventListener("click", () => {
       const name = form?.elements.namedItem("name") as HTMLInputElement | null;
       if (!form || !name?.reportValidity()) return;
-      this.saveDefinition(form, true);
+      void this.saveDefinition(form, true);
     });
     form?.addEventListener("submit", (event) => {
       event.preventDefault();
-      this.saveDefinition(form, false);
+      void this.saveDefinition(form, false);
     });
   }
 
@@ -128,25 +135,36 @@ export class GodForgeDeityEditor extends gmApplicationBase() {
     const next = root.querySelector<HTMLButtonElement>("[data-action='next-step']");
     const finish = root.querySelector<HTMLButtonElement>("[data-action='finish']");
     const current = root.querySelector<HTMLElement>("[data-wizard-current]");
+    const total = root.querySelector<HTMLElement>("[data-wizard-total]");
+    const kind = form.elements.namedItem("kind") as HTMLSelectElement | null;
     let activeStep = 0;
+    const visiblePanels = (): HTMLElement[] => panels.filter((panel) => kind?.value !== "lore" || !panel.hasAttribute("data-selectable-only"));
     const showStep = (requested: number): void => {
-      activeStep = Math.max(0, Math.min(panels.length - 1, requested));
-      panels.forEach((panel, index) => { panel.hidden = index !== activeStep; });
-      steps.forEach((step, index) => {
-        step.classList.toggle("completed", index < activeStep);
-        if (index === activeStep) step.setAttribute("aria-current", "step");
+      const visible = visiblePanels();
+      activeStep = Math.max(0, Math.min(visible.length - 1, requested));
+      const activePanel = visible[activeStep];
+      panels.forEach((panel) => { panel.hidden = panel !== activePanel; });
+      steps.forEach((step) => {
+        const panel = panels.find((entry) => entry.dataset.wizardPanel === step.dataset.wizardStep);
+        const visibleIndex = panel ? visible.indexOf(panel) : -1;
+        step.hidden = visibleIndex < 0;
+        step.querySelector("b")!.textContent = visibleIndex < 0 ? "" : String(visibleIndex + 1);
+        step.classList.toggle("completed", visibleIndex >= 0 && visibleIndex < activeStep);
+        if (panel === activePanel) step.setAttribute("aria-current", "step");
         else step.removeAttribute("aria-current");
       });
       if (previous) previous.disabled = activeStep === 0;
-      if (next) next.hidden = activeStep === panels.length - 1;
-      if (finish) finish.hidden = activeStep !== panels.length - 1;
+      if (next) next.hidden = activeStep === visible.length - 1;
+      if (finish) finish.hidden = activeStep !== visible.length - 1;
       if (current) current.textContent = String(activeStep + 1);
-      steps[activeStep]?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      if (total) total.textContent = String(visible.length);
+      steps.find((step) => step.getAttribute("aria-current") === "step")?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
       this.updateWizardPreview(root, form);
     };
-    steps.forEach((step) => step.addEventListener("click", () => showStep(Number(step.dataset.wizardStep ?? 0))));
+    steps.forEach((step) => step.addEventListener("click", () => { const panel = panels.find((entry) => entry.dataset.wizardPanel === step.dataset.wizardStep); const index = panel ? visiblePanels().indexOf(panel) : -1; if (index >= 0) showStep(index); }));
     previous?.addEventListener("click", () => showStep(activeStep - 1));
     next?.addEventListener("click", () => showStep(activeStep + 1));
+    kind?.addEventListener("change", () => showStep(0));
     showStep(0);
   }
 
@@ -161,21 +179,21 @@ export class GodForgeDeityEditor extends gmApplicationBase() {
     if (quote) { quote.textContent = value("quote"); quote.hidden = !quote.textContent; }
     const status = form.elements.namedItem("status") as HTMLSelectElement | null;
     setText("[data-wizard-preview-status]", status?.selectedOptions[0]?.textContent ?? ui.STATUS_DRAFT ?? "Draft");
-    const source = form.elements.namedItem("replacement.sourceUuid") as HTMLSelectElement | null;
-    setText("[data-wizard-preview-source]", source?.value ? (source.selectedOptions[0]?.textContent ?? source.value) : "—");
+    const source = form.elements.namedItem("replacement.sourceUuid") as HTMLInputElement | null;
+    setText("[data-wizard-preview-source]", source?.value ? (this.officialChoices.find((choice) => choice.value === source.value)?.label ?? source.value) : "—");
     setText("[data-wizard-preview-bonuses]", String(form.querySelectorAll("[data-bonus-row]").length));
     setText("[data-wizard-preview-abilities]", String(form.querySelectorAll("[data-ability-row]").length));
     const image = root.querySelector<HTMLImageElement>("[data-wizard-preview-image]");
     if (image) image.src = value("image") ? safeImageUrl(value("image")) : "modules/darkis-godforge/assets/logo.png";
   }
 
-  private saveDefinition(form: HTMLFormElement, asDraft: boolean): void {
+  private async saveDefinition(form: HTMLFormElement, asDraft: boolean): Promise<void> {
     requireGM();
     const input = this.readInput(form);
     if (asDraft) input.status = "draft";
     const deity = this.existing ? this.deityService.update(this.existing.id, input) : this.deityService.create(input);
-    this.onSaved(deity);
-    void this.close?.();
+    try { await this.deityService.flushPersistence(); this.onSaved(deity); await this.close?.(); }
+    catch (error) { reportActionError("Deity persistence failed.", error); }
   }
 
   private appendTemplate(root: HTMLElement | undefined, name: string, targetSelector: string): void {
@@ -197,7 +215,7 @@ export class GodForgeDeityEditor extends gmApplicationBase() {
 
   private populateForm(root: HTMLElement, form: HTMLFormElement, deity: DeityDefinition): void {
     const values: Record<string, string> = {
-      name: deity.name, title: deity.title, status: deity.status, description: deity.description, quote: deity.quote ?? "", image: deity.image ?? "", icon: deity.icon ?? "", symbol: deity.symbol ?? "", banner: deity.banner ?? "",
+      name: deity.name, title: deity.title, kind: deity.kind ?? "selectable", status: deity.status, description: deity.description, quote: deity.quote ?? "", image: deity.image ?? "", icon: deity.icon ?? "", symbol: deity.symbol ?? "", banner: deity.banner ?? "",
       pantheons: (deity.pantheonIds ?? []).join(", "), domains: deity.domains.join(", "), alternateDomains: (deity.alternateDomains ?? []).join(", "), divineAttributes: (deity.divineAttributes ?? []).join(", "), spells: this.formatSpells(deity.spells), tags: (deity.tags ?? []).join(", "), alignment: deity.alignment ?? "", favoredWeapon: deity.favoredWeapon ?? "", favoredWeaponUuid: deity.favoredWeaponUuid ?? "",
       font: deity.font ?? "", skill: deity.skill ?? "", sanctification: deity.sanctification ?? "", cause: deity.cause ?? "",
       edicts: (deity.edicts ?? []).join(", "), anathema: (deity.anathema ?? []).join(", "), gmNotes: deity.gmNotes ?? "", "replacement.mode": deity.replacement.mode,
@@ -239,12 +257,14 @@ export class GodForgeDeityEditor extends gmApplicationBase() {
 
   private readInput(form: HTMLFormElement): Omit<DeityDefinition, "id" | "schemaVersion" | "revision" | "createdAt" | "updatedAt" | "checksum"> {
     const data = new FormData(form);
+    const kind = data.get("kind") === "lore" ? "lore" as const : "selectable" as const;
     const visibility = structuredClone(DEFAULT_VISIBILITY);
     visibility.deity = this.visibility(data.get("visibility.deity"), "public");
     visibility.showMechanicsInSelection = data.has("visibility.showMechanicsInSelection");
     for (const field of visibilityFields) visibility.fields[field] = this.visibility(data.get(`visibility.fields.${field}`), visibility.fields[field]);
     return {
       status: this.status(data.get("status")),
+      kind,
       name: this.text(data.get("name")),
       title: this.text(data.get("title")),
       description: this.text(data.get("description")),
@@ -254,27 +274,27 @@ export class GodForgeDeityEditor extends gmApplicationBase() {
       symbol: this.optional(data.get("symbol")),
       banner: this.optional(data.get("banner")),
       imagePresentation: this.readImagePresentation(data),
-      domains: this.list(data.get("domains")),
-      alternateDomains: this.list(data.get("alternateDomains")),
-      divineAttributes: this.list(data.get("divineAttributes")),
-      spells: this.spells(data.get("spells")),
+      domains: kind === "lore" ? [] : this.list(data.get("domains")),
+      alternateDomains: kind === "lore" ? [] : this.list(data.get("alternateDomains")),
+      divineAttributes: kind === "lore" ? [] : this.list(data.get("divineAttributes")),
+      spells: kind === "lore" ? undefined : this.spells(data.get("spells")),
       pantheonIds: this.readPantheonIds(data),
       pantheons: this.readPantheons(data),
       tags: this.list(data.get("tags")),
       alignment: this.optional(data.get("alignment")),
-      favoredWeapon: this.optional(data.get("favoredWeapon")),
-      favoredWeaponUuid: this.optional(data.get("favoredWeaponUuid")),
-      font: this.optional(data.get("font")),
-      skill: this.optional(data.get("skill")),
-      sanctification: this.optional(data.get("sanctification")),
-      cause: this.optional(data.get("cause")),
-      edicts: this.list(data.get("edicts")),
-      anathema: this.list(data.get("anathema")),
+      favoredWeapon: kind === "lore" ? undefined : this.optional(data.get("favoredWeapon")),
+      favoredWeaponUuid: kind === "lore" ? undefined : this.optional(data.get("favoredWeaponUuid")),
+      font: kind === "lore" ? undefined : this.optional(data.get("font")),
+      skill: kind === "lore" ? undefined : this.optional(data.get("skill")),
+      sanctification: kind === "lore" ? undefined : this.optional(data.get("sanctification")),
+      cause: kind === "lore" ? undefined : this.optional(data.get("cause")),
+      edicts: kind === "lore" ? [] : this.list(data.get("edicts")),
+      anathema: kind === "lore" ? [] : this.list(data.get("anathema")),
       gmNotes: this.optional(data.get("gmNotes")),
-      passiveBonuses: this.readBonuses(form),
-      abilities: this.readAbilities(form),
-      grantGroups: this.readGrantGroups(form),
-      replacement: { sourceUuid: this.text(data.get("replacement.sourceUuid")), mode: this.text(data.get("replacement.sourceUuid")) ? this.replacementMode(data.get("replacement.mode")) === "hide" ? "hide" : "replace" : "none", contexts: this.list(data.get("replacement.contexts")), inherit: { domains: data.has("replacement.inherit.domains"), favoredWeapon: data.has("replacement.inherit.favoredWeapon"), spells: data.has("replacement.inherit.spells"), sanctification: data.has("replacement.inherit.sanctification"), skill: data.has("replacement.inherit.skill"), font: data.has("replacement.inherit.font"), divineAttributes: data.has("replacement.inherit.divineAttributes"), edicts: data.has("replacement.inherit.edicts"), anathema: data.has("replacement.inherit.anathema") }, keepForExistingActors: data.has("replacement.keepForExistingActors") },
+      passiveBonuses: kind === "lore" ? [] : this.readBonuses(form),
+      abilities: kind === "lore" ? [] : this.readAbilities(form),
+      grantGroups: kind === "lore" ? [] : this.readGrantGroups(form),
+      replacement: kind === "lore" ? { sourceUuid: "", mode: "none", contexts: [] } : { sourceUuid: this.text(data.get("replacement.sourceUuid")), mode: this.text(data.get("replacement.sourceUuid")) ? this.replacementMode(data.get("replacement.mode")) === "hide" ? "hide" : "replace" : "none", contexts: this.list(data.get("replacement.contexts")), inherit: { domains: data.has("replacement.inherit.domains"), favoredWeapon: data.has("replacement.inherit.favoredWeapon"), spells: data.has("replacement.inherit.spells"), sanctification: data.has("replacement.inherit.sanctification"), skill: data.has("replacement.inherit.skill"), font: data.has("replacement.inherit.font"), divineAttributes: data.has("replacement.inherit.divineAttributes"), edicts: data.has("replacement.inherit.edicts"), anathema: data.has("replacement.inherit.anathema") }, keepForExistingActors: data.has("replacement.keepForExistingActors") },
       visibility
     };
   }
@@ -447,18 +467,59 @@ export class GodForgeDeityEditor extends gmApplicationBase() {
 
   private pantheonId(name: string): string { return `pantheon-${name.toLocaleLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`; }
 
-  private addCatalogSpell(form: HTMLFormElement): void {
-    const picker = form.querySelector<HTMLSelectElement>("[data-spell-picker]");
-    const textarea = form.elements.namedItem("spells") as HTMLTextAreaElement | null;
-    const option = picker?.selectedOptions[0];
-    if (!picker?.value || !textarea || !option) return;
-    const rank = option.dataset.rank ?? "1";
-    const line = `${rank}=${picker.value}`;
-    const lines = textarea.value.split(/\r?\n/).filter(Boolean);
-    const existingIndex = lines.findIndex((entry) => entry.startsWith(`${rank}=`));
-    if (existingIndex >= 0) lines[existingIndex] = line; else lines.push(line);
-    textarea.value = lines.join("\n");
-    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  private openSystemPicker(form: HTMLFormElement, button: HTMLElement): void {
+    const key = button.dataset.picker ?? "";
+    const choices = this.pickerChoices(key);
+    const selected = this.pickerValues(form, key);
+    const multiple = key === "domains" || key === "alternateDomains" || key === "spells" || key === "attributes";
+    const ui = uiText();
+    const titles: Partial<Record<string, string>> = { domains: ui.DOMAINS, alternateDomains: ui.ALTERNATE_DOMAINS, weapons: ui.FAVORED_WEAPON, spells: ui.CLERIC_SPELLS, skills: ui.TRAINED_SKILL, fonts: ui.DIVINE_FONT, sanctifications: ui.SANCTIFICATION, attributes: ui.DIVINE_ATTRIBUTES, official: ui.OFFICIAL_DEITY };
+    void new GodForgePickerDialog(titles[key] ?? ui.PICKER_TITLE ?? "Selection", choices, selected, multiple, ({ items }) => {
+      const values = items.map((item) => item.value);
+      if (key === "weapons") {
+        this.setValue(form, "favoredWeaponUuid", values[0] ?? "");
+        this.setValue(form, "favoredWeapon", items[0]?.slug ?? "");
+      } else if (key === "spells") {
+        const byRank = new Map<number, SystemChoice>();
+        items.forEach((item) => byRank.set(item.rank ?? 1, item));
+        this.setValue(form, "spells", [...byRank.entries()].sort(([a], [b]) => a - b).map(([rank, item]) => `${rank}=${item.value}`).join("\n"));
+      } else {
+        const field = { domains: "domains", alternateDomains: "alternateDomains", skills: "skill", fonts: "font", sanctifications: "sanctification", attributes: "divineAttributes", official: "replacement.sourceUuid" }[key];
+        if (field) this.setValue(form, field, multiple ? values.join(", ") : values[0] ?? "");
+      }
+      if (key === "official") (form.elements.namedItem("replacement.sourceUuid") as HTMLInputElement | null)?.dispatchEvent(new Event("change", { bubbles: true }));
+      this.refreshPickerControls(form);
+      this.updateWizardPreview(this.element!, form);
+    }).render(true);
+  }
+
+  private pickerChoices(key: string): SystemChoice[] {
+    if (key === "official") return this.officialChoices;
+    if (key === "alternateDomains") return this.systemCatalog.domains;
+    return this.systemCatalog[key as keyof SystemEditorCatalog] ?? [];
+  }
+
+  private pickerValues(form: HTMLFormElement, key: string): string[] {
+    if (key === "spells") return Object.values(this.spells((form.elements.namedItem("spells") as HTMLTextAreaElement | null)?.value ?? "") ?? {});
+    const field = { domains: "domains", alternateDomains: "alternateDomains", weapons: "favoredWeaponUuid", skills: "skill", fonts: "font", sanctifications: "sanctification", attributes: "divineAttributes", official: "replacement.sourceUuid" }[key];
+    if (!field) return [];
+    const value = (form.elements.namedItem(field) as HTMLInputElement | HTMLTextAreaElement | null)?.value ?? "";
+    return key === "domains" || key === "alternateDomains" || key === "attributes" ? this.list(value) : value ? [value] : [];
+  }
+
+  private refreshPickerControls(form: HTMLFormElement): void {
+    const ui = uiText();
+    form.querySelectorAll<HTMLElement>("[data-picker-control]").forEach((control) => {
+      const key = control.dataset.pickerControl ?? "";
+      const choices = this.pickerChoices(key);
+      const values = this.pickerValues(form, key);
+      const found = values.flatMap((value) => { const item = choices.find((choice) => choice.value === value || (key === "weapons" && choice.slug === value)); return item ? [item] : []; });
+      const label = control.querySelector<HTMLElement>("[data-picker-label]");
+      if (label) label.textContent = found.length ? found.map((item) => item.rank === undefined || key !== "spells" ? item.label : `${item.rank}: ${item.label}`).join(", ") : values.length ? values.join(", ") : ui.PICKER_NONE ?? "—";
+      const missing = values.length > found.length;
+      control.classList.toggle("missing", missing);
+      control.title = missing ? ui.PICKER_MISSING ?? "Saved document is unavailable." : "";
+    });
   }
 
   private async generateImageVariants(form: HTMLFormElement, button: HTMLButtonElement): Promise<void> {
@@ -499,7 +560,6 @@ export class GodForgeDeityEditor extends gmApplicationBase() {
   private renderImageVariant(image: HTMLImageElement, width: number, height: number, presentation: ImagePresentation): Promise<Blob> { const canvas = document.createElement("canvas"); canvas.width = width; canvas.height = height; const context = canvas.getContext("2d"); if (!context) return Promise.reject(new Error("Canvas is unavailable.")); context.clearRect(0, 0, width, height); const scale = (presentation.fit === "contain" ? Math.min(width / image.naturalWidth, height / image.naturalHeight) : Math.max(width / image.naturalWidth, height / image.naturalHeight)) * (presentation.zoom ?? 1); context.translate(width / 2, height / 2); context.rotate((presentation.rotation ?? 0) * Math.PI / 180); context.scale(scale, scale); context.drawImage(image, -(presentation.focusX / 100) * image.naturalWidth, -(presentation.focusY / 100) * image.naturalHeight); return new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Image encoding failed.")), "image/webp", 0.9)); }
 
   private validateFormulaField(input: HTMLInputElement): void { const status = input.parentElement?.querySelector<HTMLElement>("[data-formula-status]"); if (!status) return; try { evaluateFormula(input.value.replace(/\b\d+d\d+\b/gi, "1"), { actor: { level: 1 }, target: {} }); status.textContent = "✓"; status.dataset.valid = "true"; } catch { status.textContent = "!"; status.dataset.valid = "false"; } }
-  private filterCatalog(input: HTMLInputElement): void { const target = this.element?.querySelector<HTMLSelectElement>(`[data-catalog='${input.dataset.catalogSearch ?? ""}']`); if (!target) return; const query = input.value.toLocaleLowerCase(); for (const option of target.options) option.hidden = Boolean(query) && !option.textContent?.toLocaleLowerCase().includes(query); }
 
   private readGrantGroups(form: HTMLFormElement): GrantGroup[] {
     const list = form.querySelector<HTMLElement>("[data-grant-list]");

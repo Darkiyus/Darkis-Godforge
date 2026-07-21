@@ -25,6 +25,7 @@
       <div class="dg-form-grid">
         <label>{{ui.NAME}}<small>{{ui.HELP_NAME}}</small><input name="name" required maxlength="80" placeholder="{{ui.NEW_DEITY_PLACEHOLDER}}"></label>
         <label>{{ui.TITLE_FIELD}}<small>{{ui.HELP_TITLE}}</small><input name="title" maxlength="120" placeholder="{{ui.TITLE_PLACEHOLDER}}"></label>
+        <label>{{ui.DEITY_KIND}}<small>{{ui.HELP_DEITY_KIND}}</small><select name="kind" data-deity-kind><option value="selectable">{{ui.KIND_SELECTABLE}}</option><option value="lore">{{ui.KIND_LORE}}</option></select></label>
         <label class="dg-span-2">{{ui.DESCRIPTION}}<small>{{ui.HELP_DESCRIPTION}}</small><textarea name="description" maxlength="4000" rows="6"></textarea></label>
         <label class="dg-span-2">{{ui.QUOTE}}<small>{{ui.HELP_QUOTE}}</small><input name="quote" maxlength="300"></label>
         <fieldset class="dg-span-2 dg-pantheon-picker"><legend>{{ui.PANTHEONS}}</legend><small>{{ui.HELP_PANTHEONS}}</small><div class="dg-chip-picker">{{#each pantheonOptions}}<label style="--pantheon-color:{{color}}"><input type="checkbox" name="pantheon.selected" value="{{id}}" {{#if selected}}checked{{/if}}> {{name}}</label>{{/each}}</div><div class="dg-form-grid dg-form-grid-3"><label>{{ui.NAME}}<input name="pantheon.new.name"></label><label>Farbe / Color<input type="color" name="pantheon.new.color" value="#8f38e8"></label><label>{{ui.SYMBOL}}<input name="pantheon.new.symbol"></label><label>Reihenfolge / Order<input type="number" min="0" name="pantheon.new.order" value="0"></label></div><details class="dg-wizard-advanced"><summary>{{ui.EXPERT_OPTIONS}}</summary><input name="pantheons" placeholder="{{ui.COMMA_SEPARATED}}"></details></fieldset>
@@ -44,36 +45,36 @@
       </div>
     </section>
 
-    <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="2" hidden>
+    <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="2" data-selectable-only hidden>
       <div class="dg-section-title"><div><h3>{{ui.SYSTEM_VALUES}}</h3><p>{{ui.STEP_SYSTEM_INTRO}}</p></div><i class="fas fa-gears" aria-hidden="true"></i></div>
       <div class="dg-form-grid">
-        <label>{{ui.DOMAINS}}<small>{{ui.HELP_DOMAINS}}</small><input name="domains" list="dg-domains" placeholder="{{ui.DOMAINS_PLACEHOLDER}}"></label>
-        <label>{{ui.FAVORED_WEAPON}}<small>{{ui.HELP_WEAPON}}</small><input data-catalog-search="weapons" placeholder="Waffe suchen …"><select data-catalog="weapons" data-weapon-picker><option value="">—</option>{{#each systemCatalog.weapons}}<option value="{{value}}" data-slug="{{slug}}">{{label}} · {{category}} · {{source}}</option>{{/each}}</select><input type="hidden" name="favoredWeapon"><input type="hidden" name="favoredWeaponUuid"></label>
-        <label>{{ui.TRAINED_SKILL}} – PF2e-Ausbildung<small>{{ui.HELP_SKILL}} Kein zusätzlicher Zahlenbonus.</small><select name="skill"><option value="">—</option>{{#each systemCatalog.skills}}<option value="{{value}}">{{label}}</option>{{/each}}</select></label>
-        <label>{{ui.DIVINE_FONT}}<small>{{ui.HELP_FONT}}</small><select name="font"><option value="">—</option>{{#each systemCatalog.fonts}}<option value="{{value}}">{{label}}</option>{{/each}}</select></label>
-        <label>{{ui.SANCTIFICATION}}<small>{{ui.HELP_SANCTIFICATION}}</small><select name="sanctification"><option value="">—</option>{{#each systemCatalog.sanctifications}}<option value="{{value}}">{{label}}</option>{{/each}}</select></label>
+        <label>{{ui.DOMAINS}}<small>{{ui.HELP_DOMAINS}}</small><span class="dg-system-picker-control" data-picker-control="domains"><input type="hidden" name="domains"><span data-picker-label>{{ui.PICKER_NONE}}</span><button type="button" data-action="open-system-picker" data-picker="domains" title="{{ui.PICKER_OPEN}}"><i class="fas fa-list-check"></i></button></span></label>
+        <label>{{ui.FAVORED_WEAPON}}<small>{{ui.HELP_WEAPON}}</small><span class="dg-system-picker-control" data-picker-control="weapons"><input type="hidden" name="favoredWeapon"><input type="hidden" name="favoredWeaponUuid"><span data-picker-label>{{ui.PICKER_NONE}}</span><button type="button" data-action="open-system-picker" data-picker="weapons" title="{{ui.PICKER_OPEN}}"><i class="fas fa-list-check"></i></button></span></label>
+        <label>{{ui.TRAINED_SKILL}} – PF2e-Ausbildung<small>{{ui.HELP_SKILL}} Kein zusätzlicher Zahlenbonus.</small><span class="dg-system-picker-control" data-picker-control="skills"><input type="hidden" name="skill"><span data-picker-label>{{ui.PICKER_NONE}}</span><button type="button" data-action="open-system-picker" data-picker="skills" title="{{ui.PICKER_OPEN}}"><i class="fas fa-list-check"></i></button></span></label>
+        <label>{{ui.DIVINE_FONT}}<small>{{ui.HELP_FONT}}</small><span class="dg-system-picker-control" data-picker-control="fonts"><input type="hidden" name="font"><span data-picker-label>{{ui.PICKER_NONE}}</span><button type="button" data-action="open-system-picker" data-picker="fonts" title="{{ui.PICKER_OPEN}}"><i class="fas fa-list-check"></i></button></span></label>
+        <label>{{ui.SANCTIFICATION}}<small>{{ui.HELP_SANCTIFICATION}}</small><span class="dg-system-picker-control" data-picker-control="sanctifications"><input type="hidden" name="sanctification"><span data-picker-label>{{ui.PICKER_NONE}}</span><button type="button" data-action="open-system-picker" data-picker="sanctifications" title="{{ui.PICKER_OPEN}}"><i class="fas fa-list-check"></i></button></span></label>
         <label>{{ui.CHAMPION_CAUSE}}<small>{{ui.HELP_CAUSE}}</small><input name="cause"></label>
         <label class="dg-span-2">{{ui.EDICTS}}<small>{{ui.HELP_EDICTS}}</small><input name="edicts" placeholder="{{ui.COMMA_SEPARATED}}"></label>
         <label class="dg-span-2">{{ui.ANATHEMA}}<small>{{ui.HELP_ANATHEMA}}</small><input name="anathema" placeholder="{{ui.COMMA_SEPARATED}}"></label>
-        <label class="dg-span-2">{{ui.CLERIC_SPELLS}}<small>{{ui.HELP_SPELLS}}</small><input data-catalog-search="spells" placeholder="Zauber suchen …"><span class="dg-file-control"><select data-catalog="spells" data-spell-picker><option value="">—</option>{{#each systemCatalog.spells}}<option value="{{value}}" data-rank="{{rank}}">Rang {{rank}} · {{label}} · {{source}}</option>{{/each}}</select><button type="button" data-action="add-catalog-spell"><i class="fas fa-plus"></i></button></span><details class="dg-wizard-advanced"><summary>{{ui.EXPERT_OPTIONS}} · UUID</summary><textarea name="spells" rows="3" placeholder="{{ui.SPELLS_HINT}}"></textarea></details></label>
+        <label class="dg-span-2">{{ui.CLERIC_SPELLS}}<small>{{ui.HELP_SPELLS}}</small><span class="dg-system-picker-control" data-picker-control="spells"><span data-picker-label>{{ui.PICKER_NONE}}</span><button type="button" data-action="open-system-picker" data-picker="spells" title="{{ui.PICKER_OPEN}}"><i class="fas fa-list-check"></i></button></span><details class="dg-wizard-advanced"><summary>{{ui.EXPERT_OPTIONS}} · UUID</summary><textarea name="spells" rows="3" placeholder="{{ui.SPELLS_HINT}}"></textarea></details></label>
       </div>
       <details class="dg-wizard-advanced">
         <summary>{{ui.ADVANCED_SYSTEM_VALUES}}</summary>
         <div class="dg-form-grid">
           <label>{{ui.ALIGNMENT}}<small>{{ui.HELP_ALIGNMENT}}</small><input name="alignment"></label>
-          <label>{{ui.ALTERNATE_DOMAINS}}<small>{{ui.HELP_ALTERNATE_DOMAINS}}</small><input name="alternateDomains" placeholder="{{ui.DOMAINS_PLACEHOLDER}}"></label>
-          <label class="dg-span-2">{{ui.DIVINE_ATTRIBUTES}}<small>{{ui.HELP_ATTRIBUTES}}</small><input name="divineAttributes"></label>
+          <label>{{ui.ALTERNATE_DOMAINS}}<small>{{ui.HELP_ALTERNATE_DOMAINS}}</small><span class="dg-system-picker-control" data-picker-control="alternateDomains"><input type="hidden" name="alternateDomains"><span data-picker-label>{{ui.PICKER_NONE}}</span><button type="button" data-action="open-system-picker" data-picker="alternateDomains" title="{{ui.PICKER_OPEN}}"><i class="fas fa-list-check"></i></button></span></label>
+          <label class="dg-span-2">{{ui.DIVINE_ATTRIBUTES}}<small>{{ui.HELP_ATTRIBUTES}}</small><span class="dg-system-picker-control" data-picker-control="attributes"><input type="hidden" name="divineAttributes"><span data-picker-label>{{ui.PICKER_NONE}}</span><button type="button" data-action="open-system-picker" data-picker="attributes" title="{{ui.PICKER_OPEN}}"><i class="fas fa-list-check"></i></button></span></label>
         </div>
       </details>
     </section>
 
-    <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="3" hidden>
+    <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="3" data-selectable-only hidden>
       <div class="dg-section-title"><div><h3>Zusätzliche Anhängerboni</h3><p>Diese Boni kommen gegebenenfalls zur göttlichen Ausbildung hinzu.</p></div><button type="button" class="dg-secondary" data-action="add-bonus"><i class="fas fa-plus" aria-hidden="true"></i> {{ui.ADD_BONUS}}</button></div>
       <p class="dg-wizard-note">{{ui.BONUS_EDITOR_HINT}}</p>
       <div class="dg-editor-list" data-bonus-list></div>
     </section>
 
-    <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="4" hidden>
+    <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="4" data-selectable-only hidden>
       <div class="dg-section-title"><div><h3>{{ui.DIVINE_WONDERS}}</h3><p>{{ui.STEP_WONDERS_INTRO}}</p></div><button type="button" class="dg-secondary" data-action="add-ability"><i class="fas fa-plus" aria-hidden="true"></i> {{ui.ADD_ABILITY}}</button></div>
       <p class="dg-wizard-note">{{ui.ABILITY_EDITOR_HINT}}</p>
       <div class="dg-editor-list" data-ability-list></div>
@@ -85,11 +86,11 @@
       </details>
     </section>
 
-    <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="5" hidden>
+    <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="5" data-selectable-only hidden>
       <div class="dg-section-title"><div><h3>{{ui.REPLACEMENT}}</h3><p>{{ui.STEP_REPLACEMENT_INTRO}}</p></div><i class="fas fa-code-compare" aria-hidden="true"></i></div>
       <div class="dg-form-grid">
         <label>{{ui.REPLACEMENT_MODE}}<small>{{ui.HELP_REPLACEMENT_MODE}}</small><select name="replacement.mode"><option value="none">{{ui.REPLACE_NONE}}</option><option value="hide">{{ui.REPLACE_HIDE}}</option><option value="replace">{{ui.REPLACE_SOURCE}}</option></select></label>
-        <label>{{ui.OFFICIAL_DEITY}}<small>{{ui.HELP_OFFICIAL_DEITY}}</small><input data-catalog-search="official" placeholder="Gottheit suchen …"><select name="replacement.sourceUuid" data-catalog="official"><option value="">—</option>{{#each officialDeities}}<option value="{{sourceUuid}}" {{#if selected}}selected{{/if}}>{{name}} · {{domains}}</option>{{/each}}</select></label>
+        <label>{{ui.OFFICIAL_DEITY}}<small>{{ui.HELP_OFFICIAL_DEITY}}</small><span class="dg-system-picker-control" data-picker-control="official"><input type="hidden" name="replacement.sourceUuid"><span data-picker-label>{{ui.PICKER_NONE}}</span><button type="button" data-action="open-system-picker" data-picker="official" title="{{ui.PICKER_OPEN}}"><i class="fas fa-list-check"></i></button></span></label>
       </div>
       {{#unless officialDeities.length}}<p class="dg-wizard-note"><i class="fas fa-circle-info" aria-hidden="true"></i> {{ui.NO_OFFICIAL_DEITIES_HINT}}</p>{{/unless}}
       <fieldset class="dg-check-grid"><legend>{{ui.INHERITANCE}} · empfohlene technische Werte werden automatisch gewählt</legend><label><input type="checkbox" name="replacement.inherit.domains"> {{ui.DOMAINS}}</label><label><input type="checkbox" name="replacement.inherit.favoredWeapon"> {{ui.FAVORED_WEAPON}}</label><label><input type="checkbox" name="replacement.inherit.spells"> {{ui.SPELLS}}</label><label><input type="checkbox" name="replacement.inherit.sanctification"> {{ui.SANCTIFICATION}}</label><label><input type="checkbox" name="replacement.inherit.skill"> {{ui.TRAINED_SKILL}}</label><label><input type="checkbox" name="replacement.inherit.font"> {{ui.DIVINE_FONT}}</label><label><input type="checkbox" name="replacement.inherit.divineAttributes"> {{ui.DIVINE_ATTRIBUTES}}</label><label><input type="checkbox" name="replacement.inherit.edicts"> {{ui.EDICTS}}</label><label><input type="checkbox" name="replacement.inherit.anathema"> {{ui.ANATHEMA}}</label><label><input type="checkbox" name="replacement.keepForExistingActors" checked> {{ui.KEEP_EXISTING_ACTORS}}</label></fieldset>

@@ -24,13 +24,14 @@ Darkis GodForge verwaltet eigene Gottheiten direkt in Foundry. Die Spielleitung 
 
 ### Funktionen
 
-- **Gottheiten-Editor:** Identität, Bilder mit Fokuspunkt und Darstellungsmodus, echte Pantheon-Gruppen sowie durchsuchbare Systemauswahlen für Fertigkeiten, Waffen, Zauber, Font, Heiligung und offizielle Vorlagen.
+- **Gottheiten-Editor:** Identität, Bilder mit Fokuspunkt und Darstellungsmodus, echte Pantheon-Gruppen sowie ein eigener Auswahl-Dialog mit Suche, Filtern, Vorschau und Drag-and-drop für Fertigkeiten, Waffen, Zauber, Font, Heiligung und offizielle Vorlagen.
+- **Lore-Einträge:** Urkräfte und andere nicht verehrbare Wesen erscheinen mit Geschichte und Bildern im Götterkodex, werden aber niemals in Charakterauswahlen angeboten oder mit Regeln verknüpft.
 - **Regeln und Gewährungen:** Göttliche Fertigkeitsausbildung und zusätzliche Anhängerboni sind klar getrennt. Grafische Effektketten unterstützen Heilung, Schaden, Boni, Würfe, Rettungswürfe, Bewegung, Teleport, Zustände, Aktionsverlust, Kontrolle, Ressourcen, Informationen, Auswahlvarianten, Zähler und verknüpfte Glücksräder.
 - **Veröffentlichung und Sichtbarkeit:** Entwurf, Test, veröffentlicht, deaktiviert oder archiviert; jeder Datenbereich kann getrennt für Auswahl, Anhänger, Besitzer, vertrauenswürdige Spieler oder nur die SL freigegeben werden.
 - **Götterkodex und Anhänger-Hub:** Der Kodex ist ohne Token verfügbar; der charaktergebundene Hub wählt kontrollierte oder eigene Charaktere verständlich aus und zeigt Gottheit, Boni, Wunder und Nutzungen.
 - **Pathfinder-/Starfinder-Integration:** native Gottheiten-Items für PF2e und SF2e sowie das GodForge-eigene Charaktermodell für Starfinder 1e.
 - **Ersetzungen und Zufallsinhalte:** offizielle Gottheiten kontextabhängig ausblenden oder ersetzen, ohne Kompendien zu verändern; gewichtete Zufallstabellen und Glücksräder sind ebenfalls enthalten.
-- **Werkzeuge und Sicherheit:** validierter Import/Export, automatische Schemamigration, deutscher und englischer UI-Text sowie SL- und Besitzerprüfungen für alle schreibenden Aktionen.
+- **Werkzeuge und Sicherheit:** dauerhaft in der Foundry-Welt gespeicherte Definitionen, validierter Import/Export, automatische Schemamigration, deutscher und englischer UI-Text sowie SL- und Besitzerprüfungen für alle schreibenden Aktionen.
 
 ### Unterstützte Systeme
 
@@ -70,13 +71,14 @@ Darkis GodForge manages custom deities directly in Foundry. Game Masters create 
 
 ### Features
 
-- **Deity editor:** identity, per-image focus and fit controls, managed pantheon groups, and searchable system choices for skills, weapons, spells, divine font, sanctification, and official templates.
+- **Deity editor:** identity, per-image focus and fit controls, managed pantheon groups, and a dedicated picker with search, filters, preview, and drag-and-drop for skills, weapons, spells, divine font, sanctification, and official templates.
+- **Lore entries:** primordial powers and other non-worshippable beings appear with story and artwork in the Divine Codex but are never offered for character selection or connected to mechanics.
 - **Rules and grants:** Divine skill training is separate from additional follower bonuses. Graphical effect chains cover healing, damage, modifiers, rolls, saves, movement, teleportation, conditions, action loss, control, resources, information, choices, counters, and linked fortune wheels.
 - **Publication and visibility:** draft, test, published, disabled, or archived; each data area can be exposed separately for selection, followers, owners, trusted players, or the GM only.
 - **Divine Codex and Follower Hub:** the Codex works without a token; the character-bound Hub guides users through controlled or owned character selection and displays deity, bonuses, wonders, and remaining uses.
 - **Pathfinder/Starfinder integration:** native deity items for PF2e and SF2e plus GodForge's own character model for Starfinder 1e.
 - **Replacements and random content:** hide or replace official deities by context without modifying compendiums; weighted random tables and fortune wheels are included.
-- **Tools and security:** validated import/export, automatic schema migration, German and English UI, and GM/owner checks for every write action.
+- **Tools and security:** definitions persisted in the Foundry world, validated import/export, automatic schema migration, German and English UI, and GM/owner checks for every write action.
 
 ### Supported systems
 

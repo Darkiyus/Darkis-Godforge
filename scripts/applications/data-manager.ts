@@ -23,12 +23,12 @@ export class GodForgeDataManager extends gmApplicationBase() {
     const root = this.element;
     root?.querySelector<HTMLElement>("[data-action='export']")?.addEventListener("click", () => this.downloadExport());
     root?.querySelector<HTMLInputElement>("[data-import-file]")?.addEventListener("change", (event) => void this.previewFile((event.target as HTMLInputElement).files?.[0]));
-    root?.querySelector<HTMLElement>("[data-action='apply-import']")?.addEventListener("click", () => {
+    root?.querySelector<HTMLElement>("[data-action='apply-import']")?.addEventListener("click", async () => {
       requireGM();
       if (!this.pendingImport) return;
       try {
         const random = this.readRandomContent(this.pendingImport);
-        const count = this.api.importDeities(this.pendingImport);
+        const count = await this.api.importDeities(this.pendingImport);
         if (random) this.randomContent.replace(random);
         this.pendingImport = undefined; this.preview = null; this.error = "";
         getFoundryUi()?.notifications?.info?.(`${count} ${uiText().IMPORTED}`);

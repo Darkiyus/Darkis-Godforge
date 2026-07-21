@@ -3,6 +3,7 @@ import type { Condition } from "./condition-service";
 export type GrantGroupMode = "all" | "any";
 export type ModifierType = "item" | "status" | "circumstance" | "untyped";
 export type PublicationStatus = "draft" | "test" | "published" | "disabled" | "archived";
+export type DeityKind = "selectable" | "lore";
 export type VisibilityLevel = "public" | "selection" | "followers" | "owner" | "trusted" | "gm" | "hidden-until-selected";
 export type ResetType = "ten-minute-rest" | "refocus" | "daily-preparations" | "encounter-end" | "scene-change" | "calendar-day" | "calendar-week" | "calendar-month" | "calendar-year" | "custom-rest" | "manual" | "daily" | "weekly" | "encounter";
 
@@ -150,6 +151,7 @@ export interface DeityDefinition {
   updatedAt: string;
   checksum: string;
   status: PublicationStatus;
+  kind: DeityKind;
   name: string;
   title: string;
   description: string;
@@ -184,6 +186,6 @@ export interface DeityDefinition {
 }
 
 export interface SelectionContext { actor?: unknown; user?: unknown; classId?: string; level?: number; region?: string; pantheonFilter?: string; systemId?: string; catalogContext?: string; }
-export interface DeitySummary { id: string; name: string; title: string; image?: string; domains: string[]; alignment?: string; sourceUuid?: string; official?: boolean; }
+export interface DeitySummary { id: string; name: string; title: string; image?: string; domains: string[]; alignment?: string; skill?: string; favoredWeapon?: string; pantheon?: string; sourceUuid?: string; official?: boolean; }
 export interface GrantChoiceMap { [groupId: string]: string[]; }
 export interface ActorGodForgeState { deityId: string; grants: string[]; usages: Record<string, { used: number; max: number; lastResetAt: number; reset: ResetType }>; }

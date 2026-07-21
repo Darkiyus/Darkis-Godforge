@@ -1,0 +1,25 @@
+<section class="dg-picker">
+  <header><div><p class="eyebrow">{{ui.PICKER_EYEBROW}}</p><h2>{{title}}</h2><p>{{ui.PICKER_HINT}}</p></div><span><b data-picker-count>{{items.length}}</b> {{ui.ENTRIES}}</span></header>
+  <div class="dg-picker-layout">
+    <aside class="dg-picker-filters">
+      <label>{{ui.SEARCH}}<span class="dg-search"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input data-picker-search data-picker-filter autocomplete="off"></span></label>
+      {{#if categories.length}}<label>{{ui.PICKER_CATEGORY}}<select data-picker-category data-picker-filter><option value="">{{ui.PICKER_ALL}}</option>{{#each categories}}<option value="{{this}}">{{this}}</option>{{/each}}</select></label>{{/if}}
+      {{#if groups.length}}<label>{{ui.PICKER_GROUP}}<select data-picker-group data-picker-filter><option value="">{{ui.PICKER_ALL}}</option>{{#each groups}}<option value="{{this}}">{{this}}</option>{{/each}}</select></label>{{/if}}
+      {{#if ranks.length}}<label>{{ui.PICKER_RANK}}<select data-picker-rank data-picker-filter><option value="">{{ui.PICKER_ALL}}</option>{{#each ranks}}<option value="{{this}}">{{this}}</option>{{/each}}</select></label>{{/if}}
+      {{#if traits.length}}<label>{{ui.PICKER_TRAIT}}<select data-picker-trait data-picker-filter><option value="">{{ui.PICKER_ALL}}</option>{{#each traits}}<option value="{{this}}">{{this}}</option>{{/each}}</select></label>{{/if}}
+      {{#if sources.length}}<label>{{ui.PICKER_SOURCE}}<select data-picker-source data-picker-filter><option value="">{{ui.PICKER_ALL}}</option>{{#each sources}}<option value="{{this}}">{{this}}</option>{{/each}}</select></label>{{/if}}
+      <label class="dg-picker-check"><input type="checkbox" data-picker-available data-picker-filter checked> {{ui.PICKER_AVAILABLE}}</label>
+      <label class="dg-picker-check"><input type="checkbox" data-picker-remaster data-picker-filter> {{ui.PICKER_REMASTER}}</label>
+      <p><i class="fas fa-hand-pointer" aria-hidden="true"></i> {{ui.PICKER_DROP_HINT}}</p>
+    </aside>
+    <div class="dg-picker-results">
+      {{#each items}}<article class="dg-picker-item {{#if selected}}selected{{/if}}" data-picker-item="{{token}}" data-label="{{label}}" data-img="{{img}}" data-category="{{category}}" data-group="{{group}}" data-source="{{source}}" data-rank="{{rankText}}" data-traits="{{#each traits}}{{this}}|{{/each}}" data-available="{{available}}" data-remaster="{{remaster}}">
+        {{#if img}}<img src="{{img}}" alt="">{{else}}<i class="fas fa-sparkles" aria-hidden="true"></i>{{/if}}
+        <div><strong>{{label}}</strong><small>{{#if rankText}}{{../ui.PICKER_RANK}} {{rankText}} · {{/if}}{{category}}{{#if group}} · {{group}}{{/if}}</small><span>{{traitText}}{{#if details}} · {{details}}{{/if}}</span></div>
+        <button type="button" data-picker-choose aria-pressed="{{selected}}">{{#if ../multiple}}<i class="fas fa-check" aria-hidden="true"></i>{{/if}} {{../ui.PICKER_CHOOSE}}</button>
+      </article>{{/each}}
+    </div>
+    <aside class="dg-picker-preview"><img data-picker-preview-image alt="" hidden><p class="eyebrow">{{ui.PICKER_DETAILS}}</p><h3 data-picker-preview-name>—</h3><dl><div><dt>{{ui.PICKER_CATEGORY}}</dt><dd data-picker-preview-category>—</dd></div><div><dt>{{ui.PICKER_RANK}}</dt><dd data-picker-preview-rank>—</dd></div><div><dt>{{ui.PICKER_TRAIT}}</dt><dd data-picker-preview-traits>—</dd></div><div><dt>{{ui.PICKER_SOURCE}}</dt><dd data-picker-preview-source>—</dd></div></dl></aside>
+  </div>
+  <footer><button type="button" data-picker-clear>{{ui.PICKER_CLEAR}}</button><button type="button" data-picker-cancel>{{ui.CANCEL}}</button>{{#if multiple}}<button type="button" class="dg-primary" data-picker-confirm>{{ui.PICKER_APPLY}}</button>{{/if}}</footer>
+</section>

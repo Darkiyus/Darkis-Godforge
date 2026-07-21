@@ -1,538 +1,545 @@
-var at = Object.defineProperty;
-var ot = (s, e, t) => e in s ? at(s, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : s[e] = t;
-var g = (s, e, t) => ot(s, typeof e != "symbol" ? e + "" : e, t);
-function ze(s, e) {
+var ut = Object.defineProperty;
+var ht = (r, t, e) => t in r ? ut(r, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : r[t] = e;
+var b = (r, t, e) => ht(r, typeof t != "symbol" ? t + "" : t, e);
+function Qe(r, t) {
   return {
-    name: s.name,
+    name: r.name,
     type: "deity",
-    img: s.image,
+    img: r.image,
     system: {
       category: "deity",
-      description: { value: s.description },
-      sanctification: ct(s.sanctification),
-      domains: { primary: [...s.domains], alternate: [...s.alternateDomains ?? []] },
-      font: lt(s.font),
-      attribute: [...s.divineAttributes ?? []],
-      skill: s.skill ? [s.skill] : null,
-      weapons: s.favoredWeapon ? [s.favoredWeapon] : [],
-      spells: structuredClone(s.spells ?? {}),
+      description: { value: r.description },
+      sanctification: mt(r.sanctification),
+      domains: { primary: [...r.domains], alternate: [...r.alternateDomains ?? []] },
+      font: pt(r.font),
+      attribute: [...r.divineAttributes ?? []],
+      skill: r.skill ? [r.skill] : null,
+      weapons: r.favoredWeapon ? [r.favoredWeapon] : [],
+      spells: structuredClone(r.spells ?? {}),
       traits: { otherTags: [] }
     },
-    flags: { "darkis-godforge": { definitionUuid: e } }
+    flags: { "darkis-godforge": { definitionUuid: t } }
   };
 }
-function lt(s) {
-  if (s === "heal-harm") return ["heal", "harm"];
-  const e = (s == null ? void 0 : s.split(",").map((t) => t.trim().toLocaleLowerCase()).filter((t) => t === "harm" || t === "heal")) ?? [];
-  return [...new Set(e)];
+function pt(r) {
+  if (r === "heal-harm") return ["heal", "harm"];
+  const t = (r == null ? void 0 : r.split(",").map((e) => e.trim().toLocaleLowerCase()).filter((e) => e === "harm" || e === "heal")) ?? [];
+  return [...new Set(t)];
 }
-function ct(s) {
-  if (s === "holy-unholy") return { modal: "can", what: ["holy", "unholy"] };
-  const e = (s == null ? void 0 : s.split(",").map((t) => t.trim().toLocaleLowerCase()).filter((t) => t === "holy" || t === "unholy")) ?? [];
-  return e.length ? { modal: "can", what: [...new Set(e)] } : null;
+function mt(r) {
+  if (r === "holy-unholy") return { modal: "can", what: ["holy", "unholy"] };
+  const t = (r == null ? void 0 : r.split(",").map((e) => e.trim().toLocaleLowerCase()).filter((e) => e === "holy" || e === "unholy")) ?? [];
+  return t.length ? { modal: "can", what: [...new Set(t)] } : null;
 }
-function Ie() {
-  const s = globalThis, e = typeof Hooks < "u" ? Hooks : s.Hooks;
-  return e ? { Hooks: e } : null;
+function we() {
+  const r = globalThis, t = typeof Hooks < "u" ? Hooks : r.Hooks;
+  return t ? { Hooks: t } : null;
 }
-function b() {
-  const s = globalThis;
-  return typeof game < "u" ? game : s.game;
+function v() {
+  const r = globalThis;
+  return typeof game < "u" ? game : r.game;
 }
-function k() {
-  const s = globalThis;
-  return typeof ui < "u" ? ui : s.ui;
+function L() {
+  const r = globalThis;
+  return typeof ui < "u" ? ui : r.ui;
 }
-function Ce(s) {
-  if (!s || typeof s != "object") return !1;
-  const e = s;
-  return typeof e.id == "string" && typeof e.name == "string" && typeof e.schemaVersion == "number" && Array.isArray(e.domains) && Array.isArray(e.abilities);
+function ft(r) {
+  var e, i, s, n;
+  const t = globalThis;
+  return (r == null ? void 0 : r.documentClass) ?? ((i = (e = t.foundry) == null ? void 0 : e.documents) == null ? void 0 : i.JournalEntry) ?? ((n = (s = t.CONFIG) == null ? void 0 : s.JournalEntry) == null ? void 0 : n.documentClass) ?? null;
 }
-async function be(s) {
-  var r, n, a, o, l, c, d, h;
-  const t = (((n = (r = b()) == null ? void 0 : r.packs) == null ? void 0 : n.contents) ?? []).filter((u) => {
-    var p;
-    return u.documentName === "Item" && (!((p = u.metadata) != null && p.system) || u.metadata.system === s);
+function Me(r) {
+  if (!r || typeof r != "object") return !1;
+  const t = r;
+  return typeof t.id == "string" && typeof t.name == "string" && typeof t.schemaVersion == "number" && Array.isArray(t.domains) && Array.isArray(t.abilities);
+}
+async function Ae(r) {
+  var s, n, a, o, l, c, p, u, h, d, m, g, I;
+  const e = (((n = (s = v()) == null ? void 0 : s.packs) == null ? void 0 : n.contents) ?? []).filter((f) => {
+    var y;
+    return f.documentName === "Item" && (!((y = f.metadata) != null && y.system) || f.metadata.system === r);
   }), i = [];
-  for (const u of t) {
-    const p = await u.getIndex({ fields: ["type", "img", "system.domains", "system.alignment"] });
-    for (const m of p) {
-      if (m.type !== "deity" || !m._id || !m.name || !u.collection) continue;
-      const E = `Compendium.${u.collection}.Item.${m._id}`, S = Array.isArray((a = m.system) == null ? void 0 : a.domains) ? m.system.domains : [...((l = (o = m.system) == null ? void 0 : o.domains) == null ? void 0 : l.primary) ?? [], ...((d = (c = m.system) == null ? void 0 : c.domains) == null ? void 0 : d.alternate) ?? []];
-      i.push({ id: E, sourceUuid: E, official: !0, name: m.name, title: m.name, image: m.img, domains: S, alignment: (h = m.system) == null ? void 0 : h.alignment });
+  for (const f of e) {
+    const y = await f.getIndex({ fields: ["type", "img", "system.domains", "system.alignment", "system.skill", "system.weapons", "system.pantheon"] });
+    for (const E of y) {
+      if (E.type !== "deity" || !E._id || !E.name || !f.collection) continue;
+      const S = `Compendium.${f.collection}.Item.${E._id}`, T = Array.isArray((a = E.system) == null ? void 0 : a.domains) ? E.system.domains : [...((l = (o = E.system) == null ? void 0 : o.domains) == null ? void 0 : l.primary) ?? [], ...((p = (c = E.system) == null ? void 0 : c.domains) == null ? void 0 : p.alternate) ?? []];
+      i.push({ id: S, sourceUuid: S, official: !0, name: E.name, title: E.name, image: E.img, domains: T, alignment: (u = E.system) == null ? void 0 : u.alignment, skill: (d = (h = E.system) == null ? void 0 : h.skill) == null ? void 0 : d.join(", "), favoredWeapon: (g = (m = E.system) == null ? void 0 : m.weapons) == null ? void 0 : g.join(", "), pantheon: (I = E.system) == null ? void 0 : I.pantheon });
     }
   }
   return i;
 }
-function dt(s) {
-  if (s.classId !== "cleric" && s.classId !== "champion") return null;
-  const e = s.systemValues;
-  return { classId: s.classId, deityId: s.deityId, grants: s.grants, domains: { available: e.domains, alternate: e.alternateDomains, pick: s.classId === "cleric" ? 1 : 0 }, divineAttributes: e.divineAttributes, grantedSpells: e.spells, divineFont: s.classId === "cleric" ? e.font : void 0, favoredWeapon: e.favoredWeapon, trainedSkill: s.classId === "cleric" ? e.skill : void 0, sanctification: e.sanctification, cause: s.classId === "champion" ? e.cause : void 0 };
+function gt(r) {
+  if (r.classId !== "cleric" && r.classId !== "champion") return null;
+  const t = r.systemValues;
+  return { classId: r.classId, deityId: r.deityId, grants: r.grants, domains: { available: t.domains, alternate: t.alternateDomains, pick: r.classId === "cleric" ? 1 : 0 }, divineAttributes: t.divineAttributes, grantedSpells: t.spells, divineFont: r.classId === "cleric" ? t.font : void 0, favoredWeapon: t.favoredWeapon, trainedSkill: r.classId === "cleric" ? t.skill : void 0, sanctification: t.sanctification, cause: r.classId === "champion" ? t.cause : void 0 };
 }
-const ie = /* @__PURE__ */ new Map();
-function Se(s, e) {
+const ne = /* @__PURE__ */ new Map();
+function Te(r, t) {
   var n, a;
-  const t = `${s}:${((a = (n = b()) == null ? void 0 : n.system) == null ? void 0 : a.version) ?? ""}`, i = ie.get(t);
+  const e = `${r}:${((a = (n = v()) == null ? void 0 : n.system) == null ? void 0 : a.version) ?? ""}`, i = ne.get(e);
   if (i) return i;
-  const r = ut(s, e).catch((o) => {
-    throw ie.delete(t), o;
+  const s = Et(r, t).catch((o) => {
+    throw ne.delete(e), o;
   });
-  return ie.set(t, r), r;
+  return ne.set(e, s), s;
 }
-async function ut(s, e) {
-  var l, c, d, h, u;
-  const t = ht(s), r = (((c = (l = b()) == null ? void 0 : l.packs) == null ? void 0 : c.contents) ?? []).filter((p) => {
-    var m;
-    return p.documentName === "Item" && (!((m = p.metadata) != null && m.system) || p.metadata.system === s);
+async function Et(r, t) {
+  var l, c, p, u, h, d;
+  const e = yt(r), s = (((c = (l = v()) == null ? void 0 : l.packs) == null ? void 0 : c.contents) ?? []).filter((m) => {
+    var g;
+    return m.documentName === "Item" && (!((g = m.metadata) != null && g.system) || m.metadata.system === r);
   }), n = [], a = [];
-  for (const p of r) {
-    const m = await p.getIndex({ fields: ["type", "img", "system.slug", "system.category", "system.group", "system.traits", "system.level", "system.rank"] });
-    for (const E of m) {
-      if (!E._id || !E.name || !p.collection || E.type !== "weapon" && E.type !== "spell") continue;
-      const S = E.system ?? {}, f = {
-        value: `Compendium.${p.collection}.Item.${E._id}`,
-        label: E.name,
-        slug: re(S.slug) ?? E.name.toLocaleLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
-        img: E.img,
-        category: re(S.category),
-        group: re(S.group),
-        traits: mt(((d = S.traits) == null ? void 0 : d.value) ?? S.traits),
-        source: ((h = p.metadata) == null ? void 0 : h.label) ?? p.collection,
-        rank: ft(S.rank ?? ((u = S.level) == null ? void 0 : u.value) ?? S.level)
+  for (const m of s) {
+    const g = await m.getIndex({ fields: ["type", "img", "system.slug", "system.category", "system.group", "system.traits", "system.level", "system.rank", "system.publication.remaster"] });
+    for (const I of g) {
+      if (!I._id || !I.name || !m.collection || I.type !== "weapon" && I.type !== "spell") continue;
+      const f = I.system ?? {}, y = {
+        value: `Compendium.${m.collection}.Item.${I._id}`,
+        label: I.name,
+        slug: oe(f.slug) ?? I.name.toLocaleLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+        img: I.img,
+        category: oe(f.category),
+        group: oe(f.group),
+        traits: bt(((p = f.traits) == null ? void 0 : p.value) ?? f.traits),
+        source: ((u = m.metadata) == null ? void 0 : u.label) ?? m.collection,
+        rank: vt(f.rank ?? ((h = f.level) == null ? void 0 : h.value) ?? f.level),
+        remaster: ((d = f.publication) == null ? void 0 : d.remaster) === !0,
+        available: !0
       };
-      E.type === "weapon" ? n.push(f) : a.push(f);
+      I.type === "weapon" ? n.push(y) : a.push(y);
     }
   }
   return {
-    skills: se(t.skills, e),
-    domains: se(t.deityDomains ?? t.domains, []),
-    weapons: ke(n),
-    spells: ke(a),
-    fonts: [C("heal", "Heilen / Heal"), C("harm", "Schaden / Harm"), C("heal-harm", "Heilen oder Schaden / Either"), C("none", "Keine / None")],
-    sanctifications: [C("holy", "Heilig / Holy"), C("unholy", "Unheilig / Unholy"), C("holy-unholy", "Heilig oder unheilig / Either"), C("none", "Keine / None")],
-    attributes: se(t.abilities ?? t.attributes, ["str", "dex", "con", "int", "wis", "cha"])
+    skills: ae(e.skills, t),
+    domains: ae(e.deityDomains ?? e.domains, []),
+    weapons: Ue(n),
+    spells: Ue(a),
+    fonts: [P("heal", "Heilen / Heal"), P("harm", "Schaden / Harm"), P("heal-harm", "Heilen oder Schaden / Either"), P("none", "Keine / None")],
+    sanctifications: [P("holy", "Heilig / Holy"), P("unholy", "Unheilig / Unholy"), P("holy-unholy", "Heilig oder unheilig / Either"), P("none", "Keine / None")],
+    attributes: ae(e.abilities ?? e.attributes, ["str", "dex", "con", "int", "wis", "cha"])
   };
 }
-function ht(s) {
+function yt(r) {
   var i;
-  const e = globalThis, t = s === "sfrpg" ? "SFRPG" : "PF2E";
-  return ((i = e.CONFIG) == null ? void 0 : i[t]) ?? {};
+  const t = globalThis, e = r === "sfrpg" ? "SFRPG" : "PF2E";
+  return ((i = t.CONFIG) == null ? void 0 : i[e]) ?? {};
 }
-function se(s, e) {
-  return !s || typeof s != "object" ? e.map((t) => C(t, Ye(t))) : Object.entries(s).map(([t, i]) => C(t, pt(i, t))).sort((t, i) => t.label.localeCompare(i.label));
+function ae(r, t) {
+  return !r || typeof r != "object" ? t.map((e) => P(e, Ze(e))) : Object.entries(r).map(([e, i]) => P(e, It(i, e))).sort((e, i) => e.label.localeCompare(i.label));
 }
-function pt(s, e) {
-  var r, n, a;
-  const t = typeof s == "string" ? s : s && typeof s == "object" ? String(s.label ?? s.name ?? e) : e, i = (a = (n = (r = b()) == null ? void 0 : r.i18n) == null ? void 0 : n.localize) == null ? void 0 : a.call(n, t);
-  return i && i !== t ? i : t.includes(".") ? Ye(e) : t;
+function It(r, t) {
+  var s, n, a;
+  const e = typeof r == "string" ? r : r && typeof r == "object" ? String(r.label ?? r.name ?? t) : t, i = (a = (n = (s = v()) == null ? void 0 : s.i18n) == null ? void 0 : n.localize) == null ? void 0 : a.call(n, e);
+  return i && i !== e ? i : e.includes(".") ? Ze(t) : e;
 }
-function ke(s) {
-  return [...new Map(s.map((e) => [e.value, e])).values()].sort((e, t) => e.label.localeCompare(t.label));
+function Ue(r) {
+  return [...new Map(r.map((t) => [t.value, t])).values()].sort((t, e) => t.label.localeCompare(e.label));
 }
-function C(s, e) {
-  return { value: s, label: e };
+function P(r, t) {
+  return { value: r, label: t };
 }
-function Ye(s) {
-  return s.replaceAll("-", " ").replace(/\b\w/g, (e) => e.toUpperCase());
+function Ze(r) {
+  return r.replaceAll("-", " ").replace(/\b\w/g, (t) => t.toUpperCase());
 }
-function re(s) {
-  if (typeof s == "string") return s;
-  if (s && typeof s == "object" && typeof s.value == "string") return String(s.value);
+function oe(r) {
+  if (typeof r == "string") return r;
+  if (r && typeof r == "object" && typeof r.value == "string") return String(r.value);
 }
-function mt(s) {
-  return Array.isArray(s) ? s.filter((e) => typeof e == "string") : void 0;
+function bt(r) {
+  return Array.isArray(r) ? r.filter((t) => typeof t == "string") : void 0;
 }
-function ft(s) {
-  const e = Number(s);
-  return Number.isFinite(e) ? e : void 0;
+function vt(r) {
+  const t = Number(r);
+  return Number.isFinite(t) ? t : void 0;
 }
-class gt {
+class St {
   constructor() {
-    g(this, "id", "pf2e");
-    g(this, "capabilities", { lore: !0, deity: !0, passiveBonuses: !0, abilities: !0, classCoupling: !0, selectors: ["acrobatics", "arcana", "athletics", "crafting", "deception", "diplomacy", "intimidation", "medicine", "nature", "occultism", "performance", "religion", "society", "stealth", "survival", "thievery", "perception", "ac", "attack-roll"] });
+    b(this, "id", "pf2e");
+    b(this, "capabilities", { lore: !0, deity: !0, passiveBonuses: !0, abilities: !0, classCoupling: !0, selectors: ["acrobatics", "arcana", "athletics", "crafting", "deception", "diplomacy", "intimidation", "medicine", "nature", "occultism", "performance", "religion", "society", "stealth", "survival", "thievery", "perception", "ac", "attack-roll"] });
   }
-  async materialize(e, t) {
-    return t ? (await t.createItem(ze(e, e.id))).uuid : null;
+  async materialize(t, e) {
+    return e ? (await e.createItem(Qe(t, t.id))).uuid : null;
   }
   async listOfficialDeities() {
-    return be(this.id);
+    return Ae(this.id);
   }
   listSkills() {
-    var t, i;
-    const e = (i = (t = globalThis.CONFIG) == null ? void 0 : t.PF2E) == null ? void 0 : i.skills;
-    return e ? Object.keys(e).sort() : [...this.capabilities.selectors];
+    var e, i;
+    const t = (i = (e = globalThis.CONFIG) == null ? void 0 : e.PF2E) == null ? void 0 : i.skills;
+    return t ? Object.keys(t).sort() : [...this.capabilities.selectors];
   }
   listEditorCatalog() {
-    return Se(this.id, this.listSkills());
+    return Te(this.id, this.listSkills());
   }
-  buildPassiveBonus(e) {
-    return { key: "FlatModifier", selector: e.selector, value: e.value, type: e.modifierType, slug: e.id };
+  buildPassiveBonus(t) {
+    return { key: "FlatModifier", selector: t.selector, value: t.value, type: t.modifierType, slug: t.id };
   }
-  buildClassCoupling(e) {
-    return dt(e);
+  buildClassCoupling(t) {
+    return gt(t);
   }
 }
-class yt {
+class wt {
   constructor() {
-    g(this, "id", "sfrpg");
-    g(this, "capabilities", { lore: !0, deity: !0, passiveBonuses: !0, abilities: !0, classCoupling: !1, selectors: ["perception", "stealth", "bluff", "ac", "attack-roll", "piloting"] });
+    b(this, "id", "sfrpg");
+    b(this, "capabilities", { lore: !0, deity: !0, passiveBonuses: !0, abilities: !0, classCoupling: !1, selectors: ["perception", "stealth", "bluff", "ac", "attack-roll", "piloting"] });
   }
-  async materialize(e, t) {
+  async materialize(t, e) {
     return null;
   }
   async listOfficialDeities() {
-    return be(this.id);
+    return Ae(this.id);
   }
   listSkills() {
-    var t, i;
-    const e = (i = (t = globalThis.CONFIG) == null ? void 0 : t.SFRPG) == null ? void 0 : i.skills;
-    return e ? Object.keys(e).sort() : [...this.capabilities.selectors];
+    var e, i;
+    const t = (i = (e = globalThis.CONFIG) == null ? void 0 : e.SFRPG) == null ? void 0 : i.skills;
+    return t ? Object.keys(t).sort() : [...this.capabilities.selectors];
   }
   listEditorCatalog() {
-    return Se(this.id, this.listSkills());
+    return Te(this.id, this.listSkills());
   }
-  buildPassiveBonus(e) {
-    return { key: "Modifier", selector: e.selector, value: e.value, type: e.modifierType, slug: e.id };
+  buildPassiveBonus(t) {
+    return { key: "Modifier", selector: t.selector, value: t.value, type: t.modifierType, slug: t.id };
   }
-  buildClassCoupling(e) {
+  buildClassCoupling(t) {
     return null;
   }
 }
-class Et {
+class At {
   constructor() {
-    g(this, "id", "sf2e");
-    g(this, "capabilities", { lore: !0, deity: !0, passiveBonuses: !0, abilities: !0, classCoupling: !0, selectors: ["perception", "stealth", "deception", "ac", "attack-roll", "piloting"] });
+    b(this, "id", "sf2e");
+    b(this, "capabilities", { lore: !0, deity: !0, passiveBonuses: !0, abilities: !0, classCoupling: !0, selectors: ["perception", "stealth", "deception", "ac", "attack-roll", "piloting"] });
   }
-  async materialize(e, t) {
-    return t ? (await t.createItem(ze(e, e.id))).uuid : null;
+  async materialize(t, e) {
+    return e ? (await e.createItem(Qe(t, t.id))).uuid : null;
   }
   async listOfficialDeities() {
-    return be(this.id);
+    return Ae(this.id);
   }
   listSkills() {
-    var t, i;
-    const e = (i = (t = globalThis.CONFIG) == null ? void 0 : t.PF2E) == null ? void 0 : i.skills;
-    return e ? Object.keys(e).sort() : [...this.capabilities.selectors];
+    var e, i;
+    const t = (i = (e = globalThis.CONFIG) == null ? void 0 : e.PF2E) == null ? void 0 : i.skills;
+    return t ? Object.keys(t).sort() : [...this.capabilities.selectors];
   }
   listEditorCatalog() {
-    return Se(this.id, this.listSkills());
+    return Te(this.id, this.listSkills());
   }
-  buildPassiveBonus(e) {
-    return { key: "FlatModifier", selector: e.selector, value: e.value, type: e.modifierType, slug: e.id };
+  buildPassiveBonus(t) {
+    return { key: "FlatModifier", selector: t.selector, value: t.value, type: t.modifierType, slug: t.id };
   }
-  buildClassCoupling(e) {
-    return { classId: e.classId, deityId: e.deityId, system: e.systemValues, grants: e.grants };
+  buildClassCoupling(t) {
+    return { classId: t.classId, deityId: t.deityId, system: t.systemValues, grants: t.grants };
   }
 }
-class ve {
+class De {
   constructor() {
-    g(this, "adapters", /* @__PURE__ */ new Map());
-    this.register(new gt()), this.register(new Et()), this.register(new yt());
+    b(this, "adapters", /* @__PURE__ */ new Map());
+    this.register(new St()), this.register(new At()), this.register(new wt());
   }
-  register(e) {
-    this.adapters.set(e.id, e);
+  register(t) {
+    this.adapters.set(t.id, t);
   }
-  get(e) {
-    const t = this.adapters.get(e);
-    if (!t) throw new Error(`Unsupported game system: ${e}`);
-    return t;
+  get(t) {
+    const e = this.adapters.get(t);
+    if (!e) throw new Error(`Unsupported game system: ${t}`);
+    return e;
   }
-  tryGet(e) {
-    return this.adapters.get(e) ?? null;
+  tryGet(t) {
+    return this.adapters.get(t) ?? null;
   }
-  supports(e) {
-    return this.adapters.has(e);
+  supports(t) {
+    return this.adapters.has(t);
   }
 }
-function T(s, e, t) {
-  if (t.isGM) return !0;
-  const i = t.actorDeityId === e;
-  switch (s) {
+function _(r, t, e) {
+  if (e.isGM) return !0;
+  const i = e.actorDeityId === t;
+  switch (r) {
     case "public":
       return !0;
     case "selection":
-      return t.selection === !0;
+      return e.selection === !0;
     case "followers":
     case "hidden-until-selected":
       return i;
     case "owner":
-      return i && t.ownsActor === !0;
+      return i && e.ownsActor === !0;
     case "trusted":
-      return t.isTrusted === !0;
+      return e.isTrusted === !0;
     case "gm":
       return !1;
   }
 }
-function $(s, e) {
-  return e.isGM ? !0 : s.status === "published" && T(s.visibility.deity, s.id, e);
+function j(r, t) {
+  return t.isGM ? !0 : r.status === "published" && _(r.visibility.deity, r.id, t);
 }
-function W(s, e) {
-  if (!$(s, e)) return null;
-  const t = s.visibility.fields, i = { id: s.id, name: s.name, title: s.title };
-  T(t.portrait, s.id, e) && (i.image = s.image), T(t.portrait, s.id, e) && (i.symbol = s.symbol, i.imagePresentation = structuredClone(s.imagePresentation ?? {})), T(t.description, s.id, e) && (i.description = s.description), T(t.quote, s.id, e) && (i.quote = s.quote), T(t.pantheon, s.id, e) && (i.pantheonIds = structuredClone(s.pantheonIds ?? []));
-  const r = e.selection === !0 && s.visibility.showMechanicsInSelection === !0;
-  return (T(t.domains, s.id, e) || r) && (i.domains = structuredClone(s.domains), i.alternateDomains = structuredClone(s.alternateDomains ?? [])), (T(t.spells, s.id, e) || r) && (i.spells = structuredClone(s.spells ?? {})), (T(t.favoredWeapon, s.id, e) || r) && (i.favoredWeapon = s.favoredWeapon), T(t.edicts, s.id, e) && (i.edicts = structuredClone(s.edicts ?? [])), T(t.anathema, s.id, e) && (i.anathema = structuredClone(s.anathema ?? [])), (T(t.bonuses, s.id, e) || r) && (i.passiveBonuses = s.passiveBonuses.filter((n) => n.enabled !== !1 && T(n.visibility ?? "followers", s.id, e)).map((n) => It(n, r || T(t.numericValues, s.id, e)))), (T(t.abilities, s.id, e) || r) && (i.abilities = s.abilities.filter((n) => n.enabled !== !1 && T(n.visibility ?? "followers", s.id, e)).map((n) => bt(n, r || T(t.numericValues, s.id, e)))), i;
+function z(r, t) {
+  if (!j(r, t)) return null;
+  const e = r.visibility.fields, i = { id: r.id, name: r.name, title: r.title };
+  _(e.portrait, r.id, t) && (i.image = r.image), _(e.portrait, r.id, t) && (i.symbol = r.symbol, i.imagePresentation = structuredClone(r.imagePresentation ?? {})), _(e.description, r.id, t) && (i.description = r.description), _(e.quote, r.id, t) && (i.quote = r.quote), _(e.pantheon, r.id, t) && (i.pantheonIds = structuredClone(r.pantheonIds ?? []));
+  const s = t.selection === !0 && r.visibility.showMechanicsInSelection === !0;
+  return (_(e.domains, r.id, t) || s) && (i.domains = structuredClone(r.domains), i.alternateDomains = structuredClone(r.alternateDomains ?? [])), (_(e.spells, r.id, t) || s) && (i.spells = structuredClone(r.spells ?? {})), (_(e.favoredWeapon, r.id, t) || s) && (i.favoredWeapon = r.favoredWeapon), _(e.edicts, r.id, t) && (i.edicts = structuredClone(r.edicts ?? [])), _(e.anathema, r.id, t) && (i.anathema = structuredClone(r.anathema ?? [])), (_(e.bonuses, r.id, t) || s) && (i.passiveBonuses = r.passiveBonuses.filter((n) => n.enabled !== !1 && _(n.visibility ?? "followers", r.id, t)).map((n) => Tt(n, s || _(e.numericValues, r.id, t)))), (_(e.abilities, r.id, t) || s) && (i.abilities = r.abilities.filter((n) => n.enabled !== !1 && _(n.visibility ?? "followers", r.id, t)).map((n) => Dt(n, s || _(e.numericValues, r.id, t)))), i;
 }
-function It(s, e) {
-  const t = structuredClone(s);
-  return e || (t.value = ""), delete t.visible, t;
+function Tt(r, t) {
+  const e = structuredClone(r);
+  return t || (e.value = ""), delete e.visible, e;
 }
-function bt(s, e) {
-  const t = structuredClone(s);
-  return e || (t.effects = t.effects.filter((i) => i.type === "message"), delete t.timing, delete t.uses, delete t.duration, delete t.actionCost), delete t.condition, t;
+function Dt(r, t) {
+  const e = structuredClone(r);
+  return t || (e.effects = e.effects.filter((i) => i.type === "message"), delete e.timing, delete e.uses, delete e.duration, delete e.actionCost), delete e.condition, e;
 }
-function St(s) {
-  return { id: s.id, name: s.name, title: s.title, image: s.image, domains: s.domains, alignment: s.alignment };
+function _t(r) {
+  return { id: r.id, name: r.name, title: r.title, image: r.image, domains: r.domains, alignment: r.alignment };
 }
-function vt(s, e, t, i = { isGM: !0 }) {
-  return s.filter((r) => !t.has(r.id) && $(r, i) && (!e.pantheonFilter || r.domains.includes(e.pantheonFilter))).flatMap((r) => {
-    if (i.isGM) return [St(r)];
-    const n = W(r, i);
+function Ot(r, t, e, i = { isGM: !0 }) {
+  return r.filter((s) => s.kind !== "lore" && !e.has(s.id) && j(s, i) && (!t.pantheonFilter || s.domains.includes(t.pantheonFilter))).flatMap((s) => {
+    if (i.isGM) return [_t(s)];
+    const n = z(s, i);
     return n ? [{ id: n.id, name: n.name, title: n.title ?? "", image: n.image, domains: n.domains ?? [] }] : [];
   });
 }
-function z(s, e) {
+function J(r, t) {
   var n;
-  const t = Array.isArray(e) ? e : e ? [e] : [];
-  if (s.mode === "all") return s.grants.flatMap((a) => "mode" in a ? z(a, t) : [a.ref]);
-  const i = ((n = t.find((a) => a.groupId === s.id)) == null ? void 0 : n.refs) ?? [], r = s.grants.map((a) => "mode" in a ? a.id : a.ref);
-  if (!s.pick || i.length !== s.pick || i.some((a) => !r.includes(a))) throw new Error(`Grant group ${s.id} requires ${s.pick ?? 1} valid choice(s).`);
+  const e = Array.isArray(t) ? t : t ? [t] : [];
+  if (r.mode === "all") return r.grants.flatMap((a) => "mode" in a ? J(a, e) : [a.ref]);
+  const i = ((n = e.find((a) => a.groupId === r.id)) == null ? void 0 : n.refs) ?? [], s = r.grants.map((a) => "mode" in a ? a.id : a.ref);
+  if (!r.pick || i.length !== r.pick || i.some((a) => !s.includes(a))) throw new Error(`Grant group ${r.id} requires ${r.pick ?? 1} valid choice(s).`);
   return i.flatMap((a) => {
-    const o = s.grants.find((l) => ("mode" in l ? l.id : l.ref) === a);
-    return o && "mode" in o ? z(o, t) : o ? [o.ref] : [];
+    const o = r.grants.find((l) => ("mode" in l ? l.id : l.ref) === a);
+    return o && "mode" in o ? J(o, e) : o ? [o.ref] : [];
   });
 }
-function Ke(s, e) {
-  return s.used < s.max;
+function et(r, t) {
+  return r.used < r.max;
 }
-function wt(s, e) {
-  if (!Ke(s)) throw new Error("No uses remaining.");
-  return { ...s, used: s.used + 1 };
+function Rt(r, t) {
+  if (!et(r)) throw new Error("No uses remaining.");
+  return { ...r, used: r.used + 1 };
 }
-function At(s, e) {
-  return { ...s, used: 0, lastResetAt: e };
+function Ct(r, t) {
+  return { ...r, used: 0, lastResetAt: t };
 }
-const Tt = /@(?:actor\.level|actor\.hpPercent|target\.hpPercent)|[A-Za-z_][A-Za-z0-9_.]*|\d+(?:\.\d+)?|[()+\-*/,]/g, Dt = /^\d+d\d+(?:[+\-]\d+)?$/, Ot = /* @__PURE__ */ new Set(["min", "max", "round", "floor", "ceil", "abs", "clamp", "if"]);
-function Xe(s) {
-  const e = s.replace(/\s/g, ""), t = e.match(Tt);
-  if (!t || t.join("") !== e) throw new Error("Formula contains an unsupported term.");
-  return t;
+const Nt = /@(?:actor\.level|actor\.hpPercent|target\.hpPercent)|[A-Za-z_][A-Za-z0-9_.]*|\d+(?:\.\d+)?|[()+\-*/,]/g, kt = /^\d+d\d+(?:[+\-]\d+)?$/, Pt = /* @__PURE__ */ new Set(["min", "max", "round", "floor", "ceil", "abs", "clamp", "if"]);
+function tt(r) {
+  const t = r.replace(/\s/g, ""), e = t.match(Nt);
+  if (!e || e.join("") !== t) throw new Error("Formula contains an unsupported term.");
+  return e;
 }
-function we(s) {
-  const e = s.replace(/\s/g, ""), t = e.match(/\b\d+d\d+\b/g) ?? [], i = e.replace(/\b\d+d\d+\b/g, "0");
-  if (t.some((r) => !/^\d+d\d+$/.test(r))) return !1;
+function _e(r) {
+  const t = r.replace(/\s/g, ""), e = t.match(/\b\d+d\d+\b/g) ?? [], i = t.replace(/\b\d+d\d+\b/g, "0");
+  if (e.some((s) => !/^\d+d\d+$/.test(s))) return !1;
   try {
-    return new Qe(Xe(i), { actor: { level: 0 }, target: {} }).parse(), !0;
+    return new it(tt(i), { actor: { level: 0 }, target: {} }).parse(), !0;
   } catch {
     return !1;
   }
 }
-function J(s, e) {
-  const t = s.replace(/\s/g, "");
-  if (!we(t)) throw new Error("Formula contains an unsupported term.");
-  if (Dt.test(t)) throw new Error("Dice formulas require Foundry Roll at runtime.");
-  return new Qe(Xe(t), e).parse();
+function ie(r, t) {
+  const e = r.replace(/\s/g, "");
+  if (!_e(e)) throw new Error("Formula contains an unsupported term.");
+  if (kt.test(e)) throw new Error("Dice formulas require Foundry Roll at runtime.");
+  return new it(tt(e), t).parse();
 }
-async function _t(s, e, t) {
-  if (!we(s)) throw new Error("Formula contains an unsupported term.");
-  const i = s.replace(/\s/g, "").match(/\b\d+d\d+\b/g) ?? [];
-  let r = s;
+async function Lt(r, t, e) {
+  if (!_e(r)) throw new Error("Formula contains an unsupported term.");
+  const i = r.replace(/\s/g, "").match(/\b\d+d\d+\b/g) ?? [];
+  let s = r;
   for (const n of [...new Set(i)]) {
-    const a = await t(n);
+    const a = await e(n);
     if (!Number.isFinite(a)) throw new Error("Dice result is not a finite number.");
-    r = r.replace(new RegExp(`\\b${n}\\b`, "g"), String(a));
+    s = s.replace(new RegExp(`\\b${n}\\b`, "g"), String(a));
   }
-  return J(r, e);
+  return ie(s, t);
 }
-class Qe {
-  constructor(e, t) {
-    g(this, "position", 0);
-    this.tokens = e, this.facts = t;
+class it {
+  constructor(t, e) {
+    b(this, "position", 0);
+    this.tokens = t, this.facts = e;
   }
   parse() {
-    const e = this.expression();
+    const t = this.expression();
     if (this.position !== this.tokens.length) throw new Error("Unexpected formula token.");
-    if (!Number.isFinite(e)) throw new Error("Formula could not be evaluated.");
-    return e;
+    if (!Number.isFinite(t)) throw new Error("Formula could not be evaluated.");
+    return t;
   }
   expression() {
-    let e = this.term();
+    let t = this.term();
     for (; this.peek("+") || this.peek("-"); ) {
-      const t = this.take(), i = this.term();
-      e = t === "+" ? e + i : e - i;
+      const e = this.take(), i = this.term();
+      t = e === "+" ? t + i : t - i;
     }
-    return e;
+    return t;
   }
   term() {
-    let e = this.unary();
+    let t = this.unary();
     for (; this.peek("*") || this.peek("/"); ) {
-      const t = this.take(), i = this.unary();
-      e = t === "*" ? e * i : e / i;
+      const e = this.take(), i = this.unary();
+      t = e === "*" ? t * i : t / i;
     }
-    return e;
+    return t;
   }
   unary() {
     return this.peek("+") ? (this.take(), this.unary()) : this.peek("-") ? (this.take(), -this.unary()) : this.primary();
   }
   primary() {
-    const e = this.take();
-    if (e === "(") {
-      const t = this.expression();
-      return this.expect(")"), t;
+    const t = this.take();
+    if (t === "(") {
+      const e = this.expression();
+      return this.expect(")"), e;
     }
-    if (/^\d/.test(e)) return Number(e);
-    if (e === "@actor.level") return this.facts.actor.level;
-    if (e === "@actor.hpPercent") return this.facts.actor.hpPercent ?? 0;
-    if (e === "@target.hpPercent") return this.facts.target.hpPercent ?? 0;
-    if (Ot.has(e)) return this.call(e);
+    if (/^\d/.test(t)) return Number(t);
+    if (t === "@actor.level") return this.facts.actor.level;
+    if (t === "@actor.hpPercent") return this.facts.actor.hpPercent ?? 0;
+    if (t === "@target.hpPercent") return this.facts.target.hpPercent ?? 0;
+    if (Pt.has(t)) return this.call(t);
     throw new Error("Unknown formula identifier.");
   }
-  call(e) {
+  call(t) {
     this.expect("(");
-    const t = [this.expression()];
+    const e = [this.expression()];
     for (; this.peek(","); )
-      this.take(), t.push(this.expression());
-    if (this.expect(")"), e === "min" && t.length >= 1) return Math.min(...t);
-    if (e === "max" && t.length >= 1) return Math.max(...t);
-    if (e === "round" && t.length === 1) return Math.round(t[0]);
-    if (e === "floor" && t.length === 1) return Math.floor(t[0]);
-    if (e === "ceil" && t.length === 1) return Math.ceil(t[0]);
-    if (e === "abs" && t.length === 1) return Math.abs(t[0]);
-    if (e === "clamp" && t.length === 3) return Math.min(Math.max(t[0], t[1]), t[2]);
-    if (e === "if" && t.length === 3) return t[0] !== 0 ? t[1] : t[2];
+      this.take(), e.push(this.expression());
+    if (this.expect(")"), t === "min" && e.length >= 1) return Math.min(...e);
+    if (t === "max" && e.length >= 1) return Math.max(...e);
+    if (t === "round" && e.length === 1) return Math.round(e[0]);
+    if (t === "floor" && e.length === 1) return Math.floor(e[0]);
+    if (t === "ceil" && e.length === 1) return Math.ceil(e[0]);
+    if (t === "abs" && e.length === 1) return Math.abs(e[0]);
+    if (t === "clamp" && e.length === 3) return Math.min(Math.max(e[0], e[1]), e[2]);
+    if (t === "if" && e.length === 3) return e[0] !== 0 ? e[1] : e[2];
     throw new Error("Invalid formula function arguments.");
   }
-  peek(e) {
-    return this.tokens[this.position] === e;
+  peek(t) {
+    return this.tokens[this.position] === t;
   }
   take() {
-    const e = this.tokens[this.position];
-    if (!e) throw new Error("Unexpected end of formula.");
-    return this.position += 1, e;
+    const t = this.tokens[this.position];
+    if (!t) throw new Error("Unexpected end of formula.");
+    return this.position += 1, t;
   }
-  expect(e) {
-    if (!this.peek(e)) throw new Error(`Expected ${e}.`);
+  expect(t) {
+    if (!this.peek(t)) throw new Error(`Expected ${t}.`);
     this.position += 1;
   }
 }
-function Y(s, e) {
-  if (s.type === "fact") return e[s.key] === s.equals;
-  if (s.type === "not") return !Y(s.child, e);
-  const t = s.children.map((i) => Y(i, e));
-  return s.type === "and" ? t.every(Boolean) : t.some(Boolean);
+function Q(r, t) {
+  if (r.type === "fact") return t[r.key] === r.equals;
+  if (r.type === "not") return !Q(r.child, t);
+  const e = r.children.map((i) => Q(i, t));
+  return r.type === "and" ? e.every(Boolean) : e.some(Boolean);
 }
-async function Nt(s, e) {
-  const t = { messages: [], healing: 0, damage: 0, appliedModifiers: [], appliedConditions: [], rolls: [], movements: [], resources: [], choices: [] };
-  if (s.condition && !Y(s.condition, e.conditionFacts ?? {})) return t;
-  for (const i of s.effects) await oe(i, e, t);
-  return t;
+async function Gt(r, t) {
+  const e = { messages: [], healing: 0, damage: 0, appliedModifiers: [], appliedConditions: [], rolls: [], movements: [], resources: [], choices: [] };
+  if (r.condition && !Q(r.condition, t.conditionFacts ?? {})) return e;
+  for (const i of r.effects) await de(i, t, e);
+  return e;
 }
-async function oe(s, e, t) {
-  var i, r;
-  if (s.type === "message") {
-    t.messages.push(s.text);
+async function de(r, t, e) {
+  var i, s;
+  if (r.type === "message") {
+    e.messages.push(r.text);
     return;
   }
-  if (s.type === "branch") {
-    const n = Y(s.condition, e.conditionFacts ?? {}) ? s.then : s.otherwise ?? [];
-    for (const a of n) await oe(a, e, t);
+  if (r.type === "branch") {
+    const n = Q(r.condition, t.conditionFacts ?? {}) ? r.then : r.otherwise ?? [];
+    for (const a of n) await de(a, t, e);
     return;
   }
-  if (s.type === "choice") {
-    const n = e.choose ? await e.choose(s.prompt, s.options.map(({ id: o, label: l }) => ({ id: o, label: l }))) : (i = s.options[0]) == null ? void 0 : i.id, a = s.options.find((o) => o.id === n);
+  if (r.type === "choice") {
+    const n = t.choose ? await t.choose(r.prompt, r.options.map(({ id: o, label: l }) => ({ id: o, label: l }))) : (i = r.options[0]) == null ? void 0 : i.id, a = r.options.find((o) => o.id === n);
     if (a) {
-      t.choices.push(a.id);
-      for (const o of a.effects) await oe(o, e, t);
+      e.choices.push(a.id);
+      for (const o of a.effects) await de(o, t, e);
     }
     return;
   }
-  if (s.type === "macro") {
-    if (!e.runMacro) throw new Error("This ability requires GM macro authority.");
-    await e.runMacro(s.command);
+  if (r.type === "macro") {
+    if (!t.runMacro) throw new Error("This ability requires GM macro authority.");
+    await t.runMacro(r.command);
     return;
   }
-  if (s.type === "random-wheel") {
-    if (!e.rollTable) throw new Error("This ability requires a linked random table.");
-    t.messages.push(await e.rollTable(s.tableId));
+  if (r.type === "random-wheel") {
+    if (!t.rollTable) throw new Error("This ability requires a linked random table.");
+    e.messages.push(await t.rollTable(r.tableId));
     return;
   }
-  if (s.type === "information") {
-    t.messages.push(s.text ?? `${s.mode}${s.questions ? ` (${s.questions})` : ""}`);
+  if (r.type === "information") {
+    e.messages.push(r.text ?? `${r.mode}${r.questions ? ` (${r.questions})` : ""}`);
     return;
   }
-  if (s.type === "counter") {
-    const n = (r = e.actor).counters ?? (r.counters = {}), a = B(s.value, e);
-    if (s.operation === "require") {
-      if ((n[s.key] ?? 0) < a) throw new Error(`Counter requirement not met: ${s.key}`);
-    } else n[s.key] = s.operation === "set" ? a : (n[s.key] ?? 0) + a;
+  if (r.type === "counter") {
+    const n = (s = t.actor).counters ?? (s.counters = {}), a = W(r.value, t);
+    if (r.operation === "require") {
+      if ((n[r.key] ?? 0) < a) throw new Error(`Counter requirement not met: ${r.key}`);
+    } else n[r.key] = r.operation === "set" ? a : (n[r.key] ?? 0) + a;
     return;
   }
-  if (s.type === "roll") {
-    const n = s.dc === void 0 ? void 0 : B(s.dc, e);
-    t.rolls.push({ type: s.roll, selector: s.selector, value: n });
+  if (r.type === "roll") {
+    const n = r.dc === void 0 ? void 0 : W(r.dc, t);
+    e.rolls.push({ type: r.roll, selector: r.selector, value: n });
     return;
   }
-  if (s.type === "movement") {
-    const n = B(s.distance, e);
-    for (const a of G(s.target, e)) t.movements.push({ targetId: a.id, mode: s.mode, distance: n });
+  if (r.type === "movement") {
+    const n = W(r.distance, t);
+    for (const a of U(r.target, t)) e.movements.push({ targetId: a.id, mode: r.mode, distance: n });
     return;
   }
-  if (s.type === "action") {
-    for (const n of G(s.target, e))
-      s.operation === "lose" && n.actions !== void 0 && (n.actions = Math.max(0, n.actions - s.amount)), t.messages.push(`${n.id}: ${s.operation} ${s.amount} action(s)`);
+  if (r.type === "action") {
+    for (const n of U(r.target, t))
+      r.operation === "lose" && n.actions !== void 0 && (n.actions = Math.max(0, n.actions - r.amount)), e.messages.push(`${n.id}: ${r.operation} ${r.amount} action(s)`);
     return;
   }
-  if (s.type === "control") {
-    for (const n of G(s.target, e)) n.faction = s.faction;
+  if (r.type === "control") {
+    for (const n of U(r.target, t)) n.faction = r.faction;
     return;
   }
-  if (s.type === "resource") {
-    const n = B(s.formula, e);
-    for (const a of G(s.target, e))
-      s.resource === "hp" && a.hp !== void 0 && (a.hp = Math.max(0, Math.min(a.maxHp ?? Number.MAX_SAFE_INTEGER, a.hp + (s.operation === "remove" ? -n : n)))), s.resource === "gold" && (a.gold = Math.max(0, (a.gold ?? 0) + (s.operation === "remove" ? -n : n))), s.resource === "item" && s.itemUuid && (a.items ?? (a.items = []), s.operation === "remove" ? a.items = a.items.filter((o) => o !== s.itemUuid) : a.items.push(s.itemUuid)), t.resources.push({ targetId: a.id, resource: s.resource, amount: n });
+  if (r.type === "resource") {
+    const n = W(r.formula, t);
+    for (const a of U(r.target, t))
+      r.resource === "hp" && a.hp !== void 0 && (a.hp = Math.max(0, Math.min(a.maxHp ?? Number.MAX_SAFE_INTEGER, a.hp + (r.operation === "remove" ? -n : n)))), r.resource === "gold" && (a.gold = Math.max(0, (a.gold ?? 0) + (r.operation === "remove" ? -n : n))), r.resource === "item" && r.itemUuid && (a.items ?? (a.items = []), r.operation === "remove" ? a.items = a.items.filter((o) => o !== r.itemUuid) : a.items.push(r.itemUuid)), e.resources.push({ targetId: a.id, resource: r.resource, amount: n });
     return;
   }
-  if (s.type === "heal" || s.type === "damage") {
-    const n = /\b\d+d\d+\b/.test(s.formula) ? e.rollDice ? await _t(s.formula, e.facts, e.rollDice) : (() => {
+  if (r.type === "heal" || r.type === "damage") {
+    const n = /\b\d+d\d+\b/.test(r.formula) ? t.rollDice ? await Lt(r.formula, t.facts, t.rollDice) : (() => {
       throw new Error("Dice terms require a Foundry Roll resolver.");
-    })() : J(s.formula, e.facts);
-    for (const a of G(s.target, e))
-      s.type === "heal" ? (t.healing += n, a.hp !== void 0 && (a.hp = Math.min(a.maxHp ?? Number.MAX_SAFE_INTEGER, a.hp + n))) : (t.damage += n, a.hp !== void 0 && (a.hp = Math.max(0, a.hp - n)));
+    })() : ie(r.formula, t.facts);
+    for (const a of U(r.target, t))
+      r.type === "heal" ? (e.healing += n, a.hp !== void 0 && (a.hp = Math.min(a.maxHp ?? Number.MAX_SAFE_INTEGER, a.hp + n))) : (e.damage += n, a.hp !== void 0 && (a.hp = Math.max(0, a.hp - n)));
     return;
   }
-  if (s.type === "modifier") {
-    const n = B(s.value, e);
-    for (const a of G(s.target ?? "self", e)) a.modifiers[s.selector] = n;
-    t.appliedModifiers.push(s.selector);
+  if (r.type === "modifier") {
+    const n = W(r.value, t);
+    for (const a of U(r.target ?? "self", t)) a.modifiers[r.selector] = n;
+    e.appliedModifiers.push(r.selector);
     return;
   }
-  if (s.type === "condition")
-    for (const n of G(s.target, e))
-      s.operation === "remove" ? n.conditions = n.conditions.filter((a) => a !== s.condition) : s.operation === "suppress" ? n.conditions = n.conditions.map((a) => a === s.condition ? `suppressed:${a}` : a) : n.conditions.includes(s.condition) || n.conditions.push(s.condition), t.appliedConditions.push(s.condition);
+  if (r.type === "condition")
+    for (const n of U(r.target, t))
+      r.operation === "remove" ? n.conditions = n.conditions.filter((a) => a !== r.condition) : r.operation === "suppress" ? n.conditions = n.conditions.map((a) => a === r.condition ? `suppressed:${a}` : a) : n.conditions.includes(r.condition) || n.conditions.push(r.condition), e.appliedConditions.push(r.condition);
 }
-function G(s, e) {
-  if (s === "self") return [e.actor];
-  if (s === "target") {
-    if (!e.target) throw new Error("This ability requires a valid target.");
-    return [e.target];
+function U(r, t) {
+  if (r === "self") return [t.actor];
+  if (r === "target") {
+    if (!t.target) throw new Error("This ability requires a valid target.");
+    return [t.target];
   }
-  return s === "allies" ? e.allies ?? [] : s === "enemies" ? e.enemies ?? [] : [...new Map([e.actor, e.target, ...e.allies ?? [], ...e.enemies ?? []].filter((t) => !!t).map((t) => [t.id, t])).values()];
+  return r === "allies" ? t.allies ?? [] : r === "enemies" ? t.enemies ?? [] : [...new Map([t.actor, t.target, ...t.allies ?? [], ...t.enemies ?? []].filter((e) => !!e).map((e) => [e.id, e])).values()];
 }
-function B(s, e) {
-  return typeof s == "number" ? s : J(s, e.facts);
+function W(r, t) {
+  return typeof r == "number" ? r : ie(r, t.facts);
 }
-function Rt(s, e, t = []) {
-  if (!e.trim()) throw new Error("Class identifier is required for deity coupling.");
-  const i = s.grantGroups.flatMap((r) => z(r, t));
-  return { deityId: s.id, classId: e, grants: i, choices: t, systemValues: { domains: s.domains, alternateDomains: s.alternateDomains ?? [], divineAttributes: s.divineAttributes ?? [], spells: s.spells ?? {}, font: s.font, favoredWeapon: s.favoredWeapon, skill: s.skill, sanctification: s.sanctification, cause: s.cause } };
+function Mt(r, t, e = []) {
+  if (!t.trim()) throw new Error("Class identifier is required for deity coupling.");
+  const i = r.grantGroups.flatMap((s) => J(s, e));
+  return { deityId: r.id, classId: t, grants: i, choices: e, systemValues: { domains: r.domains, alternateDomains: r.alternateDomains ?? [], divineAttributes: r.divineAttributes ?? [], spells: r.spells ?? {}, font: r.font, favoredWeapon: r.favoredWeapon, skill: r.skill, sanctification: r.sanctification, cause: r.cause } };
 }
-function ne(s, e) {
-  return !s || !e ? { deity: null, grants: [], abilities: [] } : { deity: { id: s.id, name: s.name, title: s.title ?? "", image: s.image }, grants: e.grants, abilities: (s.abilities ?? []).map((t) => {
+function le(r, t) {
+  return !r || !t ? { deity: null, grants: [], abilities: [] } : { deity: { id: r.id, name: r.name, title: r.title ?? "", image: r.image }, grants: t.grants, abilities: (r.abilities ?? []).map((e) => {
     var i;
-    return { id: t.id, name: t.name, description: t.description, uses: t.uses ? { used: ((i = e.usages[t.id]) == null ? void 0 : i.used) ?? 0, max: t.uses.max } : void 0 };
+    return { id: e.id, name: e.name, description: e.description, uses: e.uses ? { used: ((i = t.usages[e.id]) == null ? void 0 : i.used) ?? 0, max: e.uses.max } : void 0 };
   }) };
 }
-const V = {
+const H = {
   deity: "public",
   fields: {
     portrait: "public",
@@ -551,421 +558,422 @@ const V = {
   },
   showMechanicsInSelection: !1
 }, N = 3;
-function Je(s) {
-  if (!s || typeof s != "object") throw new Error("Invalid deity definition.");
-  const e = structuredClone(s), t = typeof e.schemaVersion == "number" ? e.schemaVersion : 0;
-  if (t > N) throw new Error(`Unsupported deity schema ${t}.`);
-  const i = [], r = e.visibility && typeof e.visibility == "object" ? e.visibility : {}, n = Ct(r, t < 3), a = Lt(e.status, r.players), o = {
-    ...e,
+function st(r) {
+  if (!r || typeof r != "object") throw new Error("Invalid deity definition.");
+  const t = structuredClone(r), e = typeof t.schemaVersion == "number" ? t.schemaVersion : 0;
+  if (e > N) throw new Error(`Unsupported deity schema ${e}.`);
+  const i = [], s = t.visibility && typeof t.visibility == "object" ? t.visibility : {}, n = Ut(s, e < 3), a = xt(t.status, s.players), o = {
+    ...t,
     schemaVersion: N,
-    revision: Math.max(1, typeof e.revision == "number" ? e.revision : 0) + (t < N ? 1 : 0),
-    createdAt: typeof e.createdAt == "string" ? e.createdAt : (/* @__PURE__ */ new Date()).toISOString(),
-    updatedAt: t < N ? (/* @__PURE__ */ new Date()).toISOString() : String(e.updatedAt ?? (/* @__PURE__ */ new Date()).toISOString()),
-    checksum: typeof e.checksum == "string" ? e.checksum : "pending",
+    revision: Math.max(1, typeof t.revision == "number" ? t.revision : 0) + (e < N ? 1 : 0),
+    createdAt: typeof t.createdAt == "string" ? t.createdAt : (/* @__PURE__ */ new Date()).toISOString(),
+    updatedAt: e < N ? (/* @__PURE__ */ new Date()).toISOString() : String(t.updatedAt ?? (/* @__PURE__ */ new Date()).toISOString()),
+    checksum: typeof t.checksum == "string" ? t.checksum : "pending",
     status: a,
+    kind: t.kind === "lore" ? "lore" : "selectable",
     visibility: n,
-    passiveBonuses: Array.isArray(e.passiveBonuses) ? e.passiveBonuses.map(Gt) : [],
-    abilities: Array.isArray(e.abilities) ? e.abilities.map(Mt) : [],
-    grantGroups: Array.isArray(e.grantGroups) ? e.grantGroups : [],
-    replacement: kt(e.replacement),
-    imagePresentation: Pt(e.imagePresentation),
-    domains: Array.isArray(e.domains) ? e.domains : []
+    passiveBonuses: t.kind === "lore" ? [] : Array.isArray(t.passiveBonuses) ? t.passiveBonuses.map(qt) : [],
+    abilities: t.kind === "lore" ? [] : Array.isArray(t.abilities) ? t.abilities.map(Ht) : [],
+    grantGroups: t.kind === "lore" ? [] : Array.isArray(t.grantGroups) ? t.grantGroups : [],
+    replacement: t.kind === "lore" ? { sourceUuid: "", mode: "none", contexts: [] } : Ft(t.replacement),
+    imagePresentation: Vt(t.imagePresentation),
+    domains: Array.isArray(t.domains) ? t.domains : []
   };
-  return t < N && i.push(`Legacy definition migrated to schema version ${N}.`), { definition: o, migrated: t < N, warnings: i };
+  return e < N && i.push(`Legacy definition migrated to schema version ${N}.`), { definition: o, migrated: e < N, warnings: i };
 }
-function Ct(s, e = !1) {
-  if (typeof s.deity == "string" && s.fields && typeof s.fields == "object") {
-    const n = s.fields, a = {
-      deity: K(s.deity, V.deity),
-      fields: Object.fromEntries(Object.entries(V.fields).map(([o, l]) => [o, K(n[o], l)])),
-      showMechanicsInSelection: s.showMechanicsInSelection === !0
+function Ut(r, t = !1) {
+  if (typeof r.deity == "string" && r.fields && typeof r.fields == "object") {
+    const n = r.fields, a = {
+      deity: Z(r.deity, H.deity),
+      fields: Object.fromEntries(Object.entries(H.fields).map(([o, l]) => [o, Z(n[o], l)])),
+      showMechanicsInSelection: r.showMechanicsInSelection === !0
     };
-    return e && (a.fields.domains = "followers", a.fields.spells = "followers", a.fields.favoredWeapon = "followers", a.fields.gmNotes = "gm"), a;
+    return t && (a.fields.domains = "followers", a.fields.spells = "followers", a.fields.favoredWeapon = "followers", a.fields.gmNotes = "gm"), a;
   }
-  const t = s.players !== !1, i = s.library === !1 || !t ? "gm" : "public", r = s.characterSheet === !1 ? "gm" : "followers";
-  return { ...structuredClone(V), deity: i, fields: { ...structuredClone(V.fields), bonuses: r, abilities: r } };
+  const e = r.players !== !1, i = r.library === !1 || !e ? "gm" : "public", s = r.characterSheet === !1 ? "gm" : "followers";
+  return { ...structuredClone(H), deity: i, fields: { ...structuredClone(H.fields), bonuses: s, abilities: s } };
 }
-function kt(s) {
-  if (!s || typeof s != "object") return { sourceUuid: "", mode: "none", contexts: [] };
-  const e = s, t = typeof e.sourceUuid == "string" ? e.sourceUuid.trim() : "", i = e.mode === "hide" ? "hide" : e.mode === "replace" || t ? "replace" : "none";
-  return { ...e, sourceUuid: t, mode: i, contexts: Array.isArray(e.contexts) ? e.contexts.filter((r) => typeof r == "string") : [] };
+function Ft(r) {
+  if (!r || typeof r != "object") return { sourceUuid: "", mode: "none", contexts: [] };
+  const t = r, e = typeof t.sourceUuid == "string" ? t.sourceUuid.trim() : "", i = t.mode === "hide" ? "hide" : t.mode === "replace" || e ? "replace" : "none";
+  return { ...t, sourceUuid: e, mode: i, contexts: Array.isArray(t.contexts) ? t.contexts.filter((s) => typeof s == "string") : [] };
 }
-function Pt(s) {
-  if (!s || typeof s != "object") return;
-  const e = {};
-  for (const t of ["image", "icon", "symbol", "banner"]) {
-    const i = s[t];
+function Vt(r) {
+  if (!r || typeof r != "object") return;
+  const t = {};
+  for (const e of ["image", "icon", "symbol", "banner"]) {
+    const i = r[e];
     if (!i || typeof i != "object") continue;
-    const r = i;
-    e[t] = {
-      fit: r.fit === "contain" ? "contain" : "cover",
-      focusX: Pe(r.focusX, 50),
-      focusY: Pe(r.focusY, 25),
-      zoom: le(r.zoom, 1, 1, 3),
-      rotation: le(r.rotation, 0, -180, 180)
+    const s = i;
+    t[e] = {
+      fit: s.fit === "contain" ? "contain" : "cover",
+      focusX: Fe(s.focusX, 50),
+      focusY: Fe(s.focusY, 25),
+      zoom: ue(s.zoom, 1, 1, 3),
+      rotation: ue(s.rotation, 0, -180, 180)
     };
   }
-  return e;
+  return t;
 }
-function Pe(s, e) {
-  return le(s, e, 0, 100);
+function Fe(r, t) {
+  return ue(r, t, 0, 100);
 }
-function le(s, e, t, i) {
-  const r = Number(s);
-  return Number.isFinite(r) ? Math.min(i, Math.max(t, r)) : e;
+function ue(r, t, e, i) {
+  const s = Number(r);
+  return Number.isFinite(s) ? Math.min(i, Math.max(e, s)) : t;
 }
-function Lt(s, e) {
-  return s === "draft" || s === "test" || s === "published" || s === "disabled" || s === "archived" ? s : e === !1 ? "draft" : "published";
+function xt(r, t) {
+  return r === "draft" || r === "test" || r === "published" || r === "disabled" || r === "archived" ? r : t === !1 ? "draft" : "published";
 }
-function Gt(s) {
-  if (!s || typeof s != "object") return s;
-  const e = s;
-  return { ...e, enabled: e.enabled !== !1, visibility: K(e.visibility, e.visible === !1 ? "gm" : "followers") };
+function qt(r) {
+  if (!r || typeof r != "object") return r;
+  const t = r;
+  return { ...t, enabled: t.enabled !== !1, visibility: Z(t.visibility, t.visible === !1 ? "gm" : "followers") };
 }
-function Mt(s) {
-  if (!s || typeof s != "object") return s;
-  const e = s;
-  return { ...e, enabled: e.enabled !== !1, visibility: K(e.visibility, "followers") };
+function Ht(r) {
+  if (!r || typeof r != "object") return r;
+  const t = r;
+  return { ...t, enabled: t.enabled !== !1, visibility: Z(t.visibility, "followers") };
 }
-function K(s, e) {
-  return s === "public" || s === "selection" || s === "followers" || s === "owner" || s === "trusted" || s === "gm" || s === "hidden-until-selected" ? s : e;
+function Z(r, t) {
+  return r === "public" || r === "selection" || r === "followers" || r === "owner" || r === "trusted" || r === "gm" || r === "hidden-until-selected" ? r : t;
 }
-function Ut(s, e = (/* @__PURE__ */ new Date()).toISOString()) {
-  return { format: "darkis-godforge", schemaVersion: N, exportedAt: e, deities: structuredClone(s) };
+function Bt(r, t = (/* @__PURE__ */ new Date()).toISOString()) {
+  return { format: "darkis-godforge", schemaVersion: N, exportedAt: t, deities: structuredClone(r) };
 }
-function Ft(s) {
-  if (!s || typeof s != "object") return !1;
-  const e = s;
-  return e.format === "darkis-godforge" && typeof e.schemaVersion == "number" && e.schemaVersion >= 1 && e.schemaVersion <= N && Array.isArray(e.deities) && e.deities.every((t) => typeof t == "object" && t !== null && typeof t.id == "string" && typeof t.name == "string" && typeof t.schemaVersion == "number" && Array.isArray(t.domains) && Array.isArray(t.abilities));
+function $t(r) {
+  if (!r || typeof r != "object") return !1;
+  const t = r;
+  return t.format === "darkis-godforge" && typeof t.schemaVersion == "number" && t.schemaVersion >= 1 && t.schemaVersion <= N && Array.isArray(t.deities) && t.deities.every((e) => typeof e == "object" && e !== null && typeof e.id == "string" && typeof e.name == "string" && typeof e.schemaVersion == "number" && Array.isArray(e.domains) && Array.isArray(e.abilities));
 }
-function Ze(s) {
-  if (!Ft(s)) throw new Error("Invalid GodForge export: expected a valid deity export.");
-  return s.deities.map((e) => Je(e).definition);
+function rt(r) {
+  if (!$t(r)) throw new Error("Invalid GodForge export: expected a valid deity export.");
+  return r.deities.map((t) => st(t).definition);
 }
-function Ae(s, e) {
-  const t = s.filter((o) => Number.isFinite(o.weight) && o.weight > 0), i = t.reduce((o, l) => o + l.weight, 0);
-  if (!t.length || i <= 0) throw new Error("Random table has no selectable entries.");
-  const r = Math.min(Math.max(e(), 0), 0.999999999) * i;
+function Oe(r, t) {
+  const e = r.filter((o) => Number.isFinite(o.weight) && o.weight > 0), i = e.reduce((o, l) => o + l.weight, 0);
+  if (!e.length || i <= 0) throw new Error("Random table has no selectable entries.");
+  const s = Math.min(Math.max(t(), 0), 0.999999999) * i;
   let n = 0;
-  for (const [o, l] of t.entries())
-    if (n += l.weight, r < n) return { entry: l, index: o, roll: r };
-  return { entry: t[t.length - 1], index: t.length - 1, roll: r };
+  for (const [o, l] of e.entries())
+    if (n += l.weight, s < n) return { entry: l, index: o, roll: s };
+  return { entry: e[e.length - 1], index: e.length - 1, roll: s };
 }
-function Vt(s, e) {
-  return { status: "resolved", draw: Ae(s, e) };
+function Wt(r, t) {
+  return { status: "resolved", draw: Oe(r, t) };
 }
-function et(s) {
-  if (!s || typeof s != "object") return !1;
-  const e = s;
-  if (e.tables !== void 0 && !Array.isArray(e.tables) || e.wheels !== void 0 && !Array.isArray(e.wheels)) return !1;
-  const t = e.tables ?? [], i = /* @__PURE__ */ new Set();
-  for (const n of t) {
-    if (!ce(n) || !L(n.id) || i.has(n.id) || !L(n.name) || !L(n.formula) || !Le(n.visibility) || !Array.isArray(n.entries) || !n.entries.length || !n.entries.every(xt)) return !1;
+function nt(r) {
+  if (!r || typeof r != "object") return !1;
+  const t = r;
+  if (t.tables !== void 0 && !Array.isArray(t.tables) || t.wheels !== void 0 && !Array.isArray(t.wheels)) return !1;
+  const e = t.tables ?? [], i = /* @__PURE__ */ new Set();
+  for (const n of e) {
+    if (!he(n) || !M(n.id) || i.has(n.id) || !M(n.name) || !M(n.formula) || !Ve(n.visibility) || !Array.isArray(n.entries) || !n.entries.length || !n.entries.every(jt)) return !1;
     i.add(n.id);
   }
-  const r = /* @__PURE__ */ new Set();
-  for (const n of e.wheels ?? []) {
-    if (!ce(n) || !L(n.id) || r.has(n.id) || !L(n.name) || !L(n.tableId) || !i.has(n.tableId) || !Le(n.visibility) || !de(n.duration) || !de(n.minimumSpins)) return !1;
-    r.add(n.id);
+  const s = /* @__PURE__ */ new Set();
+  for (const n of t.wheels ?? []) {
+    if (!he(n) || !M(n.id) || s.has(n.id) || !M(n.name) || !M(n.tableId) || !i.has(n.tableId) || !Ve(n.visibility) || !pe(n.duration) || !pe(n.minimumSpins)) return !1;
+    s.add(n.id);
   }
   return !0;
 }
-class tt {
+class at {
   constructor() {
-    g(this, "tables", /* @__PURE__ */ new Map());
-    g(this, "wheels", /* @__PURE__ */ new Map());
-    g(this, "persistContent");
+    b(this, "tables", /* @__PURE__ */ new Map());
+    b(this, "wheels", /* @__PURE__ */ new Map());
+    b(this, "persistContent");
   }
-  setPersistence(e) {
-    this.persistContent = e;
+  setPersistence(t) {
+    this.persistContent = t;
   }
-  load(e) {
-    const t = e ?? {};
-    if (!et(t)) throw new Error("Invalid GodForge random content.");
+  load(t) {
+    const e = t ?? {};
+    if (!nt(e)) throw new Error("Invalid GodForge random content.");
     this.tables.clear(), this.wheels.clear();
-    for (const i of t.tables ?? []) this.tables.set(i.id, structuredClone(i));
-    for (const i of t.wheels ?? []) this.wheels.set(i.id, structuredClone(i));
+    for (const i of e.tables ?? []) this.tables.set(i.id, structuredClone(i));
+    for (const i of e.wheels ?? []) this.wheels.set(i.id, structuredClone(i));
   }
-  replace(e) {
-    this.load(e), this.persist();
+  replace(t) {
+    this.load(t), this.persist();
   }
   snapshot() {
     return { tables: this.listTables(), wheels: this.listWheels() };
   }
   listTables() {
-    return [...this.tables.values()].map((e) => structuredClone(e));
+    return [...this.tables.values()].map((t) => structuredClone(t));
   }
   listWheels() {
-    return [...this.wheels.values()].map((e) => structuredClone(e));
+    return [...this.wheels.values()].map((t) => structuredClone(t));
   }
-  getTable(e) {
-    const t = this.tables.get(e);
-    return t ? structuredClone(t) : null;
+  getTable(t) {
+    const e = this.tables.get(t);
+    return e ? structuredClone(e) : null;
   }
-  createTable(e) {
-    if (!e.name.trim() || !e.entries.length) throw new Error("Random table requires a name and entries.");
-    const t = { ...structuredClone(e), id: crypto.randomUUID(), updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
-    return this.tables.set(t.id, t), this.persist(), structuredClone(t);
+  createTable(t) {
+    if (!t.name.trim() || !t.entries.length) throw new Error("Random table requires a name and entries.");
+    const e = { ...structuredClone(t), id: crypto.randomUUID(), updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
+    return this.tables.set(e.id, e), this.persist(), structuredClone(e);
   }
-  createWheel(e) {
-    if (!this.tables.has(e.tableId)) throw new Error("Fortune wheel table was not found.");
-    const t = { ...structuredClone(e), id: crypto.randomUUID(), updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
-    return this.wheels.set(t.id, t), this.persist(), structuredClone(t);
+  createWheel(t) {
+    if (!this.tables.has(t.tableId)) throw new Error("Fortune wheel table was not found.");
+    const e = { ...structuredClone(t), id: crypto.randomUUID(), updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
+    return this.wheels.set(e.id, e), this.persist(), structuredClone(e);
   }
-  drawTable(e, t) {
-    const i = this.tables.get(e);
+  drawTable(t, e) {
+    const i = this.tables.get(t);
     if (!i) throw new Error("Random table was not found.");
-    return Ae(i.entries, t);
+    return Oe(i.entries, e);
   }
-  spinWheel(e, t) {
-    var r;
-    const i = this.wheels.get(e);
+  spinWheel(t, e) {
+    var s;
+    const i = this.wheels.get(t);
     if (!i) throw new Error("Fortune wheel was not found.");
-    return Vt(((r = this.tables.get(i.tableId)) == null ? void 0 : r.entries) ?? [], t);
+    return Wt(((s = this.tables.get(i.tableId)) == null ? void 0 : s.entries) ?? [], e);
   }
   persist() {
-    this.persistContent && this.persistContent(this.snapshot()).catch((e) => console.error("Darkis GodForge | Could not persist random content.", e));
+    this.persistContent && this.persistContent(this.snapshot()).catch((t) => console.error("Darkis GodForge | Could not persist random content.", t));
   }
 }
-function ce(s) {
-  return !!s && typeof s == "object";
+function he(r) {
+  return !!r && typeof r == "object";
 }
-function L(s) {
-  return typeof s == "string" && s.trim().length > 0 && s.length <= 1e4;
+function M(r) {
+  return typeof r == "string" && r.trim().length > 0 && r.length <= 1e4;
 }
-function de(s) {
-  return typeof s == "number" && Number.isFinite(s) && s > 0;
+function pe(r) {
+  return typeof r == "number" && Number.isFinite(r) && r > 0;
 }
-function Le(s) {
-  return s === "public" || s === "selection" || s === "followers" || s === "owner" || s === "gm" || s === "hidden-until-selected";
+function Ve(r) {
+  return r === "public" || r === "selection" || r === "followers" || r === "owner" || r === "gm" || r === "hidden-until-selected";
 }
-function xt(s) {
-  return !ce(s) || !L(s.id) || !L(s.label) || !de(s.weight) || s.description !== void 0 && typeof s.description != "string" ? !1 : s.category === void 0 || s.category === "positive" || s.category === "neutral" || s.category === "negative" || s.category === "catastrophic" || s.category === "jackpot";
+function jt(r) {
+  return !he(r) || !M(r.id) || !M(r.label) || !pe(r.weight) || r.description !== void 0 && typeof r.description != "string" ? !1 : r.category === void 0 || r.category === "positive" || r.category === "neutral" || r.category === "negative" || r.category === "catastrophic" || r.category === "jackpot";
 }
-const Ht = /* @__PURE__ */ JSON.parse(`{"UI":{"TITLE":"Darkis GodForge","TAGLINE":"Custom deities","SUBTITLE":"Create, publish, and connect them directly to characters.","CREATE":"New deity","EDIT":"Edit","EDIT_DEITY":"Edit deity","CODEX":"Divine Codex","HUB":"Follower Hub","ACTIVE_GRANTS":"Active grants","ACTIVATE":"Activate","NO_WONDERS":"This deity grants no activatable wonders.","NO_ASSIGNED_DEITY":"No deity assigned","NO_ASSIGNED_DEITY_HINT":"Choose a deity in the Divine Codex or ask the GM to assign one to this character.","YOUR_DEITY":"Your deity","SELECT_DEITY":"Choose as deity","CHOOSE_AND_SELECT":"Choose options and assign","CHOOSE_GRANTS":"Choose grants","CHOOSE_GRANTS_HINT":"Select the required options for this deity.","PICK_EXACTLY":"Choose exactly {count} option(s).","ASSIGNMENT_FAILED":"The deity could not be assigned.","SELECTION_REQUIRES_GM":"This deity requires grant choices first.","OPEN_CODEX":"Open Divine Codex – available without a selected token","OPEN_HUB":"Open Follower Hub – the character's deity, bonuses, and wonders","SELECT_CHARACTER_FIRST":"The Follower Hub shows a character's deity, bonuses, and wonders. Control a token or choose one of your characters.","MY_DEITIES":"My deities","ENTRIES":"entries","DOMAINS":"Domains","ABILITIES":"Abilities","VISIBILITY":"Visibility","PASSIVE_BONUS":"Passive bonus","PASSIVE_BONUSES":"Passive bonuses","DIVINE_ABILITY":"Divine ability","DIVINE_WONDER":"Divine wonder","DIVINE_WONDERS":"Divine wonders","SEARCH":"Search GodForge …","ALL_DOMAINS":"All domains","NO_RESULTS":"No deities found.","NEW_DEITY":"Create a new deity","NEW_DEITY_HINT":"Define identity, rules, wonders, and visibility.","NAME":"Name","TITLE_FIELD":"Title","DESCRIPTION":"Description","ALIGNMENT":"Alignment","SAVE":"Save deity","CANCEL":"Cancel","OPEN_DASHBOARD":"Open GM dashboard – create and manage deities","NEW_DEITY_PLACEHOLDER":"e.g. Tenebris","TITLE_PLACEHOLDER":"e.g. Goddess of Shadows","DOMAINS_PLACEHOLDER":"Shadows, secrets, deception","QUOTE":"Quote","PORTRAIT":"Portrait","ICON":"Icon","SYMBOL":"Cult symbol","BANNER":"Banner","BROWSE_FILES":"Browse Foundry files","FILE_PATH":"Foundry file path","PANTHEONS":"Pantheons","TAGS":"Tags","FAVORED_WEAPON":"Favored weapon","DIVINE_FONT":"Divine font","TRAINED_SKILL":"Divine skill","SANCTIFICATION":"Sanctification","CHAMPION_CAUSE":"Champion cause","EDICTS":"Edicts","ANATHEMA":"Anathema","COMMA_SEPARATED":"Comma-separated","STATUS":"Publication status","STATUS_DRAFT":"Draft","STATUS_TEST":"Test","STATUS_PUBLISHED":"Published","STATUS_DISABLED":"Disabled","STATUS_ARCHIVED":"Archived","BASIC_DATA":"Basic data","EDITOR_STEPS":"Deity editor steps","REQUIRED_FIELDS":"Required fields","WIZARD_INTRO":"The wizard guides you step by step through creating a game-ready deity.","APPEARANCE":"Appearance","SYSTEM_VALUES":"System values","PREVIEW":"Preview","STEP_BASIC_INTRO":"Give your deity a clear identity. Everything except the name can be added later.","ONLY_NAME_REQUIRED":"Only the name is required","HELP_NAME":"The unique name used for this deity in the codex.","HELP_TITLE":"A short epithet such as “The Faith” or “Lady of Stars”.","HELP_DESCRIPTION":"Summarize the deity's nature, faith, and presence for players.","HELP_QUOTE":"A characteristic saying or guiding phrase.","HELP_PANTHEONS":"Optional pantheons, separated by commas.","HELP_TAGS":"Internal search terms, separated by commas.","STEP_APPEARANCE_INTRO":"Choose how the deity appears on cards, in the codex, and in selection dialogs.","OPTIONAL_STEP_HINT":"All images are optional. Paste Foundry paths, browse for files, or drag files onto the fields.","HELP_PORTRAIT":"Large image for detail views and the Divine Codex.","HELP_ICON":"Small, readable image for lists and buttons.","HELP_SYMBOL":"The cult's sign, seal, or holy symbol.","HELP_BANNER":"Wide background image for presentation areas.","STEP_SYSTEM_INTRO":"Enter the rules Pathfinder 2e or Starfinder 2e needs for this deity.","HELP_DOMAINS":"Thematic domains, separated by commas.","HELP_WEAPON":"The favored weapon of the deity's followers.","HELP_SKILL":"The skill granted by the deity, such as religion.","HELP_FONT":"Divine font such as heal, harm, or both.","HELP_SANCTIFICATION":"Allowed sanctification, such as holy or unholy.","HELP_CAUSE":"Optional champion cause or comparable bond.","HELP_EDICTS":"Actions followers are expected to uphold.","HELP_ANATHEMA":"Actions that violate the faith.","HELP_SPELLS":"Optional granted spells; one rank and UUID per line.","ADVANCED_SYSTEM_VALUES":"Additional system values for advanced users","HELP_ALIGNMENT":"Legacy alignment for older system data.","HELP_ALTERNATE_DOMAINS":"Additional domains outside the primary selection.","HELP_ATTRIBUTES":"Divine attributes, separated by commas.","STEP_BONUSES_INTRO":"Add persistent mechanical benefits. Empty cards are ignored when saving.","STEP_WONDERS_INTRO":"Create activatable abilities with uses, reset events, and effects.","STEP_REPLACEMENT_INTRO":"Choose an official deity as a template or replace it in GodForge selections without changing the system compendium.","HELP_REPLACEMENT_MODE":"None uses the selection only as a template; hide or replace changes GodForge catalogs.","HELP_OFFICIAL_DEITY":"Choose a name from the active system compendium instead of entering a UUID.","EXPERT_OPTIONS":"Expert options","HELP_REPLACEMENT_CONTEXTS":"Limits replacement to specific catalogs. Empty means all contexts.","STEP_VISIBILITY_INTRO":"Control exactly what players see before and after choosing the deity.","HELP_DEITY_VISIBILITY":"Controls who can see the deity at all.","HELP_FIELD_VISIBILITY":"Controls visibility for this individual content field.","HELP_GM_NOTES":"These notes remain visible only to the GM.","PREVIEW_AND_SAVE":"Preview and save","STEP_PREVIEW_INTRO":"Review the key details and choose the publication status.","PREVIEW_EMPTY_DESCRIPTION":"No description entered yet.","HELP_STATUS":"Drafts remain with the GM; published makes the deity normally selectable.","BACK":"Back","NEXT":"Next","SAVE_DRAFT":"Save as draft","HELP_BONUS_NAME":"A clear name for the benefit.","HELP_SELECTOR":"The system value affected by the bonus, such as religion.","HELP_BONUS_VALUE":"A number or supported formula.","HELP_WONDER_NAME":"The visible name of the ability.","HELP_WONDER_DESCRIPTION":"Describe exactly what happens on activation.","HELP_USAGES":"How often the wonder can be used before its next reset.","HELP_RESET":"The event that restores spent uses.","BONUS_EDITOR_HINT":"Create multiple system-native bonuses with conditions and individual visibility.","ABILITY_EDITOR_HINT":"Configure activation, uses, reset, and effect.","GRANT_GROUPS":"Grant groups","GRANT_GROUPS_HINT":"Nest AND/OR groups and override inherited names, descriptions, or values.","ADD_GRANT_GROUP":"Add group","GRANT_GROUP":"Grant group","ADD_GRANT":"Add grant","ADD_SUBGROUP":"Add subgroup","GROUP_MODE":"Relationship","ALL_REQUIRED":"All (AND)","CHOOSE_FROM":"Choice (OR)","PICK_COUNT":"Pick count","GRANT":"Grant","REFERENCE":"Reference ID","OVERRIDE_NAME":"Override name","OVERRIDE_VALUE":"Override value","OVERRIDE_DESCRIPTION":"Override description","ADD_BONUS":"Add bonus","ADD_ABILITY":"Add wonder","REMOVE":"Remove","MOVE_UP":"Move up","MOVE_DOWN":"Move down","DUPLICATE":"Duplicate","STACKING_WARNING":"In PF2e, this status bonus does not stack with another status bonus on the same selector; only the highest value applies.","SELECTOR":"Selector","VALUE":"Value or formula","MODIFIER_TYPE":"Modifier type","MOD_STATUS":"Status bonus","MOD_CIRCUMSTANCE":"Circumstance bonus","MOD_ITEM":"Item bonus","MOD_UNTYPED":"Untyped","APPLIES_TO":"Applies to","CHECKS":"Checks","DCS":"DCs","BOTH":"Checks and DCs","CONDITION":"Condition","OPTIONAL_CONDITION":"Optional, e.g. while in darkness","ACTION_COST":"Action cost","ACTION_AUTOMATIC":"Automatic / no action","ACTION_FREE":"Free action","ACTION_REACTION":"Reaction","ACTIONS":"Actions","ACTION_EXPLORATION":"Exploration activity","ACTION_DOWNTIME":"Downtime activity","ACTION_COUNT":"Number of actions","USAGES":"Uses","RESET":"Reset","RESET_DAILY":"At daily preparations","RESET_TEN_MINUTES":"After a 10-minute rest","RESET_REFOCUS":"After refocusing","RESET_ENCOUNTER":"At encounter end","RESET_SCENE":"On scene change","RESET_CALENDAR_DAY":"Per calendar day","RESET_MANUAL":"GM only","COOLDOWN":"Cooldown","COOLDOWN_UNIT":"Cooldown unit","DURATION":"Duration","DURATION_UNIT":"Duration unit","ROUNDS":"Rounds","MINUTES":"Minutes","HOURS":"Hours","DAYS":"Days","INSTANT":"Instant","ENCOUNTER":"Encounter","SCENE":"Scene","UNTIL_RESET":"Until next reset","EFFECT_TEMPLATE":"Effect template","EFFECT_NARRATIVE":"Narrative effect","EFFECT_HEAL":"Heal","EFFECT_DAMAGE":"Deal damage","EFFECT_BONUS":"Grant bonus","FORMULA_OR_VALUE":"Formula or value","VISIBILITY_HINT":"Hidden fields are never sent to players.","DEITY_VISIBILITY":"Deity visibility","PLAYER_PREVIEW":"Preview as player","GM_NOTES":"Internal GM notes","VIS_PUBLIC":"Public","VIS_SELECTION":"Visible before selection","VIS_FOLLOWERS":"Followers only","VIS_OWNER":"Owner only","VIS_TRUSTED":"Trusted players","VIS_GM":"GM only","VIS_HIDDEN_UNTIL_SELECTED":"Hidden until selected","VIS_FIELD_PORTRAIT":"Portrait","VIS_FIELD_DESCRIPTION":"Description","VIS_FIELD_QUOTE":"Quote","VIS_FIELD_PANTHEON":"Pantheon","VIS_FIELD_BONUSES":"Passive bonuses","VIS_FIELD_ABILITIES":"Divine wonders","VIS_FIELD_NUMERIC_VALUES":"Exact numeric values","VIS_FIELD_DOMAINS":"Domains","VIS_FIELD_SPELLS":"Granted spells","VIS_FIELD_FAVORED_WEAPON":"Favored weapon","VIS_FIELD_EDICTS":"Edicts","VIS_FIELD_ANATHEMA":"Anathema","VIS_FIELD_GM_NOTES":"Internal GM notes","REPLACEMENT":"Official template and replacement","REPLACEMENT_MODE":"Replacement mode","REPLACE_NONE":"No replacement","REPLACE_HIDE":"Hide official deity","REPLACE_SOURCE":"Replace with this deity","SOURCE_UUID":"Source UUID","REPLACEMENT_CONTEXTS":"Affected selection contexts","OVERVIEW":"Overview","DEITIES":"Deities","RANDOM_TABLES":"Random tables","FORTUNE_WHEELS":"Fortune wheels","RANDOM_AND_WHEELS":"Random tables and fortune wheels","RANDOM_MANAGER_HINT":"The result is fixed before the wheel starts spinning.","TEST_LAB_HINT":"Test existing tables and fortune wheels without creating new content.","NEW_RANDOM_TABLE":"New random table","DICE_FORMULA":"Dice formula","RESULT_ENTRIES":"Results","ADD_RESULT":"Add result","SAVE_TABLE":"Save table","NEW_FORTUNE_WHEEL":"New fortune wheel","LINKED_TABLE":"Linked table","ANIMATION_DURATION":"Animation duration in seconds","MINIMUM_SPINS":"Minimum spins","SAVE_WHEEL":"Save wheel","TEST_DRAW":"Test draw","TEST_SPIN":"Test spin","NO_RANDOM_TABLES":"No random tables have been created yet.","NO_FORTUNE_WHEELS":"No fortune wheels have been created yet.","RESULT_TITLE":"Result title","CATEGORY_JACKPOT":"Jackpot","CATEGORY_POSITIVE":"Positive","CATEGORY_NEUTRAL":"Neutral","CATEGORY_NEGATIVE":"Negative","CATEGORY_CATASTROPHIC":"Catastrophic","INTEGRATION":"Integration","REPLACEMENTS":"Replacements","REPLACEMENT_MANAGER_HINT":"Official compendiums are never modified.","OFFICIAL_DEITY":"Official deity","HOMEBREW_REPLACEMENT":"Homebrew replacement","INHERITANCE":"Inheritance","SELECTIVE_INHERITANCE":"Selective via deity definition","INHERITED_VALUES":"inherited values","SPELLS":"Spells","ALTERNATE_DOMAINS":"Alternate domains","DIVINE_ATTRIBUTES":"Divine attributes","CLERIC_SPELLS":"Granted cleric spells","SPELLS_HINT":"One per line: rank=Compendium.package.pack.Item.id","KEEP_EXISTING_ACTORS":"Keep for existing characters","NO_OFFICIAL_DEITIES":"No official deities found","NO_OFFICIAL_DEITIES_HINT":"The active system adapter did not detect a matching deity pack.","CHARACTERS":"Characters","CHARACTER":"Character","CHARACTER_MANAGER_HINT":"Assign a deity and its grants to a character.","ASSIGN_DEITY":"Assign deity","PLAYER_VIEW":"Player view","TOOLS":"Tools","TEST_LAB":"Test lab","IMPORT_EXPORT":"Import / Export","IMPORT_EXPORT_HINT":"Back up or transfer your GodForge data.","DATA_MANAGER_HINT":"Inspect GodForge packages before import and export a portable backup of your definitions.","EXPORT_PACKAGE":"Export GodForge package","EXPORT_HINT":"Exports all deities including visibility, bonuses, wonders, grants, and replacements.","EXPORT":"Export","IMPORT_PACKAGE":"Import GodForge package","IMPORT_HINT":"The file is validated and summarized before any changes are made.","CHOOSE_FILE":"Choose JSON file","IMPORT_INVALID":"Import could not be validated","IMPORT_PREVIEW":"Import preview","NEW_CONTENT":"New content","UPDATED_CONTENT":"Updated content","IMPORT_APPLY_HINT":"Existing IDs are updated and new IDs are added.","APPLY_IMPORT":"Apply validated import","IMPORTED":"GodForge entries imported.","MIGRATIONS":"Migrations","MIGRATION_MANAGER_HINT":"GodForge updates older definitions automatically when they are loaded.","MIGRATION_STATUS":"Migration status","CURRENT_SCHEMA":"Current schema","PENDING_MIGRATIONS":"Pending migrations","MIGRATION_RELOAD_HINT":"Reload the world to update pending definitions.","MIGRATION_COMPLETE":"All deities use the current schema.","AUDIT_LOG":"Audit log","PLANNED":"Planned for a later alpha release","SETTINGS":"Settings","MODULE_OPTIONS":"Module options","ADAPTER":"System adapter","HELP":"Help","QUICK_ACCESS":"Quick access","SYSTEM_STATUS":"System status","RECENTLY_EDITED":"Recently edited","PUBLISHED":"Published","INVALID":"Invalid definitions","ASSIGNED_CHARACTERS":"Assigned characters","RESET_DAILY_USAGES":"Reset daily uses","RESET_DAILY_COMPLETE":"Daily-preparation uses were reset.","MANUAL_RESET_HINT":"If the system event did not fire, the GM can reset daily uses here manually.","EMPTY_TITLE":"No custom deities yet","EMPTY_HINT":"Create a new deity or import a pantheon.","IMPORT":"Import","LARGER_WINDOW":"A larger window is recommended for the full editor.","TYPE":"Type","LAST_CHANGED":"Last changed","SYSTEM":"System","SCHEMA":"Schema","VERSION":"Version","DIAGNOSTICS_OK":"Ready"},"SETTINGS":{"MENU_NAME":"GodForge management","MENU_LABEL":"Open GodForge","MENU_HINT":"Opens the dashboard for creating and managing custom deities.","LANGUAGE":"GodForge language","LANGUAGE_HINT":"Language used by GodForge surfaces.","AUTO":"Automatic"},"ERROR":{"NO_USES":"No uses remaining.","GM_ONLY":"Only the GM may use this GodForge feature.","NO_PERMISSION":"You are not allowed to use this GodForge feature.","DASHBOARD_OPEN":"The dashboard did not open. Details are available in the browser console.","CODEX_OPEN":"The Divine Codex did not open. Reload Foundry and try again.","HUB_OPEN":"The character hub could not be loaded. Check that the character is still available.","UNSUPPORTED_SYSTEM":"Darkis GodForge does not support the active {system} system.","ACTION_FAILED":"That did not work."}}`), Te = {
-  DARKIS_GODFORGE: Ht
-}, ue = /* @__PURE__ */ new Map([["en", Te]]);
-async function Ge(s, e) {
-  if (s === "auto" || ue.has(s)) return;
-  const t = await fetch(e);
-  if (!t.ok) throw new Error(`Unable to load GodForge language ${s}.`);
-  ue.set(s, await t.json());
+const zt = /* @__PURE__ */ JSON.parse(`{"UI":{"TITLE":"Darkis GodForge","TAGLINE":"Custom deities","SUBTITLE":"Create, publish, and connect them directly to characters.","CREATE":"New deity","EDIT":"Edit","EDIT_DEITY":"Edit deity","CODEX":"Divine Codex","HUB":"Follower Hub","ACTIVE_GRANTS":"Active grants","ACTIVATE":"Activate","NO_WONDERS":"This deity grants no activatable wonders.","NO_ASSIGNED_DEITY":"No deity assigned","NO_ASSIGNED_DEITY_HINT":"Choose a deity in the Divine Codex or ask the GM to assign one to this character.","YOUR_DEITY":"Your deity","SELECT_DEITY":"Choose as deity","CHOOSE_AND_SELECT":"Choose options and assign","CHOOSE_GRANTS":"Choose grants","CHOOSE_GRANTS_HINT":"Select the required options for this deity.","PICK_EXACTLY":"Choose exactly {count} option(s).","ASSIGNMENT_FAILED":"The deity could not be assigned.","SELECTION_REQUIRES_GM":"This deity requires grant choices first.","OPEN_CODEX":"Open Divine Codex – available without a selected token","OPEN_HUB":"Open Follower Hub – the character's deity, bonuses, and wonders","SELECT_CHARACTER_FIRST":"The Follower Hub shows a character's deity, bonuses, and wonders. Control a token or choose one of your characters.","MY_DEITIES":"My deities","ENTRIES":"entries","DOMAINS":"Domains","ABILITIES":"Abilities","VISIBILITY":"Visibility","PASSIVE_BONUS":"Passive bonus","PASSIVE_BONUSES":"Passive bonuses","DIVINE_ABILITY":"Divine ability","DIVINE_WONDER":"Divine wonder","DIVINE_WONDERS":"Divine wonders","SEARCH":"Search GodForge …","ALL_DOMAINS":"All domains","NO_RESULTS":"No deities found.","NEW_DEITY":"Create a new deity","NEW_DEITY_HINT":"Define identity, rules, wonders, and visibility.","NAME":"Name","TITLE_FIELD":"Title","DEITY_KIND":"Entry type","HELP_DEITY_KIND":"Lore entries appear in the codex but cannot be worshipped or assigned to characters.","KIND_SELECTABLE":"Selectable deity","KIND_LORE":"Lore only / not worshippable","LORE_BADGE":"Lore · not worshippable","PICKER_TITLE":"GodForge selection","PICKER_EYEBROW":"System selection","PICKER_HINT":"Search, filter, or drop a Foundry document into this window.","PICKER_CATEGORY":"Category","PICKER_GROUP":"Group","PICKER_RANK":"Rank","PICKER_TRAIT":"Traits","PICKER_SOURCE":"Source","PICKER_ALL":"All","PICKER_AVAILABLE":"Available only","PICKER_REMASTER":"Remaster only","PICKER_DETAILS":"Details","PICKER_CHOOSE":"Choose","PICKER_APPLY":"Apply selection","PICKER_CLEAR":"Clear selection","PICKER_DROP_HINT":"Foundry documents can be dropped here.","PICKER_OPEN":"Open selection","PICKER_NONE":"Nothing selected yet","PICKER_MISSING":"The saved document is unavailable in the current system.","DESCRIPTION":"Description","ALIGNMENT":"Alignment","SAVE":"Save deity","CANCEL":"Cancel","OPEN_DASHBOARD":"Open GM dashboard – create and manage deities","NEW_DEITY_PLACEHOLDER":"e.g. Tenebris","TITLE_PLACEHOLDER":"e.g. Goddess of Shadows","DOMAINS_PLACEHOLDER":"Shadows, secrets, deception","QUOTE":"Quote","PORTRAIT":"Portrait","ICON":"Icon","SYMBOL":"Cult symbol","BANNER":"Banner","BROWSE_FILES":"Browse Foundry files","FILE_PATH":"Foundry file path","PANTHEONS":"Pantheons","TAGS":"Tags","FAVORED_WEAPON":"Favored weapon","DIVINE_FONT":"Divine font","TRAINED_SKILL":"Divine skill","SANCTIFICATION":"Sanctification","CHAMPION_CAUSE":"Champion cause","EDICTS":"Edicts","ANATHEMA":"Anathema","COMMA_SEPARATED":"Comma-separated","STATUS":"Publication status","STATUS_DRAFT":"Draft","STATUS_TEST":"Test","STATUS_PUBLISHED":"Published","STATUS_DISABLED":"Disabled","STATUS_ARCHIVED":"Archived","BASIC_DATA":"Basic data","EDITOR_STEPS":"Deity editor steps","REQUIRED_FIELDS":"Required fields","WIZARD_INTRO":"The wizard guides you step by step through creating a game-ready deity.","APPEARANCE":"Appearance","SYSTEM_VALUES":"System values","PREVIEW":"Preview","STEP_BASIC_INTRO":"Give your deity a clear identity. Everything except the name can be added later.","ONLY_NAME_REQUIRED":"Only the name is required","HELP_NAME":"The unique name used for this deity in the codex.","HELP_TITLE":"A short epithet such as “The Faith” or “Lady of Stars”.","HELP_DESCRIPTION":"Summarize the deity's nature, faith, and presence for players.","HELP_QUOTE":"A characteristic saying or guiding phrase.","HELP_PANTHEONS":"Optional pantheons, separated by commas.","HELP_TAGS":"Internal search terms, separated by commas.","STEP_APPEARANCE_INTRO":"Choose how the deity appears on cards, in the codex, and in selection dialogs.","OPTIONAL_STEP_HINT":"All images are optional. Paste Foundry paths, browse for files, or drag files onto the fields.","HELP_PORTRAIT":"Large image for detail views and the Divine Codex.","HELP_ICON":"Small, readable image for lists and buttons.","HELP_SYMBOL":"The cult's sign, seal, or holy symbol.","HELP_BANNER":"Wide background image for presentation areas.","STEP_SYSTEM_INTRO":"Enter the rules Pathfinder 2e or Starfinder 2e needs for this deity.","HELP_DOMAINS":"Thematic domains, separated by commas.","HELP_WEAPON":"The favored weapon of the deity's followers.","HELP_SKILL":"The skill granted by the deity, such as religion.","HELP_FONT":"Divine font such as heal, harm, or both.","HELP_SANCTIFICATION":"Allowed sanctification, such as holy or unholy.","HELP_CAUSE":"Optional champion cause or comparable bond.","HELP_EDICTS":"Actions followers are expected to uphold.","HELP_ANATHEMA":"Actions that violate the faith.","HELP_SPELLS":"Optional granted spells; one rank and UUID per line.","ADVANCED_SYSTEM_VALUES":"Additional system values for advanced users","HELP_ALIGNMENT":"Legacy alignment for older system data.","HELP_ALTERNATE_DOMAINS":"Additional domains outside the primary selection.","HELP_ATTRIBUTES":"Divine attributes, separated by commas.","STEP_BONUSES_INTRO":"Add persistent mechanical benefits. Empty cards are ignored when saving.","STEP_WONDERS_INTRO":"Create activatable abilities with uses, reset events, and effects.","STEP_REPLACEMENT_INTRO":"Choose an official deity as a template or replace it in GodForge selections without changing the system compendium.","HELP_REPLACEMENT_MODE":"None uses the selection only as a template; hide or replace changes GodForge catalogs.","HELP_OFFICIAL_DEITY":"Choose a name from the active system compendium instead of entering a UUID.","EXPERT_OPTIONS":"Expert options","HELP_REPLACEMENT_CONTEXTS":"Limits replacement to specific catalogs. Empty means all contexts.","STEP_VISIBILITY_INTRO":"Control exactly what players see before and after choosing the deity.","HELP_DEITY_VISIBILITY":"Controls who can see the deity at all.","HELP_FIELD_VISIBILITY":"Controls visibility for this individual content field.","HELP_GM_NOTES":"These notes remain visible only to the GM.","PREVIEW_AND_SAVE":"Preview and save","STEP_PREVIEW_INTRO":"Review the key details and choose the publication status.","PREVIEW_EMPTY_DESCRIPTION":"No description entered yet.","HELP_STATUS":"Drafts remain with the GM; published makes the deity normally selectable.","BACK":"Back","NEXT":"Next","SAVE_DRAFT":"Save as draft","HELP_BONUS_NAME":"A clear name for the benefit.","HELP_SELECTOR":"The system value affected by the bonus, such as religion.","HELP_BONUS_VALUE":"A number or supported formula.","HELP_WONDER_NAME":"The visible name of the ability.","HELP_WONDER_DESCRIPTION":"Describe exactly what happens on activation.","HELP_USAGES":"How often the wonder can be used before its next reset.","HELP_RESET":"The event that restores spent uses.","BONUS_EDITOR_HINT":"Create multiple system-native bonuses with conditions and individual visibility.","ABILITY_EDITOR_HINT":"Configure activation, uses, reset, and effect.","GRANT_GROUPS":"Grant groups","GRANT_GROUPS_HINT":"Nest AND/OR groups and override inherited names, descriptions, or values.","ADD_GRANT_GROUP":"Add group","GRANT_GROUP":"Grant group","ADD_GRANT":"Add grant","ADD_SUBGROUP":"Add subgroup","GROUP_MODE":"Relationship","ALL_REQUIRED":"All (AND)","CHOOSE_FROM":"Choice (OR)","PICK_COUNT":"Pick count","GRANT":"Grant","REFERENCE":"Reference ID","OVERRIDE_NAME":"Override name","OVERRIDE_VALUE":"Override value","OVERRIDE_DESCRIPTION":"Override description","ADD_BONUS":"Add bonus","ADD_ABILITY":"Add wonder","REMOVE":"Remove","MOVE_UP":"Move up","MOVE_DOWN":"Move down","DUPLICATE":"Duplicate","STACKING_WARNING":"In PF2e, this status bonus does not stack with another status bonus on the same selector; only the highest value applies.","SELECTOR":"Selector","VALUE":"Value or formula","MODIFIER_TYPE":"Modifier type","MOD_STATUS":"Status bonus","MOD_CIRCUMSTANCE":"Circumstance bonus","MOD_ITEM":"Item bonus","MOD_UNTYPED":"Untyped","APPLIES_TO":"Applies to","CHECKS":"Checks","DCS":"DCs","BOTH":"Checks and DCs","CONDITION":"Condition","OPTIONAL_CONDITION":"Optional, e.g. while in darkness","ACTION_COST":"Action cost","ACTION_AUTOMATIC":"Automatic / no action","ACTION_FREE":"Free action","ACTION_REACTION":"Reaction","ACTIONS":"Actions","ACTION_EXPLORATION":"Exploration activity","ACTION_DOWNTIME":"Downtime activity","ACTION_COUNT":"Number of actions","USAGES":"Uses","RESET":"Reset","RESET_DAILY":"At daily preparations","RESET_TEN_MINUTES":"After a 10-minute rest","RESET_REFOCUS":"After refocusing","RESET_ENCOUNTER":"At encounter end","RESET_SCENE":"On scene change","RESET_CALENDAR_DAY":"Per calendar day","RESET_MANUAL":"GM only","COOLDOWN":"Cooldown","COOLDOWN_UNIT":"Cooldown unit","DURATION":"Duration","DURATION_UNIT":"Duration unit","ROUNDS":"Rounds","MINUTES":"Minutes","HOURS":"Hours","DAYS":"Days","INSTANT":"Instant","ENCOUNTER":"Encounter","SCENE":"Scene","UNTIL_RESET":"Until next reset","EFFECT_TEMPLATE":"Effect template","EFFECT_NARRATIVE":"Narrative effect","EFFECT_HEAL":"Heal","EFFECT_DAMAGE":"Deal damage","EFFECT_BONUS":"Grant bonus","FORMULA_OR_VALUE":"Formula or value","VISIBILITY_HINT":"Hidden fields are never sent to players.","DEITY_VISIBILITY":"Deity visibility","PLAYER_PREVIEW":"Preview as player","GM_NOTES":"Internal GM notes","VIS_PUBLIC":"Public","VIS_SELECTION":"Visible before selection","VIS_FOLLOWERS":"Followers only","VIS_OWNER":"Owner only","VIS_TRUSTED":"Trusted players","VIS_GM":"GM only","VIS_HIDDEN_UNTIL_SELECTED":"Hidden until selected","VIS_FIELD_PORTRAIT":"Portrait","VIS_FIELD_DESCRIPTION":"Description","VIS_FIELD_QUOTE":"Quote","VIS_FIELD_PANTHEON":"Pantheon","VIS_FIELD_BONUSES":"Passive bonuses","VIS_FIELD_ABILITIES":"Divine wonders","VIS_FIELD_NUMERIC_VALUES":"Exact numeric values","VIS_FIELD_DOMAINS":"Domains","VIS_FIELD_SPELLS":"Granted spells","VIS_FIELD_FAVORED_WEAPON":"Favored weapon","VIS_FIELD_EDICTS":"Edicts","VIS_FIELD_ANATHEMA":"Anathema","VIS_FIELD_GM_NOTES":"Internal GM notes","REPLACEMENT":"Official template and replacement","REPLACEMENT_MODE":"Replacement mode","REPLACE_NONE":"No replacement","REPLACE_HIDE":"Hide official deity","REPLACE_SOURCE":"Replace with this deity","SOURCE_UUID":"Source UUID","REPLACEMENT_CONTEXTS":"Affected selection contexts","OVERVIEW":"Overview","DEITIES":"Deities","RANDOM_TABLES":"Random tables","FORTUNE_WHEELS":"Fortune wheels","RANDOM_AND_WHEELS":"Random tables and fortune wheels","RANDOM_MANAGER_HINT":"The result is fixed before the wheel starts spinning.","TEST_LAB_HINT":"Test existing tables and fortune wheels without creating new content.","NEW_RANDOM_TABLE":"New random table","DICE_FORMULA":"Dice formula","RESULT_ENTRIES":"Results","ADD_RESULT":"Add result","SAVE_TABLE":"Save table","NEW_FORTUNE_WHEEL":"New fortune wheel","LINKED_TABLE":"Linked table","ANIMATION_DURATION":"Animation duration in seconds","MINIMUM_SPINS":"Minimum spins","SAVE_WHEEL":"Save wheel","TEST_DRAW":"Test draw","TEST_SPIN":"Test spin","NO_RANDOM_TABLES":"No random tables have been created yet.","NO_FORTUNE_WHEELS":"No fortune wheels have been created yet.","RESULT_TITLE":"Result title","CATEGORY_JACKPOT":"Jackpot","CATEGORY_POSITIVE":"Positive","CATEGORY_NEUTRAL":"Neutral","CATEGORY_NEGATIVE":"Negative","CATEGORY_CATASTROPHIC":"Catastrophic","INTEGRATION":"Integration","REPLACEMENTS":"Replacements","REPLACEMENT_MANAGER_HINT":"Official compendiums are never modified.","OFFICIAL_DEITY":"Official deity","HOMEBREW_REPLACEMENT":"Homebrew replacement","INHERITANCE":"Inheritance","SELECTIVE_INHERITANCE":"Selective via deity definition","INHERITED_VALUES":"inherited values","SPELLS":"Spells","ALTERNATE_DOMAINS":"Alternate domains","DIVINE_ATTRIBUTES":"Divine attributes","CLERIC_SPELLS":"Granted cleric spells","SPELLS_HINT":"One per line: rank=Compendium.package.pack.Item.id","KEEP_EXISTING_ACTORS":"Keep for existing characters","NO_OFFICIAL_DEITIES":"No official deities found","NO_OFFICIAL_DEITIES_HINT":"The active system adapter did not detect a matching deity pack.","CHARACTERS":"Characters","CHARACTER":"Character","CHARACTER_MANAGER_HINT":"Assign a deity and its grants to a character.","ASSIGN_DEITY":"Assign deity","PLAYER_VIEW":"Player view","TOOLS":"Tools","TEST_LAB":"Test lab","IMPORT_EXPORT":"Import / Export","IMPORT_EXPORT_HINT":"Back up or transfer your GodForge data.","DATA_MANAGER_HINT":"Inspect GodForge packages before import and export a portable backup of your definitions.","EXPORT_PACKAGE":"Export GodForge package","EXPORT_HINT":"Exports all deities including visibility, bonuses, wonders, grants, and replacements.","EXPORT":"Export","IMPORT_PACKAGE":"Import GodForge package","IMPORT_HINT":"The file is validated and summarized before any changes are made.","CHOOSE_FILE":"Choose JSON file","IMPORT_INVALID":"Import could not be validated","IMPORT_PREVIEW":"Import preview","NEW_CONTENT":"New content","UPDATED_CONTENT":"Updated content","IMPORT_APPLY_HINT":"Existing IDs are updated and new IDs are added.","APPLY_IMPORT":"Apply validated import","IMPORTED":"GodForge entries imported.","MIGRATIONS":"Migrations","MIGRATION_MANAGER_HINT":"GodForge updates older definitions automatically when they are loaded.","MIGRATION_STATUS":"Migration status","CURRENT_SCHEMA":"Current schema","PENDING_MIGRATIONS":"Pending migrations","MIGRATION_RELOAD_HINT":"Reload the world to update pending definitions.","MIGRATION_COMPLETE":"All deities use the current schema.","AUDIT_LOG":"Audit log","PLANNED":"Planned for a later alpha release","SETTINGS":"Settings","MODULE_OPTIONS":"Module options","ADAPTER":"System adapter","HELP":"Help","QUICK_ACCESS":"Quick access","SYSTEM_STATUS":"System status","RECENTLY_EDITED":"Recently edited","PUBLISHED":"Published","INVALID":"Invalid definitions","ASSIGNED_CHARACTERS":"Assigned characters","RESET_DAILY_USAGES":"Reset daily uses","RESET_DAILY_COMPLETE":"Daily-preparation uses were reset.","MANUAL_RESET_HINT":"If the system event did not fire, the GM can reset daily uses here manually.","EMPTY_TITLE":"No custom deities yet","EMPTY_HINT":"Create a new deity or import a pantheon.","IMPORT":"Import","LARGER_WINDOW":"A larger window is recommended for the full editor.","TYPE":"Type","LAST_CHANGED":"Last changed","SYSTEM":"System","SCHEMA":"Schema","VERSION":"Version","DIAGNOSTICS_OK":"Ready"},"SETTINGS":{"MENU_NAME":"GodForge management","MENU_LABEL":"Open GodForge","MENU_HINT":"Opens the dashboard for creating and managing custom deities.","LANGUAGE":"GodForge language","LANGUAGE_HINT":"Language used by GodForge surfaces.","AUTO":"Automatic"},"ERROR":{"NO_USES":"No uses remaining.","GM_ONLY":"Only the GM may use this GodForge feature.","NO_PERMISSION":"You are not allowed to use this GodForge feature.","DASHBOARD_OPEN":"The dashboard did not open. Details are available in the browser console.","CODEX_OPEN":"The Divine Codex did not open. Reload Foundry and try again.","HUB_OPEN":"The character hub could not be loaded. Check that the character is still available.","UNSUPPORTED_SYSTEM":"Darkis GodForge does not support the active {system} system.","ACTION_FAILED":"That did not work."}}`), Re = {
+  DARKIS_GODFORGE: zt
+}, me = /* @__PURE__ */ new Map([["en", Re]]);
+async function xe(r, t) {
+  if (r === "auto" || me.has(r)) return;
+  const e = await fetch(t);
+  if (!e.ok) throw new Error(`Unable to load GodForge language ${r}.`);
+  me.set(r, await e.json());
 }
-function P(s) {
+function G(r) {
   var n, a, o, l;
-  const e = b(), t = (a = (n = e == null ? void 0 : e.settings) == null ? void 0 : n.get) == null ? void 0 : a.call(n, "darkis-godforge", "language");
-  if (typeof t == "string" && t !== "auto") {
-    const c = Me(ue.get(t), s);
+  const t = v(), e = (a = (n = t == null ? void 0 : t.settings) == null ? void 0 : n.get) == null ? void 0 : a.call(n, "darkis-godforge", "language");
+  if (typeof e == "string" && e !== "auto") {
+    const c = qe(me.get(e), r);
     if (typeof c == "string") return c;
   }
-  const i = (l = (o = e == null ? void 0 : e.i18n) == null ? void 0 : o.localize) == null ? void 0 : l.call(o, s);
-  if (i && i !== s) return i;
-  const r = Me(Te, s);
-  return typeof r == "string" ? r : s;
+  const i = (l = (o = t == null ? void 0 : t.i18n) == null ? void 0 : o.localize) == null ? void 0 : l.call(o, r);
+  if (i && i !== r) return i;
+  const s = qe(Re, r);
+  return typeof s == "string" ? s : r;
 }
-function _() {
-  return Object.fromEntries(Object.keys(Te.DARKIS_GODFORGE.UI).map((s) => [s, P(`DARKIS_GODFORGE.UI.${s}`)]));
+function D() {
+  return Object.fromEntries(Object.keys(Re.DARKIS_GODFORGE.UI).map((r) => [r, G(`DARKIS_GODFORGE.UI.${r}`)]));
 }
-function Me(s, e) {
-  return e.split(".").reduce((t, i) => t && typeof t == "object" ? t[i] : void 0, s);
+function qe(r, t) {
+  return t.split(".").reduce((e, i) => e && typeof e == "object" ? e[i] : void 0, r);
 }
-function v() {
-  if (!De())
-    throw Oe(), new Error("GodForge: GM only.");
+function w() {
+  if (!Ce())
+    throw Ne(), new Error("GodForge: GM only.");
 }
-function De() {
-  var s, e;
-  return ((e = (s = b()) == null ? void 0 : s.user) == null ? void 0 : e.isGM) === !0;
+function Ce() {
+  var r, t;
+  return ((t = (r = v()) == null ? void 0 : r.user) == null ? void 0 : t.isGM) === !0;
 }
-function Oe() {
-  var s, e, t;
-  (t = (e = (s = k()) == null ? void 0 : s.notifications) == null ? void 0 : e.warn) == null || t.call(e, P("DARKIS_GODFORGE.ERROR.GM_ONLY"));
+function Ne() {
+  var r, t, e;
+  (e = (t = (r = L()) == null ? void 0 : r.notifications) == null ? void 0 : t.warn) == null || e.call(t, G("DARKIS_GODFORGE.ERROR.GM_ONLY"));
 }
-function M(s = !1) {
-  var r, n, a;
-  const e = (r = b()) == null ? void 0 : r.user, t = e == null ? void 0 : e.character, i = (n = t == null ? void 0 : t.flags) == null ? void 0 : n["darkis-godforge"];
+function F(r = !1) {
+  var s, n, a;
+  const t = (s = v()) == null ? void 0 : s.user, e = t == null ? void 0 : t.character, i = (n = e == null ? void 0 : e.flags) == null ? void 0 : n["darkis-godforge"];
   return {
-    isGM: (e == null ? void 0 : e.isGM) === !0,
-    isTrusted: (e == null ? void 0 : e.isTrusted) === !0 || typeof (e == null ? void 0 : e.role) == "number" && e.role >= 2,
-    selection: s,
+    isGM: (t == null ? void 0 : t.isGM) === !0,
+    isTrusted: (t == null ? void 0 : t.isTrusted) === !0 || typeof (t == null ? void 0 : t.role) == "number" && t.role >= 2,
+    selection: r,
     actorDeityId: typeof (i == null ? void 0 : i.deityId) == "string" ? i.deityId : void 0,
-    ownsActor: !!(e && ((a = t == null ? void 0 : t.testUserPermission) == null ? void 0 : a.call(t, e, "OWNER")) === !0)
+    ownsActor: !!(t && ((a = e == null ? void 0 : e.testUserPermission) == null ? void 0 : a.call(e, t, "OWNER")) === !0)
   };
 }
-class it {
-  constructor(e, t) {
-    g(this, "catalogCache", null);
-    this.deities = e, this.adapters = t;
+class ot {
+  constructor(t, e) {
+    b(this, "catalogCache", null);
+    this.deities = t, this.adapters = e;
   }
-  async getSelectableDeities(e) {
-    var p, m, E, S;
-    const t = this.deities.list(), i = e.systemId ?? ((m = (p = b()) == null ? void 0 : p.system) == null ? void 0 : m.id) ?? "", r = M(!0), n = { classId: e.classId, level: e.level, region: e.region, pantheonFilter: e.pantheonFilter, systemId: i, catalogContext: e.catalogContext, viewer: r }, a = JSON.stringify([t.map((f) => [f.id, f.revision]), n]);
-    if (((E = this.catalogCache) == null ? void 0 : E.key) === a) return this.catalogCache.result;
-    const o = await (((S = this.adapters.tryGet(i)) == null ? void 0 : S.listOfficialDeities()) ?? Promise.resolve([])), l = e.catalogContext ?? "characterBuilder", c = new Set(t.filter((f) => f.replacement.sourceUuid && (f.replacement.mode === "hide" || f.replacement.mode === "replace") && (!f.replacement.contexts.length || f.replacement.contexts.includes(l))).map((f) => f.replacement.sourceUuid)), d = vt(t, e, /* @__PURE__ */ new Set(), r), h = o.filter((f) => !f.sourceUuid || !c.has(f.sourceUuid)), u = [...d, ...h];
-    return this.catalogCache = { key: a, result: u }, u;
+  async getSelectableDeities(t) {
+    var d, m, g, I;
+    const e = this.deities.list(), i = t.systemId ?? ((m = (d = v()) == null ? void 0 : d.system) == null ? void 0 : m.id) ?? "", s = F(!0), n = { classId: t.classId, level: t.level, region: t.region, pantheonFilter: t.pantheonFilter, systemId: i, catalogContext: t.catalogContext, viewer: s }, a = JSON.stringify([e.map((f) => [f.id, f.revision]), n]);
+    if (((g = this.catalogCache) == null ? void 0 : g.key) === a) return this.catalogCache.result;
+    const o = await (((I = this.adapters.tryGet(i)) == null ? void 0 : I.listOfficialDeities()) ?? Promise.resolve([])), l = t.catalogContext ?? "characterBuilder", c = new Set(e.filter((f) => f.replacement.sourceUuid && (f.replacement.mode === "hide" || f.replacement.mode === "replace") && (!f.replacement.contexts.length || f.replacement.contexts.includes(l))).map((f) => f.replacement.sourceUuid)), p = Ot(e, t, /* @__PURE__ */ new Set(), s), u = o.filter((f) => !f.sourceUuid || !c.has(f.sourceUuid)), h = [...p, ...u];
+    return this.catalogCache = { key: a, result: h }, h;
   }
-  exportDeities(e) {
-    return v(), Ut(this.deities.list(), e);
+  exportDeities(t) {
+    return w(), Bt(this.deities.list(), t);
   }
-  importDeities(e) {
-    v();
-    const t = Ze(e);
-    for (const i of t) this.deities.save(i);
-    return this.catalogCache = null, t.length;
+  async importDeities(t) {
+    w();
+    const e = rt(t);
+    for (const i of e) this.deities.save(i);
+    return await this.deities.flushPersistence(), this.catalogCache = null, e.length;
   }
-  drawRandomDeity(e) {
-    const t = M(!0);
-    return Ae(this.deities.list().filter((i) => $(i, t)).map((i) => ({ id: i.id, label: i.name, weight: 1 })), e);
+  drawRandomDeity(t) {
+    const e = F(!0);
+    return Oe(this.deities.list().filter((i) => i.kind !== "lore" && j(i, e)).map((i) => ({ id: i.id, label: i.name, weight: 1 })), t);
   }
-  getAdapterCapabilities(e) {
-    return this.adapters.get(e).capabilities;
+  getAdapterCapabilities(t) {
+    return this.adapters.get(t).capabilities;
   }
-  isDeitySelectableByPlayer(e) {
-    const t = this.deities.get(e);
-    return !!(t && $(t, { isGM: !1, selection: !0 }));
+  isDeitySelectableByPlayer(t) {
+    const e = this.deities.get(t);
+    return !!(e && e.kind !== "lore" && j(e, { isGM: !1, selection: !0 }));
   }
-  async materializeDeity(e, t, i) {
-    v();
-    const r = this.deities.get(e);
-    if (!r) throw new Error(`Unknown deity: ${e}`);
-    return this.adapters.get(t).materialize(r, i);
+  async materializeDeity(t, e, i) {
+    w();
+    const s = this.deities.get(t);
+    if (!s) throw new Error(`Unknown deity: ${t}`);
+    return this.adapters.get(e).materialize(s, i);
   }
-  getDeity(e) {
-    const t = this.deities.get(e);
-    if (!t) return null;
-    const i = M();
-    return i.isGM ? t : W(t, i);
+  getDeity(t) {
+    const e = this.deities.get(t);
+    if (!e) return null;
+    const i = F();
+    return i.isGM ? e : z(e, i);
   }
-  getActorDeity(e) {
+  getActorDeity(t) {
     var n;
-    this.requireActorOwner(e);
-    const t = (n = e.flags) == null ? void 0 : n["darkis-godforge"];
-    if (!t || typeof t != "object" || !("deityId" in t) || typeof t.deityId != "string") return null;
-    const i = this.deities.get(t.deityId);
+    this.requireActorOwner(t);
+    const e = (n = t.flags) == null ? void 0 : n["darkis-godforge"];
+    if (!e || typeof e != "object" || !("deityId" in e) || typeof e.deityId != "string") return null;
+    const i = this.deities.get(e.deityId);
     if (!i) return null;
-    const r = { ...M(), actorDeityId: t.deityId, ownsActor: !0 };
-    return r.isGM ? i : W(i, r);
+    const s = { ...F(), actorDeityId: e.deityId, ownsActor: !0 };
+    return s.isGM ? i : z(i, s);
   }
-  getCharacterWidgetData(e) {
+  getCharacterWidgetData(t) {
     var o;
-    this.requireActorOwner(e);
-    const t = (o = e.flags) == null ? void 0 : o["darkis-godforge"], i = t && typeof t == "object" && "deityId" in t && "grants" in t && "usages" in t ? t : null, r = i ? this.deities.get(i.deityId) : null;
-    if (!r || !i) return ne(null, null);
-    const n = M();
-    if (n.isGM) return ne(r, i);
-    const a = W(r, { ...n, actorDeityId: r.id, ownsActor: !0 });
-    return ne(a, { ...i, grants: [] });
+    this.requireActorOwner(t);
+    const e = (o = t.flags) == null ? void 0 : o["darkis-godforge"], i = e && typeof e == "object" && "deityId" in e && "grants" in e && "usages" in e ? e : null, s = i ? this.deities.get(i.deityId) : null;
+    if (!s || !i) return le(null, null);
+    const n = F();
+    if (n.isGM) return le(s, i);
+    const a = z(s, { ...n, actorDeityId: s.id, ownsActor: !0 });
+    return le(a, { ...i, grants: [] });
   }
-  getGrantChoices(e, t) {
+  getGrantChoices(t, e) {
     var i;
-    return v(), ((i = this.deities.get(e)) == null ? void 0 : i.grantGroups) ?? null;
+    return w(), ((i = this.deities.get(t)) == null ? void 0 : i.grantGroups) ?? null;
   }
-  getClassGrants(e, t, i = []) {
-    v();
-    const r = this.deities.get(e);
-    if (!r) throw new Error(`Unknown deity: ${e}`);
-    return Rt(r, t, i);
+  getClassGrants(t, e, i = []) {
+    w();
+    const s = this.deities.get(t);
+    if (!s) throw new Error(`Unknown deity: ${t}`);
+    return Mt(s, e, i);
   }
-  buildClassCoupling(e, t, i, r = []) {
-    return this.adapters.get(i).buildClassCoupling(this.getClassGrants(e, t, r));
+  buildClassCoupling(t, e, i, s = []) {
+    return this.adapters.get(i).buildClassCoupling(this.getClassGrants(t, e, s));
   }
-  async assignDeity(e, t, i = {}) {
-    this.requireActorOwner(e);
-    const r = this.deities.get(t);
-    if (!r || !$(r, M(!0))) throw new Error("Deity is not available for assignment.");
-    const n = Object.entries(i).map(([l, c]) => ({ groupId: l, refs: c })), a = r.grantGroups.flatMap((l) => z(l, n)), o = Object.fromEntries(r.abilities.filter((l) => l.uses).map((l) => [l.id, { used: 0, max: l.uses.max, lastResetAt: Date.now(), reset: l.uses.reset }]));
-    await e.update({ flags: { "darkis-godforge": { deityId: t, grants: a, usages: o } } }), await this.synchronizeActorDeityItem(e, r);
+  async assignDeity(t, e, i = {}) {
+    this.requireActorOwner(t);
+    const s = this.deities.get(e);
+    if (!s || s.kind === "lore" || !j(s, F(!0))) throw new Error("Deity is not available for assignment.");
+    const n = Object.entries(i).map(([l, c]) => ({ groupId: l, refs: c })), a = s.grantGroups.flatMap((l) => J(l, n)), o = Object.fromEntries(s.abilities.filter((l) => l.uses).map((l) => [l.id, { used: 0, max: l.uses.max, lastResetAt: Date.now(), reset: l.uses.reset }]));
+    await t.update({ flags: { "darkis-godforge": { deityId: e, grants: a, usages: o } } }), await this.synchronizeActorDeityItem(t, s);
   }
-  async removeDeity(e) {
-    this.requireActorOwner(e), e.unsetFlag ? await Promise.all(["deityId", "grants", "usages"].map((t) => e.unsetFlag("darkis-godforge", t))) : await e.update({ flags: { "darkis-godforge": null } }), await this.removeActorDeityItems(e);
+  async removeDeity(t) {
+    this.requireActorOwner(t), t.unsetFlag ? await Promise.all(["deityId", "grants", "usages"].map((e) => t.unsetFlag("darkis-godforge", e))) : await t.update({ flags: { "darkis-godforge": null } }), await this.removeActorDeityItems(t);
   }
-  async resetActorUsages(e, t) {
-    this.requireActorOwner(e);
-    const i = this.readState(e), r = Date.now(), n = Object.fromEntries(Object.entries(i.usages).map(([a, o]) => o.reset === t ? [a, At(o, r)] : [a, o]));
-    await e.update({ flags: { "darkis-godforge": { ...i, usages: n } } });
+  async resetActorUsages(t, e) {
+    this.requireActorOwner(t);
+    const i = this.readState(t), s = Date.now(), n = Object.fromEntries(Object.entries(i.usages).map(([a, o]) => o.reset === e ? [a, Ct(o, s)] : [a, o]));
+    await t.update({ flags: { "darkis-godforge": { ...i, usages: n } } });
   }
-  async activateAbility(e, t, i = {}) {
-    v();
-    const r = this.readState(e), n = this.deities.get(r.deityId), a = n == null ? void 0 : n.abilities.find((d) => d.id === t);
+  async activateAbility(t, e, i = {}) {
+    w();
+    const s = this.readState(t), n = this.deities.get(s.deityId), a = n == null ? void 0 : n.abilities.find((p) => p.id === e);
     if (!a) throw new Error("Ability is not available for this actor.");
-    const o = r.usages[t];
-    if (o && !Ke(o)) throw new Error("No uses remaining.");
-    const l = o ? { ...r.usages, [t]: wt(o) } : r.usages, c = { id: e.id, modifiers: {}, conditions: [] };
-    await Nt(a, { actor: c, target: i.target, facts: i.facts ?? { actor: { level: 0 }, target: {} }, rollDice: i.rollDice }), await e.update({ flags: { "darkis-godforge": { ...r, usages: l } } });
+    const o = s.usages[e];
+    if (o && !et(o)) throw new Error("No uses remaining.");
+    const l = o ? { ...s.usages, [e]: Rt(o) } : s.usages, c = { id: t.id, modifiers: {}, conditions: [] };
+    await Gt(a, { actor: c, target: i.target, facts: i.facts ?? { actor: { level: 0 }, target: {} }, rollDice: i.rollDice }), await t.update({ flags: { "darkis-godforge": { ...s, usages: l } } });
   }
-  getReplacementFor(e) {
-    return v(), this.deities.list().find((t) => t.replacement.sourceUuid === e && t.replacement.mode === "replace") ?? null;
+  getReplacementFor(t) {
+    return w(), this.deities.list().find((e) => e.replacement.sourceUuid === t && e.replacement.mode === "replace") ?? null;
   }
-  isSourceHidden(e, t) {
-    return v(), this.deities.list().some((i) => i.replacement.sourceUuid === e && i.replacement.mode === "hide" && i.replacement.contexts.includes(t));
+  isSourceHidden(t, e) {
+    return w(), this.deities.list().some((i) => i.replacement.sourceUuid === t && i.replacement.mode === "hide" && i.replacement.contexts.includes(e));
   }
-  registerAdapter(e) {
-    v(), this.adapters.register(e);
+  registerAdapter(t) {
+    w(), this.adapters.register(t);
   }
-  async synchronizeActorDeityItem(e, t) {
+  async synchronizeActorDeityItem(t, e) {
     var l, c;
-    const i = (c = (l = b()) == null ? void 0 : l.system) == null ? void 0 : c.id, r = i ? this.adapters.tryGet(i) : null;
-    if (!r || !e.createEmbeddedDocuments) return;
-    const n = this.actorDeityItems(e), a = n[0];
-    await r.materialize(t, { createItem: async (d) => {
+    const i = (c = (l = v()) == null ? void 0 : l.system) == null ? void 0 : c.id, s = i ? this.adapters.tryGet(i) : null;
+    if (!s || !t.createEmbeddedDocuments) return;
+    const n = this.actorDeityItems(t), a = n[0];
+    await s.materialize(e, { createItem: async (p) => {
       if (a != null && a.update)
-        return await a.update(d), { uuid: a.uuid ?? `Actor.${e.id}.Item.${a.id}` };
-      const [h] = await e.createEmbeddedDocuments("Item", [d]);
-      if (!h) throw new Error("The system did not create the deity item.");
-      return { uuid: h.uuid ?? `Actor.${e.id}.Item.${h.id}` };
-    } }) && n.length > 1 && e.deleteEmbeddedDocuments && await e.deleteEmbeddedDocuments("Item", n.slice(1).map((d) => d.id));
+        return await a.update(p), { uuid: a.uuid ?? `Actor.${t.id}.Item.${a.id}` };
+      const [u] = await t.createEmbeddedDocuments("Item", [p]);
+      if (!u) throw new Error("The system did not create the deity item.");
+      return { uuid: u.uuid ?? `Actor.${t.id}.Item.${u.id}` };
+    } }) && n.length > 1 && t.deleteEmbeddedDocuments && await t.deleteEmbeddedDocuments("Item", n.slice(1).map((p) => p.id));
   }
-  async removeActorDeityItems(e) {
-    const t = this.actorDeityItems(e).map((i) => i.id);
-    t.length && e.deleteEmbeddedDocuments && await e.deleteEmbeddedDocuments("Item", t);
+  async removeActorDeityItems(t) {
+    const e = this.actorDeityItems(t).map((i) => i.id);
+    e.length && t.deleteEmbeddedDocuments && await t.deleteEmbeddedDocuments("Item", e);
   }
-  actorDeityItems(e) {
-    var t;
-    return (((t = e.items) == null ? void 0 : t.contents) ?? []).filter((i) => {
+  actorDeityItems(t) {
+    var e;
+    return (((e = t.items) == null ? void 0 : e.contents) ?? []).filter((i) => {
       var n;
-      const r = (n = i.flags) == null ? void 0 : n["darkis-godforge"];
-      return !!(r && typeof r == "object" && "definitionUuid" in r);
+      const s = (n = i.flags) == null ? void 0 : n["darkis-godforge"];
+      return !!(s && typeof s == "object" && "definitionUuid" in s);
     });
   }
-  readState(e) {
+  readState(t) {
     var i;
-    const t = (i = e.flags) == null ? void 0 : i["darkis-godforge"];
-    if (!t || typeof t != "object" || !("deityId" in t) || typeof t.deityId != "string" || !("usages" in t) || typeof t.usages != "object") throw new Error("Actor has no assigned deity.");
-    return t;
+    const e = (i = t.flags) == null ? void 0 : i["darkis-godforge"];
+    if (!e || typeof e != "object" || !("deityId" in e) || typeof e.deityId != "string" || !("usages" in e) || typeof e.usages != "object") throw new Error("Actor has no assigned deity.");
+    return e;
   }
-  requireActorOwner(e) {
-    var i, r;
-    const t = b();
-    if (((i = t == null ? void 0 : t.user) == null ? void 0 : i.isGM) !== !0 && !(t != null && t.user && ((r = e.testUserPermission) == null ? void 0 : r.call(e, t.user, "OWNER")) === !0))
+  requireActorOwner(t) {
+    var i, s;
+    const e = v();
+    if (((i = e == null ? void 0 : e.user) == null ? void 0 : i.isGM) !== !0 && !(e != null && e.user && ((s = t.testUserPermission) == null ? void 0 : s.call(t, e.user, "OWNER")) === !0))
       throw new Error("GodForge: Actor owner or GM required.");
   }
 }
-function Ue(s) {
-  return s.replace(/[&<>\"']/g, (e) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[e] ?? e);
+function He(r) {
+  return r.replace(/[&<>\"']/g, (t) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[t] ?? t);
 }
-function U(s) {
-  if (!s) return "icons/svg/eye.svg";
-  const e = s.trim();
-  return /^(?:javascript|data|vbscript):/i.test(e) || /^\/\//.test(e) || /[\u0000-\u001f]/.test(e) ? "icons/svg/eye.svg" : e;
+function V(r) {
+  if (!r) return "icons/svg/eye.svg";
+  const t = r.trim();
+  return /^(?:javascript|data|vbscript):/i.test(t) || /^\/\//.test(t) || /[\u0000-\u001f]/.test(t) ? "icons/svg/eye.svg" : t;
 }
-function qt(s) {
-  const e = [];
-  s.name.trim() || e.push({ level: "error", field: "name", message: "Name is required." }), s.title.trim() || e.push({ level: "warning", field: "title", message: "Title is empty." }), s.description.trim() || e.push({ level: "warning", field: "description", message: "Description is empty." });
-  for (const t of s.passiveBonuses)
-    (!t.name.trim() || !t.selector.trim()) && e.push({ level: "error", field: `bonus.${t.id}`, message: "Bonus name and selector are required." }), typeof t.value == "string" && !we(t.value) && e.push({ level: "error", field: `bonus.${t.id}.value`, message: "Bonus formula is invalid." });
-  for (const t of s.abilities)
-    t.name.trim() || e.push({ level: "error", field: `ability.${t.id}`, message: "Ability name is required." }), !t.timing && t.actionCost === void 0 && e.push({ level: "warning", field: `ability.${t.id}.timing`, message: "Ability timing is incomplete." });
-  return e;
+function Kt(r) {
+  const t = [];
+  r.name.trim() || t.push({ level: "error", field: "name", message: "Name is required." }), r.title.trim() || t.push({ level: "warning", field: "title", message: "Title is empty." }), r.description.trim() || t.push({ level: "warning", field: "description", message: "Description is empty." });
+  for (const e of r.passiveBonuses)
+    (!e.name.trim() || !e.selector.trim()) && t.push({ level: "error", field: `bonus.${e.id}`, message: "Bonus name and selector are required." }), typeof e.value == "string" && !_e(e.value) && t.push({ level: "error", field: `bonus.${e.id}.value`, message: "Bonus formula is invalid." });
+  for (const e of r.abilities)
+    e.name.trim() || t.push({ level: "error", field: `ability.${e.id}`, message: "Ability name is required." }), !e.timing && e.actionCost === void 0 && t.push({ level: "warning", field: `ability.${e.id}.timing`, message: "Ability timing is incomplete." });
+  return t;
 }
-function Z() {
+function K() {
   var i;
-  const s = globalThis, e = typeof foundry < "u" ? foundry : s.foundry, t = (i = e == null ? void 0 : e.applications) == null ? void 0 : i.api;
-  if (t != null && t.ApplicationV2 && t.HandlebarsApplicationMixin) return t.HandlebarsApplicationMixin(t.ApplicationV2);
-  if (Ie()) {
-    const r = "Darkis GodForge | Foundry ApplicationV2 is unavailable while loading the module.";
-    return console.error(r), class {
+  const r = globalThis, t = typeof foundry < "u" ? foundry : r.foundry, e = (i = t == null ? void 0 : t.applications) == null ? void 0 : i.api;
+  if (e != null && e.ApplicationV2 && e.HandlebarsApplicationMixin) return e.HandlebarsApplicationMixin(e.ApplicationV2);
+  if (we()) {
+    const s = "Darkis GodForge | Foundry ApplicationV2 is unavailable while loading the module.";
+    return console.error(s), class {
       render() {
-        return Promise.reject(new Error(r));
+        return Promise.reject(new Error(s));
       }
     };
   }
@@ -975,142 +983,142 @@ function Z() {
     }
   };
 }
-function F() {
-  const s = Z();
-  return class extends s {
-    render(e) {
-      return De() ? super.render(e) : (Oe(), Promise.resolve(this));
+function q() {
+  const r = K();
+  return class extends r {
+    render(t) {
+      return Ce() ? super.render(t) : (Ne(), Promise.resolve(this));
     }
   };
 }
-function x(s, e) {
-  var t, i, r;
-  console.error(`Darkis GodForge | ${s}`, e), (r = (i = (t = k()) == null ? void 0 : t.notifications) == null ? void 0 : i.error) == null || r.call(i, P("DARKIS_GODFORGE.ERROR.ACTION_FAILED"));
+function x(r, t) {
+  var e, i, s;
+  console.error(`Darkis GodForge | ${r}`, t), (s = (i = (e = L()) == null ? void 0 : e.notifications) == null ? void 0 : i.error) == null || s.call(i, G("DARKIS_GODFORGE.ERROR.ACTION_FAILED"));
 }
-function ee(s, e = []) {
-  const t = s.grants.flatMap((r) => {
-    if (!("mode" in r)) return [];
-    const n = s.mode === "any" ? [...e, { groupId: s.id, optionId: r.id }] : e;
-    return ee(r, n);
+function se(r, t = []) {
+  const e = r.grants.flatMap((s) => {
+    if (!("mode" in s)) return [];
+    const n = r.mode === "any" ? [...t, { groupId: r.id, optionId: s.id }] : t;
+    return se(s, n);
   });
-  if (s.mode !== "any") return t;
-  const i = s.grants.map((r) => {
+  if (r.mode !== "any") return e;
+  const i = r.grants.map((s) => {
     var n;
-    return "mode" in r ? { id: r.id, label: r.label || r.id } : { id: r.ref, label: ((n = r.overrides) == null ? void 0 : n.name) || r.ref };
+    return "mode" in s ? { id: s.id, label: s.label || s.id } : { id: s.ref, label: ((n = s.overrides) == null ? void 0 : n.name) || s.ref };
   });
-  return [{ id: s.id, label: s.label || s.id, pick: s.pick ?? 1, options: i, requirements: e }, ...t];
+  return [{ id: r.id, label: r.label || r.id, pick: r.pick ?? 1, options: i, requirements: t }, ...e];
 }
-function Fe(s) {
-  return s.some((e) => ee(e).length > 0);
+function Be(r) {
+  return r.some((t) => se(t).length > 0);
 }
-class he extends Z() {
-  constructor(t, i, r, n) {
+class fe extends K() {
+  constructor(e, i, s, n) {
     super();
-    g(this, "groups", []);
-    g(this, "tokens", /* @__PURE__ */ new Map());
-    g(this, "error", "");
-    this.deity = t, this.actor = i, this.socketRouter = r, this.onAssigned = n;
+    b(this, "groups", []);
+    b(this, "tokens", /* @__PURE__ */ new Map());
+    b(this, "error", "");
+    this.deity = e, this.actor = i, this.socketRouter = s, this.onAssigned = n;
   }
   async _prepareContext() {
     this.tokens.clear();
-    const t = this.deity.grantGroups.flatMap((n) => ee(n)), i = /* @__PURE__ */ new Map(), r = t.map((n, a) => n.options.map((o, l) => {
+    const e = this.deity.grantGroups.flatMap((n) => se(n)), i = /* @__PURE__ */ new Map(), s = e.map((n, a) => n.options.map((o, l) => {
       const c = `${a}-${l}-${crypto.randomUUID()}`;
       return this.tokens.set(c, o.id), i.set(`${n.id}\0${o.id}`, c), { token: c, label: o.label };
     }));
-    return this.groups = t.map((n, a) => ({
+    return this.groups = e.map((n, a) => ({
       id: n.id,
       label: n.label,
       pick: n.pick,
       inputType: n.pick === 1 ? "radio" : "checkbox",
-      options: r[a] ?? [],
+      options: s[a] ?? [],
       requirements: n.requirements.flatMap((o) => {
-        const l = t.findIndex((d) => d.id === o.groupId), c = i.get(`${o.groupId}\0${o.optionId}`);
+        const l = e.findIndex((p) => p.id === o.groupId), c = i.get(`${o.groupId}\0${o.optionId}`);
         return l >= 0 && c ? [{ name: `choice-${l}`, token: c }] : [];
       })
-    })), { ui: _(), deityName: this.deity.name, groups: this.groups, error: this.error };
+    })), { ui: D(), deityName: this.deity.name, groups: this.groups, error: this.error };
   }
   _onRender() {
-    var i, r, n, a, o, l;
-    (r = (i = this.element) == null ? void 0 : i.querySelector("form")) == null || r.addEventListener("submit", (c) => {
-      var u;
+    var i, s, n, a, o, l;
+    (s = (i = this.element) == null ? void 0 : i.querySelector("form")) == null || s.addEventListener("submit", (c) => {
+      var h;
       c.preventDefault();
-      const d = c.currentTarget, h = {};
-      for (const [p, m] of this.groups.entries()) {
-        if ((u = d.querySelector(`[data-choice-group='${p}']`)) != null && u.hidden) continue;
-        const E = [...d.querySelectorAll(`[name='choice-${p}']:checked`)].flatMap((S) => {
-          const f = this.tokens.get(S.value);
+      const p = c.currentTarget, u = {};
+      for (const [d, m] of this.groups.entries()) {
+        if ((h = p.querySelector(`[data-choice-group='${d}']`)) != null && h.hidden) continue;
+        const g = [...p.querySelectorAll(`[name='choice-${d}']:checked`)].flatMap((I) => {
+          const f = this.tokens.get(I.value);
           return f ? [f] : [];
         });
-        if (E.length !== m.pick) {
-          this.error = `${m.label}: ${(_().PICK_EXACTLY ?? "Choose exactly {count} option(s).").replace("{count}", String(m.pick))}`, this.render(!0);
+        if (g.length !== m.pick) {
+          this.error = `${m.label}: ${(D().PICK_EXACTLY ?? "Choose exactly {count} option(s).").replace("{count}", String(m.pick))}`, this.render(!0);
           return;
         }
-        h[m.id] = E;
+        u[m.id] = g;
       }
-      this.socketRouter.assign({ actorId: this.actor.id, deityId: this.deity.id, choices: h }).then(() => {
-        var p;
-        this.onAssigned(), (p = this.close) == null || p.call(this);
-      }).catch((p) => {
-        this.error = _().ASSIGNMENT_FAILED ?? "The deity could not be assigned.", x("Grant choice assignment failed.", p), this.render(!0);
+      this.socketRouter.assign({ actorId: this.actor.id, deityId: this.deity.id, choices: u }).then(() => {
+        var d;
+        this.onAssigned(), (d = this.close) == null || d.call(this);
+      }).catch((d) => {
+        this.error = D().ASSIGNMENT_FAILED ?? "The deity could not be assigned.", x("Grant choice assignment failed.", d), this.render(!0);
       });
     });
-    const t = () => {
+    const e = () => {
       var c;
-      (c = this.element) == null || c.querySelectorAll("[data-choice-group]").forEach((d) => {
-        const u = [...d.querySelectorAll("[data-choice-requirement]")].every((p) => {
-          var S, f;
-          const m = p.dataset.name ?? "", E = p.dataset.token ?? "";
-          return ((f = (S = this.element) == null ? void 0 : S.querySelector(`[name='${m}'][value='${E}']`)) == null ? void 0 : f.checked) === !0;
+      (c = this.element) == null || c.querySelectorAll("[data-choice-group]").forEach((p) => {
+        const h = [...p.querySelectorAll("[data-choice-requirement]")].every((d) => {
+          var I, f;
+          const m = d.dataset.name ?? "", g = d.dataset.token ?? "";
+          return ((f = (I = this.element) == null ? void 0 : I.querySelector(`[name='${m}'][value='${g}']`)) == null ? void 0 : f.checked) === !0;
         });
-        d.hidden = !u, d.querySelectorAll("input").forEach((p) => {
-          p.disabled = !u, u || (p.checked = !1);
+        p.hidden = !h, p.querySelectorAll("input").forEach((d) => {
+          d.disabled = !h, h || (d.checked = !1);
         });
       });
     };
-    (a = (n = this.element) == null ? void 0 : n.querySelector("form")) == null || a.addEventListener("change", t), t(), (l = (o = this.element) == null ? void 0 : o.querySelector("[data-action='cancel']")) == null || l.addEventListener("click", () => {
+    (a = (n = this.element) == null ? void 0 : n.querySelector("form")) == null || a.addEventListener("change", e), e(), (l = (o = this.element) == null ? void 0 : o.querySelector("[data-action='cancel']")) == null || l.addEventListener("click", () => {
       var c;
       return void ((c = this.close) == null ? void 0 : c.call(this));
     });
   }
 }
-g(he, "DEFAULT_OPTIONS", { id: "darkis-godforge-grant-choices", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.CHOOSE_GRANTS", resizable: !0 }, position: { width: 620, height: 680 } }), g(he, "PARTS", { main: { template: "modules/darkis-godforge/templates/grant-choice-dialog.hbs" } });
-class H extends Z() {
-  constructor(t, i, r, n, a, o) {
+b(fe, "DEFAULT_OPTIONS", { id: "darkis-godforge-grant-choices", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.CHOOSE_GRANTS", resizable: !0 }, position: { width: 620, height: 680 } }), b(fe, "PARTS", { main: { template: "modules/darkis-godforge/templates/grant-choice-dialog.hbs" } });
+class B extends K() {
+  constructor(e, i, s, n, a, o) {
     super();
-    g(this, "searchTerm", "");
-    g(this, "selectedDomain", "");
-    this.deityService = t, this.preview = i, this.api = r, this.socketRouter = n, this.actor = a, this.viewerOverride = o;
+    b(this, "searchTerm", "");
+    b(this, "selectedDomain", "");
+    this.deityService = e, this.preview = i, this.api = s, this.socketRouter = n, this.actor = a, this.viewerOverride = o;
   }
   async _prepareContext() {
-    var d, h, u, p, m, E, S;
-    const t = ((d = this.preview) == null ? void 0 : d.viewer) ?? this.viewerOverride ?? M(!0), i = this.preview ? [{ ...this.preview.deity, status: "published" }] : this.deityService.list(), r = (p = (u = (h = this.actor) == null ? void 0 : h.flags) == null ? void 0 : u["darkis-godforge"]) == null ? void 0 : p.deityId, n = (m = b()) == null ? void 0 : m.user, a = !!(this.actor && n && ((S = (E = this.actor).testUserPermission) == null ? void 0 : S.call(E, n, "OWNER")) === !0), o = (f) => {
-      var y, I, A, O, R, w;
-      return { ...f, image: U(f.image), imageFit: ((I = (y = f.imagePresentation) == null ? void 0 : y.image) == null ? void 0 : I.fit) === "contain" ? "contain" : "cover", imagePosition: `${((O = (A = f.imagePresentation) == null ? void 0 : A.image) == null ? void 0 : O.focusX) ?? 50}% ${((w = (R = f.imagePresentation) == null ? void 0 : R.image) == null ? void 0 : w.focusY) ?? 25}%` };
+    var p, u, h, d, m, g, I;
+    const e = ((p = this.preview) == null ? void 0 : p.viewer) ?? this.viewerOverride ?? F(!0), i = this.preview ? [{ ...this.preview.deity, status: "published" }] : this.deityService.list(), s = (d = (h = (u = this.actor) == null ? void 0 : u.flags) == null ? void 0 : h["darkis-godforge"]) == null ? void 0 : d.deityId, n = (m = v()) == null ? void 0 : m.user, a = !!(this.actor && n && ((I = (g = this.actor).testUserPermission) == null ? void 0 : I.call(g, n, "OWNER")) === !0), o = (f) => {
+      var y, E, S, T, O, A;
+      return { ...f, image: V(f.image), imageFit: ((E = (y = f.imagePresentation) == null ? void 0 : y.image) == null ? void 0 : E.fit) === "contain" ? "contain" : "cover", imagePosition: `${((T = (S = f.imagePresentation) == null ? void 0 : S.image) == null ? void 0 : T.focusX) ?? 50}% ${((A = (O = f.imagePresentation) == null ? void 0 : O.image) == null ? void 0 : A.focusY) ?? 25}%` };
     }, l = i.flatMap((f) => {
-      const y = Fe(f.grantGroups);
-      if (t.isGM) return [{ ...o(f), selected: f.id === r, canSelect: !1, requiresChoices: y }];
-      const I = W(f, t);
-      return I ? [{ ...o(I), selected: f.id === r, canSelect: !!(this.api && this.socketRouter && this.actor && !this.preview && !this.viewerOverride && (t.ownsActor || a)), requiresChoices: y }] : [];
-    }), c = l.filter((f) => {
+      const y = Be(f.grantGroups), E = f.kind === "lore";
+      if (e.isGM) return [{ ...o(f), lore: E, selected: f.id === s, canSelect: !1, requiresChoices: y }];
+      const S = z(f, e);
+      return S ? [{ ...o(S), lore: E, selected: f.id === s, canSelect: !E && !!(this.api && this.socketRouter && this.actor && !this.preview && !this.viewerOverride && (e.ownsActor || a)), requiresChoices: y }] : [];
+    }).sort((f, y) => Number(y.lore) - Number(f.lore) || f.name.localeCompare(y.name)), c = l.filter((f) => {
       var y;
       return (!this.searchTerm || `${f.name} ${f.title ?? ""}`.toLocaleLowerCase().includes(this.searchTerm)) && (!this.selectedDomain || ((y = f.domains) == null ? void 0 : y.includes(this.selectedDomain)));
     });
-    return { ui: _(), deities: c, domains: [...new Set(l.flatMap((f) => f.domains ?? []))].sort(), searchTerm: this.searchTerm, selectedDomain: this.selectedDomain, isGM: t.isGM, isPreview: !!(this.preview || this.viewerOverride) };
+    return { ui: D(), deities: c, domains: [...new Set(l.flatMap((f) => f.domains ?? []))].sort(), searchTerm: this.searchTerm, selectedDomain: this.selectedDomain, isGM: e.isGM, isPreview: !!(this.preview || this.viewerOverride) };
   }
   _onRender() {
-    const t = this.element;
-    if (!t) return;
-    const i = t.querySelector("[data-search]"), r = t.querySelector("[data-filter]");
-    i && (i.value = this.searchTerm), r && (r.value = this.selectedDomain), i == null || i.addEventListener("input", (n) => {
+    const e = this.element;
+    if (!e) return;
+    const i = e.querySelector("[data-search]"), s = e.querySelector("[data-filter]");
+    i && (i.value = this.searchTerm), s && (s.value = this.selectedDomain), i == null || i.addEventListener("input", (n) => {
       this.searchTerm = n.target.value.toLocaleLowerCase(), this.render(!0);
-    }), r == null || r.addEventListener("change", (n) => {
+    }), s == null || s.addEventListener("change", (n) => {
       this.selectedDomain = n.target.value, this.render(!0);
-    }), t.querySelectorAll("[data-select-deity]").forEach((n) => n.addEventListener("click", () => {
+    }), e.querySelectorAll("[data-select-deity]").forEach((n) => n.addEventListener("click", () => {
       if (!this.actor || !this.socketRouter) return;
       const a = this.deityService.get(n.dataset.selectDeity ?? "");
       if (a) {
-        if (Fe(a.grantGroups)) {
-          new he(a, this.actor, this.socketRouter, () => void this.render(!0)).render(!0);
+        if (Be(a.grantGroups)) {
+          new fe(a, this.actor, this.socketRouter, () => void this.render(!0)).render(!0);
           return;
         }
         this.socketRouter.assign({ actorId: this.actor.id, deityId: a.id, choices: {} }).then(() => this.render(!0)).catch((o) => x("Deity assignment failed.", o));
@@ -1118,509 +1126,632 @@ class H extends Z() {
     }));
   }
 }
-g(H, "DEFAULT_OPTIONS", { id: "darkis-godforge-codex", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: !0 }, position: { width: 1e3, height: 760 } }), g(H, "PARTS", { main: { template: "modules/darkis-godforge/templates/codex.hbs" } });
-const Ve = Object.keys(V.fields);
-class X extends F() {
-  constructor(e, t, i = new ve(), r) {
-    super(), this.deityService = e, this.onSaved = t, this.adapters = i, this.existing = r;
+b(B, "DEFAULT_OPTIONS", { id: "darkis-godforge-codex", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: !0 }, position: { width: 1e3, height: 760 } }), b(B, "PARTS", { main: { template: "modules/darkis-godforge/templates/codex.hbs" } });
+class ge extends K() {
+  constructor(e, i, s, n, a) {
+    super();
+    b(this, "selected", /* @__PURE__ */ new Set());
+    this.title = e, this.choices = i, this.multiple = n, this.onChoose = a, s.forEach((o) => this.selected.add(o));
   }
   async _prepareContext() {
-    var c, d, h;
-    v();
-    const e = ((d = (c = b()) == null ? void 0 : c.system) == null ? void 0 : d.id) ?? "", t = this.adapters.tryGet(e), i = (t == null ? void 0 : t.listSkills()) ?? [];
-    let r = { skills: i.map((u) => ({ value: u, label: u })), domains: [], weapons: [], spells: [], fonts: [], sanctifications: [], attributes: [] }, n = [];
+    const e = this.choices.map((s, n) => {
+      var a;
+      return { ...s, token: String(n), selected: this.selected.has(s.value), traitText: ((a = s.traits) == null ? void 0 : a.join(", ")) ?? "", rankText: s.rank === void 0 ? "" : String(s.rank), available: s.available !== !1 };
+    }), i = (s) => [...new Set(s.filter((n) => !!n))].sort((n, a) => n.localeCompare(a));
+    return { ui: D(), title: this.title, items: e, multiple: this.multiple, categories: i(e.map((s) => s.category)), groups: i(e.map((s) => s.group)), sources: i(e.map((s) => s.source)), ranks: [...new Set(e.flatMap((s) => s.rank === void 0 ? [] : [s.rank]))].sort((s, n) => s - n), traits: i(e.flatMap((s) => s.traits ?? [])) };
+  }
+  _onRender() {
+    var l, c, p;
+    const e = this.element;
+    if (!e) return;
+    const i = [...e.querySelectorAll("[data-picker-item]")], s = () => {
+      var T, O, A, k, $, X, Le, Ge;
+      const u = ((T = e.querySelector("[data-picker-search]")) == null ? void 0 : T.value.trim().toLocaleLowerCase()) ?? "", h = ((O = e.querySelector("[data-picker-category]")) == null ? void 0 : O.value) ?? "", d = ((A = e.querySelector("[data-picker-group]")) == null ? void 0 : A.value) ?? "", m = ((k = e.querySelector("[data-picker-source]")) == null ? void 0 : k.value) ?? "", g = (($ = e.querySelector("[data-picker-rank]")) == null ? void 0 : $.value) ?? "", I = ((X = e.querySelector("[data-picker-trait]")) == null ? void 0 : X.value) ?? "", f = ((Le = e.querySelector("[data-picker-available]")) == null ? void 0 : Le.checked) === !0, y = ((Ge = e.querySelector("[data-picker-remaster]")) == null ? void 0 : Ge.checked) === !0;
+      for (const C of i) {
+        const dt = `${C.dataset.label ?? ""} ${C.dataset.traits ?? ""} ${C.dataset.category ?? ""} ${C.dataset.group ?? ""} ${C.dataset.source ?? ""}`.toLocaleLowerCase();
+        C.hidden = !!(u && !dt.includes(u) || h && C.dataset.category !== h || d && C.dataset.group !== d || m && C.dataset.source !== m || g && C.dataset.rank !== g || I && !(C.dataset.traits ?? "").split("|").includes(I) || f && C.dataset.available !== "true" || y && C.dataset.remaster !== "true");
+      }
+      const E = i.filter((C) => !C.hidden).length, S = e.querySelector("[data-picker-count]");
+      S && (S.textContent = String(E));
+    }, n = (u) => {
+      i.forEach((m) => m.classList.toggle("active", m === u));
+      const h = e.querySelector("[data-picker-preview-image]");
+      h && (h.hidden = !u.dataset.img, u.dataset.img && (h.src = u.dataset.img));
+      const d = (m, g) => {
+        const I = e.querySelector(m);
+        I && (I.textContent = g || "—");
+      };
+      d("[data-picker-preview-name]", u.dataset.label ?? ""), d("[data-picker-preview-category]", [u.dataset.category, u.dataset.group].filter(Boolean).join(" · ")), d("[data-picker-preview-traits]", (u.dataset.traits ?? "").replaceAll("|", ", ")), d("[data-picker-preview-source]", u.dataset.source ?? ""), d("[data-picker-preview-rank]", u.dataset.rank ?? "");
+    }, a = (u) => {
+      var m;
+      const h = this.choices[Number(u.dataset.pickerItem)];
+      if (!h) return;
+      if (!this.multiple) {
+        this.onChoose({ values: [h.value], items: [h] }), (m = this.close) == null || m.call(this);
+        return;
+      }
+      this.selected.has(h.value) ? this.selected.delete(h.value) : this.selected.add(h.value), u.classList.toggle("selected", this.selected.has(h.value));
+      const d = u.querySelector("[data-picker-choose]");
+      d && d.setAttribute("aria-pressed", String(this.selected.has(h.value)));
+    };
+    e.querySelectorAll("[data-picker-filter]").forEach((u) => u.addEventListener("input", s)), i.forEach((u) => {
+      u.addEventListener("click", (h) => {
+        n(u), h.target.closest("[data-picker-choose]") && a(u);
+      }), u.addEventListener("dblclick", () => a(u));
+    }), e.addEventListener("dragover", (u) => u.preventDefault()), e.addEventListener("drop", (u) => {
+      var g;
+      u.preventDefault();
+      const h = ((g = u.dataTransfer) == null ? void 0 : g.getData("text/plain")) ?? "";
+      let d = h.trim();
+      try {
+        const I = JSON.parse(h);
+        typeof I.uuid == "string" && (d = I.uuid);
+      } catch {
+      }
+      const m = this.choices.findIndex((I) => I.value === d);
+      m >= 0 && a(i[m]);
+    }), (l = e.querySelector("[data-picker-confirm]")) == null || l.addEventListener("click", () => {
+      var h;
+      const u = this.choices.filter((d) => this.selected.has(d.value));
+      this.onChoose({ values: u.map((d) => d.value), items: u }), (h = this.close) == null || h.call(this);
+    }), (c = e.querySelector("[data-picker-clear]")) == null || c.addEventListener("click", () => {
+      var u;
+      this.onChoose({ values: [], items: [] }), (u = this.close) == null || u.call(this);
+    }), (p = e.querySelector("[data-picker-cancel]")) == null || p.addEventListener("click", () => {
+      var u;
+      return void ((u = this.close) == null ? void 0 : u.call(this));
+    });
+    const o = i.find((u) => u.classList.contains("selected")) ?? i[0];
+    o && n(o), s();
+  }
+}
+b(ge, "DEFAULT_OPTIONS", { id: "darkis-godforge-picker", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.PICKER_TITLE", resizable: !0 }, position: { width: 980, height: 720 } }), b(ge, "PARTS", { main: { template: "modules/darkis-godforge/templates/picker-dialog.hbs" } });
+const $e = Object.keys(H.fields);
+class ee extends q() {
+  constructor(e, i, s = new De(), n) {
+    super();
+    b(this, "systemCatalog", { skills: [], domains: [], weapons: [], spells: [], fonts: [], sanctifications: [], attributes: [] });
+    b(this, "officialChoices", []);
+    this.deityService = e, this.onSaved = i, this.adapters = s, this.existing = n;
+  }
+  async _prepareContext() {
+    var p, u, h;
+    w();
+    const e = ((u = (p = v()) == null ? void 0 : p.system) == null ? void 0 : u.id) ?? "", i = this.adapters.tryGet(e), s = (i == null ? void 0 : i.listSkills()) ?? [];
+    let n = { skills: s.map((d) => ({ value: d, label: d })), domains: [], weapons: [], spells: [], fonts: [], sanctifications: [], attributes: [] }, a = [];
     try {
-      n = await ((t == null ? void 0 : t.listOfficialDeities()) ?? Promise.resolve([]));
-    } catch (u) {
-      console.error("Darkis GodForge | Could not load official deities for the editor.", u);
+      a = await ((i == null ? void 0 : i.listOfficialDeities()) ?? Promise.resolve([]));
+    } catch (d) {
+      console.error("Darkis GodForge | Could not load official deities for the editor.", d);
     }
     try {
-      t && (r = await t.listEditorCatalog());
-    } catch (u) {
-      console.error("Darkis GodForge | Could not load system choices for the editor.", u);
+      i && (n = await i.listEditorCatalog());
+    } catch (d) {
+      console.error("Darkis GodForge | Could not load system choices for the editor.", d);
     }
-    const a = ((h = this.existing) == null ? void 0 : h.replacement.sourceUuid) ?? "", o = n.map((u) => ({ ...u, selected: u.sourceUuid === a }));
-    a && !o.some((u) => u.sourceUuid === a) && o.push({ id: a, sourceUuid: a, official: !0, name: a, title: a, domains: [], selected: !0 });
-    const l = _();
+    this.systemCatalog = n, this.officialChoices = a.map((d) => ({ value: d.sourceUuid ?? d.id, label: d.name, img: d.image, category: d.pantheon, group: d.skill ?? d.alignment, traits: d.domains, source: e.toUpperCase(), details: d.favoredWeapon ? `Waffe: ${d.favoredWeapon}` : void 0, available: !0 }));
+    const o = ((h = this.existing) == null ? void 0 : h.replacement.sourceUuid) ?? "", l = a.map((d) => ({ ...d, selected: d.sourceUuid === o }));
+    o && !l.some((d) => d.sourceUuid === o) && l.push({ id: o, sourceUuid: o, official: !0, name: o, title: o, domains: [], selected: !0 });
+    const c = D();
     return {
-      ui: { ...l, NEW_DEITY: this.existing ? l.EDIT_DEITY : l.NEW_DEITY },
-      selectors: i,
-      systemCatalog: r,
-      pantheonOptions: this.deityService.list().flatMap((u) => u.pantheons ?? []).filter((u, p, m) => m.findIndex((E) => E.id === u.id) === p).map((u) => {
-        var p, m;
-        return { ...u, selected: ((m = (p = this.existing) == null ? void 0 : p.pantheonIds) == null ? void 0 : m.includes(u.id)) === !0 };
+      ui: { ...c, NEW_DEITY: this.existing ? c.EDIT_DEITY : c.NEW_DEITY },
+      selectors: s,
+      systemCatalog: n,
+      pantheonOptions: this.deityService.list().flatMap((d) => d.pantheons ?? []).filter((d, m, g) => g.findIndex((I) => I.id === d.id) === m).map((d) => {
+        var m, g;
+        return { ...d, selected: ((g = (m = this.existing) == null ? void 0 : m.pantheonIds) == null ? void 0 : g.includes(d.id)) === !0 };
       }),
-      officialDeities: o,
-      visibilityFields: Ve.map((u) => ({ key: u, label: l[`VIS_FIELD_${u.replace(/([A-Z])/g, "_$1").toUpperCase()}`] ?? u })),
-      visibilityOptions: ["public", "selection", "followers", "owner", "trusted", "gm", "hidden-until-selected"].map((u) => ({ value: u, label: l[`VIS_${u.replaceAll("-", "_").toUpperCase()}`] ?? u }))
+      officialDeities: l,
+      visibilityFields: $e.map((d) => ({ key: d, label: c[`VIS_FIELD_${d.replace(/([A-Z])/g, "_$1").toUpperCase()}`] ?? d })),
+      visibilityOptions: ["public", "selection", "followers", "owner", "trusted", "gm", "hidden-until-selected"].map((d) => ({ value: d, label: c[`VIS_${d.replaceAll("-", "_").toUpperCase()}`] ?? d }))
     };
   }
   _onRender() {
-    var r, n, a, o, l;
-    v();
-    const e = this.element, t = e == null ? void 0 : e.querySelector("form");
-    let i = !1;
-    e && t && this.existing && this.populateForm(e, t, this.existing), e && t && this.setupWizard(e, t), e == null || e.querySelectorAll("[data-action='browse-image']").forEach((c) => c.addEventListener("click", () => this.openFilePicker(e, c))), e == null || e.querySelectorAll("[data-image-field]").forEach((c) => {
-      c.addEventListener("dragover", (d) => {
-        d.preventDefault(), d.dataTransfer.dropEffect = "copy";
-      }), c.addEventListener("drop", (d) => this.handleImageDrop(d, c));
-    }), (r = e == null ? void 0 : e.querySelector("[data-action='close']")) == null || r.addEventListener("click", () => {
-      var c;
-      i && !globalThis.confirm("Ungespeicherte Änderungen verwerfen? / Discard unsaved changes?") || (c = this.close) == null || c.call(this);
-    }), (n = e == null ? void 0 : e.querySelector("[data-action='add-bonus']")) == null || n.addEventListener("click", () => this.appendTemplate(e, "bonus", "[data-bonus-list]")), (a = e == null ? void 0 : e.querySelector("[data-action='add-ability']")) == null || a.addEventListener("click", () => this.appendTemplate(e, "ability", "[data-ability-list]")), (o = e == null ? void 0 : e.querySelector("[data-action='add-grant-group']")) == null || o.addEventListener("click", () => this.appendTemplate(e, "grant-group", "[data-grant-list]")), e == null || e.addEventListener("click", (c) => {
-      var u, p, m;
-      const d = c.target.closest("[data-action]");
-      if (!d) return;
-      if (d.dataset.action === "add-catalog-spell" && t) {
-        this.addCatalogSpell(t);
+    var n, a, o, l, c;
+    w();
+    const e = this.element, i = e == null ? void 0 : e.querySelector("form");
+    let s = !1;
+    e && i && this.existing && this.populateForm(e, i, this.existing), e && i && this.setupWizard(e, i), i && this.refreshPickerControls(i), e == null || e.querySelectorAll("[data-action='browse-image']").forEach((p) => p.addEventListener("click", () => this.openFilePicker(e, p))), e == null || e.querySelectorAll("[data-image-field]").forEach((p) => {
+      p.addEventListener("dragover", (u) => {
+        u.preventDefault(), u.dataTransfer.dropEffect = "copy";
+      }), p.addEventListener("drop", (u) => this.handleImageDrop(u, p));
+    }), (n = e == null ? void 0 : e.querySelector("[data-action='close']")) == null || n.addEventListener("click", () => {
+      var p;
+      s && !globalThis.confirm("Ungespeicherte Änderungen verwerfen? / Discard unsaved changes?") || (p = this.close) == null || p.call(this);
+    }), (a = e == null ? void 0 : e.querySelector("[data-action='add-bonus']")) == null || a.addEventListener("click", () => this.appendTemplate(e, "bonus", "[data-bonus-list]")), (o = e == null ? void 0 : e.querySelector("[data-action='add-ability']")) == null || o.addEventListener("click", () => this.appendTemplate(e, "ability", "[data-ability-list]")), (l = e == null ? void 0 : e.querySelector("[data-action='add-grant-group']")) == null || l.addEventListener("click", () => this.appendTemplate(e, "grant-group", "[data-grant-list]")), e == null || e.addEventListener("click", (p) => {
+      var d, m, g;
+      const u = p.target.closest("[data-action]");
+      if (!u) return;
+      if (u.dataset.action === "open-system-picker" && i) {
+        this.openSystemPicker(i, u);
         return;
       }
-      if (d.dataset.action === "generate-image-variants" && t) {
-        this.generateImageVariants(t, d);
+      if (u.dataset.action === "generate-image-variants" && i) {
+        this.generateImageVariants(i, u);
         return;
       }
-      if (d.dataset.action === "scroll-steps-left" || d.dataset.action === "scroll-steps-right") {
-        (u = e.querySelector(".dg-step-strip")) == null || u.scrollBy({ left: d.dataset.action.endsWith("right") ? 260 : -260, behavior: "smooth" });
+      if (u.dataset.action === "scroll-steps-left" || u.dataset.action === "scroll-steps-right") {
+        (d = e.querySelector(".dg-step-strip")) == null || d.scrollBy({ left: u.dataset.action.endsWith("right") ? 260 : -260, behavior: "smooth" });
         return;
       }
-      const h = d == null ? void 0 : d.closest(".dg-editor-card");
-      h && (d.dataset.action === "add-grant-member" && this.appendTemplate(h, "grant-member", ":scope > [data-grant-members]"), d.dataset.action === "add-subgroup" && this.appendTemplate(h, "grant-group", ":scope > [data-grant-members]"), d.dataset.action === "add-effect" && this.appendTemplate(h, "effect", ":scope > [data-effect-list]"), d.dataset.action === "remove-row" && h.remove(), d.dataset.action === "duplicate-row" && h.after(h.cloneNode(!0)), d.dataset.action === "move-up" && h.previousElementSibling && ((p = h.parentElement) == null || p.insertBefore(h, h.previousElementSibling)), d.dataset.action === "move-down" && h.nextElementSibling && ((m = h.parentElement) == null || m.insertBefore(h.nextElementSibling, h)), this.updateStackingWarnings(e), t && this.updateWizardPreview(e, t));
-    }), e == null || e.addEventListener("input", (c) => {
-      i = !0, this.updateStackingWarnings(e);
-      const d = c.target;
-      d.matches("[data-image-input]") && this.updateImagePreview(e, d.name, d.value), d.matches("[data-formula]") && this.validateFormulaField(d), d.matches("[data-catalog-search]") && this.filterCatalog(d), t && this.updateWizardPreview(e, t);
-    }), e == null || e.addEventListener("change", (c) => {
-      i = !0;
-      const d = c.target;
-      if (d.name === "replacement.sourceUuid" && t) {
-        const h = t.elements.namedItem("replacement.mode");
-        h && (h.value = d.value ? "replace" : "none"), d.value && t.querySelectorAll("[name^='replacement.inherit.']").forEach((u) => {
-          u.checked = u.name !== "replacement.inherit.edicts" && u.name !== "replacement.inherit.anathema";
+      const h = u == null ? void 0 : u.closest(".dg-editor-card");
+      h && (u.dataset.action === "add-grant-member" && this.appendTemplate(h, "grant-member", ":scope > [data-grant-members]"), u.dataset.action === "add-subgroup" && this.appendTemplate(h, "grant-group", ":scope > [data-grant-members]"), u.dataset.action === "add-effect" && this.appendTemplate(h, "effect", ":scope > [data-effect-list]"), u.dataset.action === "remove-row" && h.remove(), u.dataset.action === "duplicate-row" && h.after(h.cloneNode(!0)), u.dataset.action === "move-up" && h.previousElementSibling && ((m = h.parentElement) == null || m.insertBefore(h, h.previousElementSibling)), u.dataset.action === "move-down" && h.nextElementSibling && ((g = h.parentElement) == null || g.insertBefore(h.nextElementSibling, h)), this.updateStackingWarnings(e), i && this.updateWizardPreview(e, i));
+    }), e == null || e.addEventListener("input", (p) => {
+      s = !0, this.updateStackingWarnings(e);
+      const u = p.target;
+      u.matches("[data-image-input]") && this.updateImagePreview(e, u.name, u.value), u.matches("[data-formula]") && this.validateFormulaField(u), i && this.updateWizardPreview(e, i);
+    }), e == null || e.addEventListener("change", (p) => {
+      s = !0;
+      const u = p.target;
+      if (u.name === "replacement.sourceUuid" && i) {
+        const h = i.elements.namedItem("replacement.mode");
+        h && (h.value = u.value ? "replace" : "none"), u.value && i.querySelectorAll("[name^='replacement.inherit.']").forEach((d) => {
+          d.checked = d.name !== "replacement.inherit.edicts" && d.name !== "replacement.inherit.anathema";
         });
       }
-      if (d.matches("[data-weapon-picker]") && t) {
-        const h = d.selectedOptions[0], u = t.elements.namedItem("favoredWeapon"), p = t.elements.namedItem("favoredWeaponUuid");
-        u && (u.value = (h == null ? void 0 : h.dataset.slug) ?? ""), p && (p.value = d.value);
+      if (u.matches("[data-weapon-picker]") && i) {
+        const h = u.selectedOptions[0], d = i.elements.namedItem("favoredWeapon"), m = i.elements.namedItem("favoredWeaponUuid");
+        d && (d.value = (h == null ? void 0 : h.dataset.slug) ?? ""), m && (m.value = u.value);
       }
-      d.matches("[data-image-setting]") && this.updateImagePresentationPreview(e, d.dataset.imageSetting ?? ""), t && this.updateWizardPreview(e, t);
-    }), e == null || e.querySelectorAll("[data-image-input]").forEach((c) => this.updateImagePreview(e, c.name, c.value)), e == null || e.querySelectorAll("[data-action='preview-player']").forEach((c) => c.addEventListener("click", () => {
-      const d = t == null ? void 0 : t.elements.namedItem("name");
-      if (!t || !(d != null && d.reportValidity())) return;
-      const h = this.previewDefinition(t);
-      new H(this.deityService, { deity: h, viewer: { isGM: !1, selection: !0 } }).render(!0);
-    })), (l = e == null ? void 0 : e.querySelector("[data-action='save-draft']")) == null || l.addEventListener("click", () => {
-      const c = t == null ? void 0 : t.elements.namedItem("name");
-      !t || !(c != null && c.reportValidity()) || this.saveDefinition(t, !0);
-    }), t == null || t.addEventListener("submit", (c) => {
-      c.preventDefault(), this.saveDefinition(t, !1);
+      u.matches("[data-image-setting]") && this.updateImagePresentationPreview(e, u.dataset.imageSetting ?? ""), i && this.updateWizardPreview(e, i);
+    }), e == null || e.querySelectorAll("[data-image-input]").forEach((p) => this.updateImagePreview(e, p.name, p.value)), e == null || e.querySelectorAll("[data-action='preview-player']").forEach((p) => p.addEventListener("click", () => {
+      const u = i == null ? void 0 : i.elements.namedItem("name");
+      if (!i || !(u != null && u.reportValidity())) return;
+      const h = this.previewDefinition(i);
+      new B(this.deityService, { deity: h, viewer: { isGM: !1, selection: !0 } }).render(!0);
+    })), (c = e == null ? void 0 : e.querySelector("[data-action='save-draft']")) == null || c.addEventListener("click", () => {
+      const p = i == null ? void 0 : i.elements.namedItem("name");
+      !i || !(p != null && p.reportValidity()) || this.saveDefinition(i, !0);
+    }), i == null || i.addEventListener("submit", (p) => {
+      p.preventDefault(), this.saveDefinition(i, !1);
     });
   }
-  setupWizard(e, t) {
-    const i = [...e.querySelectorAll("[data-wizard-panel]")], r = [...e.querySelectorAll("[data-wizard-step]")], n = e.querySelector("[data-action='previous-step']"), a = e.querySelector("[data-action='next-step']"), o = e.querySelector("[data-action='finish']"), l = e.querySelector("[data-wizard-current]");
-    let c = 0;
-    const d = (h) => {
-      var u;
-      c = Math.max(0, Math.min(i.length - 1, h)), i.forEach((p, m) => {
-        p.hidden = m !== c;
-      }), r.forEach((p, m) => {
-        p.classList.toggle("completed", m < c), m === c ? p.setAttribute("aria-current", "step") : p.removeAttribute("aria-current");
-      }), n && (n.disabled = c === 0), a && (a.hidden = c === i.length - 1), o && (o.hidden = c !== i.length - 1), l && (l.textContent = String(c + 1)), (u = r[c]) == null || u.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" }), this.updateWizardPreview(e, t);
+  setupWizard(e, i) {
+    const s = [...e.querySelectorAll("[data-wizard-panel]")], n = [...e.querySelectorAll("[data-wizard-step]")], a = e.querySelector("[data-action='previous-step']"), o = e.querySelector("[data-action='next-step']"), l = e.querySelector("[data-action='finish']"), c = e.querySelector("[data-wizard-current]"), p = e.querySelector("[data-wizard-total]"), u = i.elements.namedItem("kind");
+    let h = 0;
+    const d = () => s.filter((g) => (u == null ? void 0 : u.value) !== "lore" || !g.hasAttribute("data-selectable-only")), m = (g) => {
+      var y;
+      const I = d();
+      h = Math.max(0, Math.min(I.length - 1, g));
+      const f = I[h];
+      s.forEach((E) => {
+        E.hidden = E !== f;
+      }), n.forEach((E) => {
+        const S = s.find((O) => O.dataset.wizardPanel === E.dataset.wizardStep), T = S ? I.indexOf(S) : -1;
+        E.hidden = T < 0, E.querySelector("b").textContent = T < 0 ? "" : String(T + 1), E.classList.toggle("completed", T >= 0 && T < h), S === f ? E.setAttribute("aria-current", "step") : E.removeAttribute("aria-current");
+      }), a && (a.disabled = h === 0), o && (o.hidden = h === I.length - 1), l && (l.hidden = h !== I.length - 1), c && (c.textContent = String(h + 1)), p && (p.textContent = String(I.length)), (y = n.find((E) => E.getAttribute("aria-current") === "step")) == null || y.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" }), this.updateWizardPreview(e, i);
     };
-    r.forEach((h) => h.addEventListener("click", () => d(Number(h.dataset.wizardStep ?? 0)))), n == null || n.addEventListener("click", () => d(c - 1)), a == null || a.addEventListener("click", () => d(c + 1)), d(0);
+    n.forEach((g) => g.addEventListener("click", () => {
+      const I = s.find((y) => y.dataset.wizardPanel === g.dataset.wizardStep), f = I ? d().indexOf(I) : -1;
+      f >= 0 && m(f);
+    })), a == null || a.addEventListener("click", () => m(h - 1)), o == null || o.addEventListener("click", () => m(h + 1)), u == null || u.addEventListener("change", () => m(0)), m(0);
   }
-  updateWizardPreview(e, t) {
-    var d, h;
-    const i = _(), r = (u) => {
-      var p;
-      return ((p = t.elements.namedItem(u)) == null ? void 0 : p.value.trim()) ?? "";
-    }, n = (u, p) => {
-      const m = e.querySelector(u);
-      m && (m.textContent = p);
+  updateWizardPreview(e, i) {
+    var u, h;
+    const s = D(), n = (d) => {
+      var m;
+      return ((m = i.elements.namedItem(d)) == null ? void 0 : m.value.trim()) ?? "";
+    }, a = (d, m) => {
+      const g = e.querySelector(d);
+      g && (g.textContent = m);
     };
-    n("[data-wizard-preview-name]", r("name") || i.NEW_DEITY_PLACEHOLDER || "New deity"), n("[data-wizard-preview-title]", r("title") || "—"), n("[data-wizard-preview-description]", r("description") || i.PREVIEW_EMPTY_DESCRIPTION || "—");
-    const a = e.querySelector("[data-wizard-preview-quote]");
-    a && (a.textContent = r("quote"), a.hidden = !a.textContent);
-    const o = t.elements.namedItem("status");
-    n("[data-wizard-preview-status]", ((d = o == null ? void 0 : o.selectedOptions[0]) == null ? void 0 : d.textContent) ?? i.STATUS_DRAFT ?? "Draft");
-    const l = t.elements.namedItem("replacement.sourceUuid");
-    n("[data-wizard-preview-source]", l != null && l.value ? ((h = l.selectedOptions[0]) == null ? void 0 : h.textContent) ?? l.value : "—"), n("[data-wizard-preview-bonuses]", String(t.querySelectorAll("[data-bonus-row]").length)), n("[data-wizard-preview-abilities]", String(t.querySelectorAll("[data-ability-row]").length));
-    const c = e.querySelector("[data-wizard-preview-image]");
-    c && (c.src = r("image") ? U(r("image")) : "modules/darkis-godforge/assets/logo.png");
+    a("[data-wizard-preview-name]", n("name") || s.NEW_DEITY_PLACEHOLDER || "New deity"), a("[data-wizard-preview-title]", n("title") || "—"), a("[data-wizard-preview-description]", n("description") || s.PREVIEW_EMPTY_DESCRIPTION || "—");
+    const o = e.querySelector("[data-wizard-preview-quote]");
+    o && (o.textContent = n("quote"), o.hidden = !o.textContent);
+    const l = i.elements.namedItem("status");
+    a("[data-wizard-preview-status]", ((u = l == null ? void 0 : l.selectedOptions[0]) == null ? void 0 : u.textContent) ?? s.STATUS_DRAFT ?? "Draft");
+    const c = i.elements.namedItem("replacement.sourceUuid");
+    a("[data-wizard-preview-source]", c != null && c.value ? ((h = this.officialChoices.find((d) => d.value === c.value)) == null ? void 0 : h.label) ?? c.value : "—"), a("[data-wizard-preview-bonuses]", String(i.querySelectorAll("[data-bonus-row]").length)), a("[data-wizard-preview-abilities]", String(i.querySelectorAll("[data-ability-row]").length));
+    const p = e.querySelector("[data-wizard-preview-image]");
+    p && (p.src = n("image") ? V(n("image")) : "modules/darkis-godforge/assets/logo.png");
   }
-  saveDefinition(e, t) {
-    var n;
-    v();
-    const i = this.readInput(e);
-    t && (i.status = "draft");
-    const r = this.existing ? this.deityService.update(this.existing.id, i) : this.deityService.create(i);
-    this.onSaved(r), (n = this.close) == null || n.call(this);
+  async saveDefinition(e, i) {
+    var a;
+    w();
+    const s = this.readInput(e);
+    i && (s.status = "draft");
+    const n = this.existing ? this.deityService.update(this.existing.id, s) : this.deityService.create(s);
+    try {
+      await this.deityService.flushPersistence(), this.onSaved(n), await ((a = this.close) == null ? void 0 : a.call(this));
+    } catch (o) {
+      x("Deity persistence failed.", o);
+    }
   }
-  appendTemplate(e, t, i) {
-    var l, c, d;
-    const r = ((l = this.element) == null ? void 0 : l.querySelector(`template[data-template='${t}']`)) ?? (e == null ? void 0 : e.querySelector(`template[data-template='${t}']`)), n = e == null ? void 0 : e.querySelector(i);
-    if (!r || !n) return;
-    const a = r.content.cloneNode(!0);
-    (d = (c = a.querySelector("[name$='.visibility']")) == null ? void 0 : c.querySelector("[value='followers']")) == null || d.setAttribute("selected", "selected"), n.append(a), this.updateStackingWarnings(e);
-    const o = e == null ? void 0 : e.querySelector("form");
-    e && o && this.updateWizardPreview(e, o);
+  appendTemplate(e, i, s) {
+    var c, p, u;
+    const n = ((c = this.element) == null ? void 0 : c.querySelector(`template[data-template='${i}']`)) ?? (e == null ? void 0 : e.querySelector(`template[data-template='${i}']`)), a = e == null ? void 0 : e.querySelector(s);
+    if (!n || !a) return;
+    const o = n.content.cloneNode(!0);
+    (u = (p = o.querySelector("[name$='.visibility']")) == null ? void 0 : p.querySelector("[value='followers']")) == null || u.setAttribute("selected", "selected"), a.append(o), this.updateStackingWarnings(e);
+    const l = e == null ? void 0 : e.querySelector("form");
+    e && l && this.updateWizardPreview(e, l);
   }
   previewDefinition(e) {
-    const t = (/* @__PURE__ */ new Date()).toISOString();
-    return { ...this.readInput(e), id: "preview", schemaVersion: N, revision: 1, createdAt: t, updatedAt: t, checksum: "preview" };
+    const i = (/* @__PURE__ */ new Date()).toISOString();
+    return { ...this.readInput(e), id: "preview", schemaVersion: N, revision: 1, createdAt: i, updatedAt: i, checksum: "preview" };
   }
-  populateForm(e, t, i) {
-    var n, a, o, l, c, d;
-    const r = {
-      name: i.name,
-      title: i.title,
-      status: i.status,
-      description: i.description,
-      quote: i.quote ?? "",
-      image: i.image ?? "",
-      icon: i.icon ?? "",
-      symbol: i.symbol ?? "",
-      banner: i.banner ?? "",
-      pantheons: (i.pantheonIds ?? []).join(", "),
-      domains: i.domains.join(", "),
-      alternateDomains: (i.alternateDomains ?? []).join(", "),
-      divineAttributes: (i.divineAttributes ?? []).join(", "),
-      spells: this.formatSpells(i.spells),
-      tags: (i.tags ?? []).join(", "),
-      alignment: i.alignment ?? "",
-      favoredWeapon: i.favoredWeapon ?? "",
-      favoredWeaponUuid: i.favoredWeaponUuid ?? "",
-      font: i.font ?? "",
-      skill: i.skill ?? "",
-      sanctification: i.sanctification ?? "",
-      cause: i.cause ?? "",
-      edicts: (i.edicts ?? []).join(", "),
-      anathema: (i.anathema ?? []).join(", "),
-      gmNotes: i.gmNotes ?? "",
-      "replacement.mode": i.replacement.mode,
-      "replacement.sourceUuid": i.replacement.sourceUuid,
-      "replacement.contexts": i.replacement.contexts.join(", "),
-      "visibility.deity": i.visibility.deity
+  populateForm(e, i, s) {
+    var a, o, l, c, p, u;
+    const n = {
+      name: s.name,
+      title: s.title,
+      kind: s.kind ?? "selectable",
+      status: s.status,
+      description: s.description,
+      quote: s.quote ?? "",
+      image: s.image ?? "",
+      icon: s.icon ?? "",
+      symbol: s.symbol ?? "",
+      banner: s.banner ?? "",
+      pantheons: (s.pantheonIds ?? []).join(", "),
+      domains: s.domains.join(", "),
+      alternateDomains: (s.alternateDomains ?? []).join(", "),
+      divineAttributes: (s.divineAttributes ?? []).join(", "),
+      spells: this.formatSpells(s.spells),
+      tags: (s.tags ?? []).join(", "),
+      alignment: s.alignment ?? "",
+      favoredWeapon: s.favoredWeapon ?? "",
+      favoredWeaponUuid: s.favoredWeaponUuid ?? "",
+      font: s.font ?? "",
+      skill: s.skill ?? "",
+      sanctification: s.sanctification ?? "",
+      cause: s.cause ?? "",
+      edicts: (s.edicts ?? []).join(", "),
+      anathema: (s.anathema ?? []).join(", "),
+      gmNotes: s.gmNotes ?? "",
+      "replacement.mode": s.replacement.mode,
+      "replacement.sourceUuid": s.replacement.sourceUuid,
+      "replacement.contexts": s.replacement.contexts.join(", "),
+      "visibility.deity": s.visibility.deity
     };
-    for (const [h, u] of Object.entries(i.visibility.fields)) r[`visibility.fields.${h}`] = u;
+    for (const [h, d] of Object.entries(s.visibility.fields)) n[`visibility.fields.${h}`] = d;
     for (const h of ["image", "icon", "symbol", "banner"]) {
-      const u = (n = i.imagePresentation) == null ? void 0 : n[h];
-      r[`imagePresentation.${h}.fit`] = (u == null ? void 0 : u.fit) ?? "cover", r[`imagePresentation.${h}.focusX`] = String((u == null ? void 0 : u.focusX) ?? 50), r[`imagePresentation.${h}.focusY`] = String((u == null ? void 0 : u.focusY) ?? 25), r[`imagePresentation.${h}.zoom`] = String((u == null ? void 0 : u.zoom) ?? 1), r[`imagePresentation.${h}.rotation`] = String((u == null ? void 0 : u.rotation) ?? 0);
+      const d = (a = s.imagePresentation) == null ? void 0 : a[h];
+      n[`imagePresentation.${h}.fit`] = (d == null ? void 0 : d.fit) ?? "cover", n[`imagePresentation.${h}.focusX`] = String((d == null ? void 0 : d.focusX) ?? 50), n[`imagePresentation.${h}.focusY`] = String((d == null ? void 0 : d.focusY) ?? 25), n[`imagePresentation.${h}.zoom`] = String((d == null ? void 0 : d.zoom) ?? 1), n[`imagePresentation.${h}.rotation`] = String((d == null ? void 0 : d.rotation) ?? 0);
     }
-    for (const [h, u] of Object.entries(r)) this.setValue(t, h, u);
-    for (const h of ["domains", "favoredWeapon", "spells", "sanctification", "skill", "font", "divineAttributes", "edicts", "anathema"]) this.setChecked(t, `replacement.inherit.${h}`, ((a = i.replacement.inherit) == null ? void 0 : a[h]) === !0);
-    this.setChecked(t, "replacement.keepForExistingActors", i.replacement.keepForExistingActors !== !1), this.setChecked(t, "visibility.showMechanicsInSelection", i.visibility.showMechanicsInSelection === !0);
-    for (const h of i.passiveBonuses) {
+    for (const [h, d] of Object.entries(n)) this.setValue(i, h, d);
+    for (const h of ["domains", "favoredWeapon", "spells", "sanctification", "skill", "font", "divineAttributes", "edicts", "anathema"]) this.setChecked(i, `replacement.inherit.${h}`, ((o = s.replacement.inherit) == null ? void 0 : o[h]) === !0);
+    this.setChecked(i, "replacement.keepForExistingActors", s.replacement.keepForExistingActors !== !1), this.setChecked(i, "visibility.showMechanicsInSelection", s.visibility.showMechanicsInSelection === !0);
+    for (const h of s.passiveBonuses) {
       this.appendTemplate(e, "bonus", "[data-bonus-list]");
-      const u = e.querySelector("[data-bonus-list] [data-bonus-row]:last-child");
-      u && (this.setValue(u, "bonus.name", h.name), this.setValue(u, "bonus.selector", h.selector), this.setValue(u, "bonus.value", String(h.value)), this.setValue(u, "bonus.modifierType", h.modifierType), this.setValue(u, "bonus.appliesTo", h.appliesTo ?? "checks"), this.setValue(u, "bonus.condition", h.condition ?? ""), this.setValue(u, "bonus.visibility", h.visibility ?? "followers"));
+      const d = e.querySelector("[data-bonus-list] [data-bonus-row]:last-child");
+      d && (this.setValue(d, "bonus.name", h.name), this.setValue(d, "bonus.selector", h.selector), this.setValue(d, "bonus.value", String(h.value)), this.setValue(d, "bonus.modifierType", h.modifierType), this.setValue(d, "bonus.appliesTo", h.appliesTo ?? "checks"), this.setValue(d, "bonus.condition", h.condition ?? ""), this.setValue(d, "bonus.visibility", h.visibility ?? "followers"));
     }
-    for (const h of i.abilities) {
+    for (const h of s.abilities) {
       this.appendTemplate(e, "ability", "[data-ability-list]");
-      const u = e.querySelector("[data-ability-list] [data-ability-row]:last-child");
-      if (!u) continue;
-      const p = h.timing;
-      this.setValue(u, "ability.name", h.name), this.setValue(u, "ability.description", h.description), this.setValue(u, "ability.visibility", h.visibility ?? "followers"), this.setValue(u, "ability.abilityType", h.abilityType ?? "standard"), this.setValue(u, "ability.actionCost", (p == null ? void 0 : p.actionCost.type) ?? "actions"), this.setValue(u, "ability.actions", String((p == null ? void 0 : p.actionCost.actions) ?? h.actionCost ?? 1)), this.setValue(u, "ability.usageMax", String((p == null ? void 0 : p.usage.max) ?? ((o = h.uses) == null ? void 0 : o.max) ?? "")), this.setValue(u, "ability.reset", (p == null ? void 0 : p.reset.event) ?? ((l = h.uses) == null ? void 0 : l.reset) ?? "daily-preparations"), this.setValue(u, "ability.cooldownValue", String(((c = p == null ? void 0 : p.cooldown) == null ? void 0 : c.value) ?? 0)), this.setValue(u, "ability.cooldownUnit", ((d = p == null ? void 0 : p.cooldown) == null ? void 0 : d.unit) ?? "rounds"), this.setValue(u, "ability.durationValue", String((p == null ? void 0 : p.duration.value) ?? h.duration ?? 0)), this.setValue(u, "ability.durationUnit", (p == null ? void 0 : p.duration.unit) ?? "instant");
-      for (const m of h.effects) this.populateEffect(u, m);
+      const d = e.querySelector("[data-ability-list] [data-ability-row]:last-child");
+      if (!d) continue;
+      const m = h.timing;
+      this.setValue(d, "ability.name", h.name), this.setValue(d, "ability.description", h.description), this.setValue(d, "ability.visibility", h.visibility ?? "followers"), this.setValue(d, "ability.abilityType", h.abilityType ?? "standard"), this.setValue(d, "ability.actionCost", (m == null ? void 0 : m.actionCost.type) ?? "actions"), this.setValue(d, "ability.actions", String((m == null ? void 0 : m.actionCost.actions) ?? h.actionCost ?? 1)), this.setValue(d, "ability.usageMax", String((m == null ? void 0 : m.usage.max) ?? ((l = h.uses) == null ? void 0 : l.max) ?? "")), this.setValue(d, "ability.reset", (m == null ? void 0 : m.reset.event) ?? ((c = h.uses) == null ? void 0 : c.reset) ?? "daily-preparations"), this.setValue(d, "ability.cooldownValue", String(((p = m == null ? void 0 : m.cooldown) == null ? void 0 : p.value) ?? 0)), this.setValue(d, "ability.cooldownUnit", ((u = m == null ? void 0 : m.cooldown) == null ? void 0 : u.unit) ?? "rounds"), this.setValue(d, "ability.durationValue", String((m == null ? void 0 : m.duration.value) ?? h.duration ?? 0)), this.setValue(d, "ability.durationUnit", (m == null ? void 0 : m.duration.unit) ?? "instant");
+      for (const g of h.effects) this.populateEffect(d, g);
     }
-    for (const h of i.grantGroups) this.populateGrantGroup(e, e.querySelector("[data-grant-list]"), h);
+    for (const h of s.grantGroups) this.populateGrantGroup(e, e.querySelector("[data-grant-list]"), h);
     this.updateStackingWarnings(e);
   }
   readInput(e) {
-    const t = new FormData(e), i = structuredClone(V);
-    i.deity = this.visibility(t.get("visibility.deity"), "public"), i.showMechanicsInSelection = t.has("visibility.showMechanicsInSelection");
-    for (const r of Ve) i.fields[r] = this.visibility(t.get(`visibility.fields.${r}`), i.fields[r]);
+    const i = new FormData(e), s = i.get("kind") === "lore" ? "lore" : "selectable", n = structuredClone(H);
+    n.deity = this.visibility(i.get("visibility.deity"), "public"), n.showMechanicsInSelection = i.has("visibility.showMechanicsInSelection");
+    for (const a of $e) n.fields[a] = this.visibility(i.get(`visibility.fields.${a}`), n.fields[a]);
     return {
-      status: this.status(t.get("status")),
-      name: this.text(t.get("name")),
-      title: this.text(t.get("title")),
-      description: this.text(t.get("description")),
-      quote: this.optional(t.get("quote")),
-      image: this.optional(t.get("image")),
-      icon: this.optional(t.get("icon")),
-      symbol: this.optional(t.get("symbol")),
-      banner: this.optional(t.get("banner")),
-      imagePresentation: this.readImagePresentation(t),
-      domains: this.list(t.get("domains")),
-      alternateDomains: this.list(t.get("alternateDomains")),
-      divineAttributes: this.list(t.get("divineAttributes")),
-      spells: this.spells(t.get("spells")),
-      pantheonIds: this.readPantheonIds(t),
-      pantheons: this.readPantheons(t),
-      tags: this.list(t.get("tags")),
-      alignment: this.optional(t.get("alignment")),
-      favoredWeapon: this.optional(t.get("favoredWeapon")),
-      favoredWeaponUuid: this.optional(t.get("favoredWeaponUuid")),
-      font: this.optional(t.get("font")),
-      skill: this.optional(t.get("skill")),
-      sanctification: this.optional(t.get("sanctification")),
-      cause: this.optional(t.get("cause")),
-      edicts: this.list(t.get("edicts")),
-      anathema: this.list(t.get("anathema")),
-      gmNotes: this.optional(t.get("gmNotes")),
-      passiveBonuses: this.readBonuses(e),
-      abilities: this.readAbilities(e),
-      grantGroups: this.readGrantGroups(e),
-      replacement: { sourceUuid: this.text(t.get("replacement.sourceUuid")), mode: this.text(t.get("replacement.sourceUuid")) ? this.replacementMode(t.get("replacement.mode")) === "hide" ? "hide" : "replace" : "none", contexts: this.list(t.get("replacement.contexts")), inherit: { domains: t.has("replacement.inherit.domains"), favoredWeapon: t.has("replacement.inherit.favoredWeapon"), spells: t.has("replacement.inherit.spells"), sanctification: t.has("replacement.inherit.sanctification"), skill: t.has("replacement.inherit.skill"), font: t.has("replacement.inherit.font"), divineAttributes: t.has("replacement.inherit.divineAttributes"), edicts: t.has("replacement.inherit.edicts"), anathema: t.has("replacement.inherit.anathema") }, keepForExistingActors: t.has("replacement.keepForExistingActors") },
-      visibility: i
+      status: this.status(i.get("status")),
+      kind: s,
+      name: this.text(i.get("name")),
+      title: this.text(i.get("title")),
+      description: this.text(i.get("description")),
+      quote: this.optional(i.get("quote")),
+      image: this.optional(i.get("image")),
+      icon: this.optional(i.get("icon")),
+      symbol: this.optional(i.get("symbol")),
+      banner: this.optional(i.get("banner")),
+      imagePresentation: this.readImagePresentation(i),
+      domains: s === "lore" ? [] : this.list(i.get("domains")),
+      alternateDomains: s === "lore" ? [] : this.list(i.get("alternateDomains")),
+      divineAttributes: s === "lore" ? [] : this.list(i.get("divineAttributes")),
+      spells: s === "lore" ? void 0 : this.spells(i.get("spells")),
+      pantheonIds: this.readPantheonIds(i),
+      pantheons: this.readPantheons(i),
+      tags: this.list(i.get("tags")),
+      alignment: this.optional(i.get("alignment")),
+      favoredWeapon: s === "lore" ? void 0 : this.optional(i.get("favoredWeapon")),
+      favoredWeaponUuid: s === "lore" ? void 0 : this.optional(i.get("favoredWeaponUuid")),
+      font: s === "lore" ? void 0 : this.optional(i.get("font")),
+      skill: s === "lore" ? void 0 : this.optional(i.get("skill")),
+      sanctification: s === "lore" ? void 0 : this.optional(i.get("sanctification")),
+      cause: s === "lore" ? void 0 : this.optional(i.get("cause")),
+      edicts: s === "lore" ? [] : this.list(i.get("edicts")),
+      anathema: s === "lore" ? [] : this.list(i.get("anathema")),
+      gmNotes: this.optional(i.get("gmNotes")),
+      passiveBonuses: s === "lore" ? [] : this.readBonuses(e),
+      abilities: s === "lore" ? [] : this.readAbilities(e),
+      grantGroups: s === "lore" ? [] : this.readGrantGroups(e),
+      replacement: s === "lore" ? { sourceUuid: "", mode: "none", contexts: [] } : { sourceUuid: this.text(i.get("replacement.sourceUuid")), mode: this.text(i.get("replacement.sourceUuid")) ? this.replacementMode(i.get("replacement.mode")) === "hide" ? "hide" : "replace" : "none", contexts: this.list(i.get("replacement.contexts")), inherit: { domains: i.has("replacement.inherit.domains"), favoredWeapon: i.has("replacement.inherit.favoredWeapon"), spells: i.has("replacement.inherit.spells"), sanctification: i.has("replacement.inherit.sanctification"), skill: i.has("replacement.inherit.skill"), font: i.has("replacement.inherit.font"), divineAttributes: i.has("replacement.inherit.divineAttributes"), edicts: i.has("replacement.inherit.edicts"), anathema: i.has("replacement.inherit.anathema") }, keepForExistingActors: i.has("replacement.keepForExistingActors") },
+      visibility: n
     };
   }
-  openFilePicker(e, t) {
-    var c, d, h;
+  openFilePicker(e, i) {
+    var p, u, h;
     if (!e) return;
-    const i = t.dataset.target ?? "", r = e.querySelector(`[name='${i}']`);
-    if (!r) return;
-    const n = globalThis, a = ((h = (d = (c = n.foundry) == null ? void 0 : c.applications) == null ? void 0 : d.apps) == null ? void 0 : h.FilePicker) ?? n.FilePicker;
-    if (!a) return;
-    const o = (u) => {
-      r.value = u, r.dispatchEvent(new Event("input", { bubbles: !0 }));
-    }, l = a.fromButton ? a.fromButton(t) : new a({ type: "image", current: r.value, callback: o });
-    l.callback = o, l.render(!0);
+    const s = i.dataset.target ?? "", n = e.querySelector(`[name='${s}']`);
+    if (!n) return;
+    const a = globalThis, o = ((h = (u = (p = a.foundry) == null ? void 0 : p.applications) == null ? void 0 : u.apps) == null ? void 0 : h.FilePicker) ?? a.FilePicker;
+    if (!o) return;
+    const l = (d) => {
+      n.value = d, n.dispatchEvent(new Event("input", { bubbles: !0 }));
+    }, c = o.fromButton ? o.fromButton(i) : new o({ type: "image", current: n.value, callback: l });
+    c.callback = l, c.render(!0);
   }
-  handleImageDrop(e, t) {
-    var a, o;
+  handleImageDrop(e, i) {
+    var o, l;
     e.preventDefault();
-    const i = (o = (a = e.dataTransfer) == null ? void 0 : a.getData("text/plain")) == null ? void 0 : o.trim();
-    if (!i) return;
-    let r = i;
+    const s = (l = (o = e.dataTransfer) == null ? void 0 : o.getData("text/plain")) == null ? void 0 : l.trim();
+    if (!s) return;
+    let n = s;
     try {
-      const l = JSON.parse(i);
-      r = typeof l.path == "string" ? l.path : typeof l.src == "string" ? l.src : "";
+      const c = JSON.parse(s);
+      n = typeof c.path == "string" ? c.path : typeof c.src == "string" ? c.src : "";
     } catch {
     }
-    if (!r) return;
-    const n = t.querySelector("[data-image-input]");
-    n && (n.value = r, n.dispatchEvent(new Event("input", { bubbles: !0 })));
+    if (!n) return;
+    const a = i.querySelector("[data-image-input]");
+    a && (a.value = n, a.dispatchEvent(new Event("input", { bubbles: !0 })));
   }
-  updateImagePreview(e, t, i) {
-    const r = e.querySelector(`[data-image-preview='${t}']`);
-    if (!r) return;
-    const n = i.trim();
-    r.hidden = !n, n ? r.src = U(n) : r.removeAttribute("src"), this.updateImagePresentationPreview(e, t);
+  updateImagePreview(e, i, s) {
+    const n = e.querySelector(`[data-image-preview='${i}']`);
+    if (!n) return;
+    const a = s.trim();
+    n.hidden = !a, a ? n.src = V(a) : n.removeAttribute("src"), this.updateImagePresentationPreview(e, i);
   }
-  updateImagePresentationPreview(e, t) {
-    if (!t) return;
-    const i = e.querySelector(`[data-image-preview='${t}']`);
+  updateImagePresentationPreview(e, i) {
     if (!i) return;
-    const r = (n, a) => {
-      var o;
-      return ((o = e.querySelector(`[name='imagePresentation.${t}.${n}']`)) == null ? void 0 : o.value) ?? a;
+    const s = e.querySelector(`[data-image-preview='${i}']`);
+    if (!s) return;
+    const n = (a, o) => {
+      var l;
+      return ((l = e.querySelector(`[name='imagePresentation.${i}.${a}']`)) == null ? void 0 : l.value) ?? o;
     };
-    i.style.objectFit = r("fit", "cover") === "contain" ? "contain" : "cover", i.style.objectPosition = `${r("focusX", "50")}% ${r("focusY", "25")}%`, i.style.transform = `scale(${r("zoom", "1")}) rotate(${r("rotation", "0")}deg)`;
+    s.style.objectFit = n("fit", "cover") === "contain" ? "contain" : "cover", s.style.objectPosition = `${n("focusX", "50")}% ${n("focusY", "25")}%`, s.style.transform = `scale(${n("zoom", "1")}) rotate(${n("rotation", "0")}deg)`;
   }
   readBonuses(e) {
-    return [...e.querySelectorAll("[data-bonus-row]")].flatMap((t) => {
-      const i = this.input(t, "bonus.name"), r = this.input(t, "bonus.selector");
-      if (!i && !r) return [];
-      const n = this.input(t, "bonus.value"), a = Number(n);
+    return [...e.querySelectorAll("[data-bonus-row]")].flatMap((i) => {
+      const s = this.input(i, "bonus.name"), n = this.input(i, "bonus.selector");
+      if (!s && !n) return [];
+      const a = this.input(i, "bonus.value"), o = Number(a);
       return [{
         id: crypto.randomUUID(),
-        name: i,
-        selector: r,
-        value: n !== "" && Number.isFinite(a) ? a : n,
-        modifierType: this.modifierType(this.input(t, "bonus.modifierType")),
-        appliesTo: this.appliesTo(this.input(t, "bonus.appliesTo")),
-        condition: this.input(t, "bonus.condition") || void 0,
-        visibility: this.visibility(this.input(t, "bonus.visibility"), "followers"),
+        name: s,
+        selector: n,
+        value: a !== "" && Number.isFinite(o) ? o : a,
+        modifierType: this.modifierType(this.input(i, "bonus.modifierType")),
+        appliesTo: this.appliesTo(this.input(i, "bonus.appliesTo")),
+        condition: this.input(i, "bonus.condition") || void 0,
+        visibility: this.visibility(this.input(i, "bonus.visibility"), "followers"),
         enabled: !0
       }];
     });
   }
   readAbilities(e) {
-    return [...e.querySelectorAll("[data-ability-row]")].flatMap((t) => {
-      const i = this.input(t, "ability.name");
-      if (!i) return [];
-      const r = this.input(t, "ability.description"), n = this.input(t, "ability.usageMax"), a = n === "" ? null : Math.max(0, Number(n)), o = this.resetType(this.input(t, "ability.reset")), l = Math.max(0, Number(this.input(t, "ability.cooldownValue") || 0)), c = Math.max(0, Number(this.input(t, "ability.durationValue") || 0)), d = [...t.querySelectorAll("[data-effect-row]")].map((h) => this.readEffect(h, c));
+    return [...e.querySelectorAll("[data-ability-row]")].flatMap((i) => {
+      const s = this.input(i, "ability.name");
+      if (!s) return [];
+      const n = this.input(i, "ability.description"), a = this.input(i, "ability.usageMax"), o = a === "" ? null : Math.max(0, Number(a)), l = this.resetType(this.input(i, "ability.reset")), c = Math.max(0, Number(this.input(i, "ability.cooldownValue") || 0)), p = Math.max(0, Number(this.input(i, "ability.durationValue") || 0)), u = [...i.querySelectorAll("[data-effect-row]")].map((h) => this.readEffect(h, p));
       return [{
         id: crypto.randomUUID(),
-        name: i,
-        description: r,
-        visibility: this.visibility(this.input(t, "ability.visibility"), "followers"),
+        name: s,
+        description: n,
+        visibility: this.visibility(this.input(i, "ability.visibility"), "followers"),
         enabled: !0,
-        abilityType: this.input(t, "ability.abilityType") === "fortune-wheel" ? "fortune-wheel" : "standard",
-        uses: a === null ? void 0 : { max: a, reset: o },
+        abilityType: this.input(i, "ability.abilityType") === "fortune-wheel" ? "fortune-wheel" : "standard",
+        uses: o === null ? void 0 : { max: o, reset: l },
         timing: {
-          actionCost: { type: this.actionCost(this.input(t, "ability.actionCost")), actions: Number(this.input(t, "ability.actions") || 0) || void 0 },
-          usage: { max: a, period: a === null ? "unlimited" : "reset" },
-          reset: { event: o },
-          cooldown: l > 0 ? { value: l, unit: this.cooldownUnit(this.input(t, "ability.cooldownUnit")) } : null,
-          duration: { value: c, unit: this.durationUnit(this.input(t, "ability.durationUnit")) }
+          actionCost: { type: this.actionCost(this.input(i, "ability.actionCost")), actions: Number(this.input(i, "ability.actions") || 0) || void 0 },
+          usage: { max: o, period: o === null ? "unlimited" : "reset" },
+          reset: { event: l },
+          cooldown: c > 0 ? { value: c, unit: this.cooldownUnit(this.input(i, "ability.cooldownUnit")) } : null,
+          duration: { value: p, unit: this.durationUnit(this.input(i, "ability.durationUnit")) }
         },
-        effects: d.length ? d : [{ type: "message", text: r }]
+        effects: u.length ? u : [{ type: "message", text: n }]
       }];
     });
   }
-  readEffect(e, t) {
-    const i = this.input(e, "effect.type"), r = this.input(e, "effect.formula") || "1", n = this.input(e, "effect.selector") || "all", a = this.effectTarget(this.input(e, "effect.target")), o = this.input(e, "effect.aux"), l = this.input(e, "effect.operation");
-    return i === "heal" || i === "damage" ? { type: i, formula: r, target: a } : i === "modifier" ? { type: i, selector: n, value: r, modifierType: this.modifierType(this.input(e, "effect.modifierType")), target: a, duration: Math.max(0, Number(this.input(e, "effect.duration") || t)) } : i === "condition" ? { type: i, condition: o || n, target: a, operation: l === "remove" || l === "suppress" ? l : "add", duration: Math.max(0, Number(this.input(e, "effect.duration") || t)) } : i === "roll" ? { type: i, roll: l === "check" || l === "saving-throw" || l === "degree-of-success" ? l : "reroll", selector: n, dc: r, keep: o === "higher" || o === "lower" ? o : "new", target: a } : i === "movement" ? { type: i, mode: l === "teleport" || l === "forced" ? l : "step", distance: r, target: a } : i === "action" ? { type: i, operation: l === "repeat" ? "repeat" : "lose", amount: Math.max(1, Number(r) || 1), target: a } : i === "control" ? { type: i, faction: l === "friendly" || l === "neutral" ? l : "hostile", target: a, save: n, bossImmune: o !== "allow-boss" } : i === "resource" ? { type: i, resource: l === "gold" || l === "item" ? l : "hp", operation: o === "remove" || o === "transfer" ? o : "add", formula: r, target: a, itemUuid: this.input(e, "effect.uuid") || void 0 } : i === "information" ? { type: i, mode: l === "reveal" || l === "truth" ? l : "gm-dialog", text: o || void 0, questions: Math.max(1, Number(r) || 1) } : i === "counter" ? { type: i, key: n, operation: l === "set" || l === "require" ? l : "add", value: r } : i === "choice" ? { type: i, prompt: o || "Choose", options: n.split(",").map((c) => c.trim()).filter(Boolean).map((c) => ({ id: crypto.randomUUID(), label: c, effects: [{ type: "message", text: c }] })) } : i === "random-wheel" ? { type: i, tableId: this.input(e, "effect.uuid") || n, visibility: l === "gm" || l === "user" ? l : "public" } : i === "macro" ? { type: i, command: this.input(e, "effect.code") || o } : { type: "message", text: o || r };
+  readEffect(e, i) {
+    const s = this.input(e, "effect.type"), n = this.input(e, "effect.formula") || "1", a = this.input(e, "effect.selector") || "all", o = this.effectTarget(this.input(e, "effect.target")), l = this.input(e, "effect.aux"), c = this.input(e, "effect.operation");
+    return s === "heal" || s === "damage" ? { type: s, formula: n, target: o } : s === "modifier" ? { type: s, selector: a, value: n, modifierType: this.modifierType(this.input(e, "effect.modifierType")), target: o, duration: Math.max(0, Number(this.input(e, "effect.duration") || i)) } : s === "condition" ? { type: s, condition: l || a, target: o, operation: c === "remove" || c === "suppress" ? c : "add", duration: Math.max(0, Number(this.input(e, "effect.duration") || i)) } : s === "roll" ? { type: s, roll: c === "check" || c === "saving-throw" || c === "degree-of-success" ? c : "reroll", selector: a, dc: n, keep: l === "higher" || l === "lower" ? l : "new", target: o } : s === "movement" ? { type: s, mode: c === "teleport" || c === "forced" ? c : "step", distance: n, target: o } : s === "action" ? { type: s, operation: c === "repeat" ? "repeat" : "lose", amount: Math.max(1, Number(n) || 1), target: o } : s === "control" ? { type: s, faction: c === "friendly" || c === "neutral" ? c : "hostile", target: o, save: a, bossImmune: l !== "allow-boss" } : s === "resource" ? { type: s, resource: c === "gold" || c === "item" ? c : "hp", operation: l === "remove" || l === "transfer" ? l : "add", formula: n, target: o, itemUuid: this.input(e, "effect.uuid") || void 0 } : s === "information" ? { type: s, mode: c === "reveal" || c === "truth" ? c : "gm-dialog", text: l || void 0, questions: Math.max(1, Number(n) || 1) } : s === "counter" ? { type: s, key: a, operation: c === "set" || c === "require" ? c : "add", value: n } : s === "choice" ? { type: s, prompt: l || "Choose", options: a.split(",").map((p) => p.trim()).filter(Boolean).map((p) => ({ id: crypto.randomUUID(), label: p, effects: [{ type: "message", text: p }] })) } : s === "random-wheel" ? { type: s, tableId: this.input(e, "effect.uuid") || a, visibility: c === "gm" || c === "user" ? c : "public" } : s === "macro" ? { type: s, command: this.input(e, "effect.code") || l } : { type: "message", text: l || n };
   }
-  populateEffect(e, t) {
+  populateEffect(e, i) {
     this.appendTemplate(e, "effect", ":scope > [data-effect-list]");
-    const i = e.querySelector("[data-effect-list] [data-effect-row]:last-child");
-    i && (this.setValue(i, "effect.type", t.type), "target" in t && this.setValue(i, "effect.target", t.target ?? "self"), "formula" in t && this.setValue(i, "effect.formula", String(t.formula)), t.type === "modifier" && (this.setValue(i, "effect.formula", String(t.value)), this.setValue(i, "effect.selector", t.selector), this.setValue(i, "effect.modifierType", t.modifierType), this.setValue(i, "effect.duration", String(t.duration ?? 0))), t.type === "condition" && (this.setValue(i, "effect.aux", t.condition), this.setValue(i, "effect.operation", t.operation ?? "add"), this.setValue(i, "effect.duration", String(t.duration ?? 0))), t.type === "message" && this.setValue(i, "effect.aux", t.text), t.type === "macro" && this.setValue(i, "effect.code", t.command), t.type === "random-wheel" && (this.setValue(i, "effect.uuid", t.tableId), this.setValue(i, "effect.operation", t.visibility)));
+    const s = e.querySelector("[data-effect-list] [data-effect-row]:last-child");
+    s && (this.setValue(s, "effect.type", i.type), "target" in i && this.setValue(s, "effect.target", i.target ?? "self"), "formula" in i && this.setValue(s, "effect.formula", String(i.formula)), i.type === "modifier" && (this.setValue(s, "effect.formula", String(i.value)), this.setValue(s, "effect.selector", i.selector), this.setValue(s, "effect.modifierType", i.modifierType), this.setValue(s, "effect.duration", String(i.duration ?? 0))), i.type === "condition" && (this.setValue(s, "effect.aux", i.condition), this.setValue(s, "effect.operation", i.operation ?? "add"), this.setValue(s, "effect.duration", String(i.duration ?? 0))), i.type === "message" && this.setValue(s, "effect.aux", i.text), i.type === "macro" && this.setValue(s, "effect.code", i.command), i.type === "random-wheel" && (this.setValue(s, "effect.uuid", i.tableId), this.setValue(s, "effect.operation", i.visibility)));
   }
   readImagePresentation(e) {
-    const t = {};
-    for (const i of ["image", "icon", "symbol", "banner"]) t[i] = {
-      fit: this.text(e.get(`imagePresentation.${i}.fit`)) === "contain" ? "contain" : "cover",
-      focusX: this.clampNumber(e.get(`imagePresentation.${i}.focusX`), 50, 0, 100),
-      focusY: this.clampNumber(e.get(`imagePresentation.${i}.focusY`), 25, 0, 100),
-      zoom: this.clampNumber(e.get(`imagePresentation.${i}.zoom`), 1, 1, 3),
-      rotation: this.clampNumber(e.get(`imagePresentation.${i}.rotation`), 0, -180, 180)
+    const i = {};
+    for (const s of ["image", "icon", "symbol", "banner"]) i[s] = {
+      fit: this.text(e.get(`imagePresentation.${s}.fit`)) === "contain" ? "contain" : "cover",
+      focusX: this.clampNumber(e.get(`imagePresentation.${s}.focusX`), 50, 0, 100),
+      focusY: this.clampNumber(e.get(`imagePresentation.${s}.focusY`), 25, 0, 100),
+      zoom: this.clampNumber(e.get(`imagePresentation.${s}.zoom`), 1, 1, 3),
+      rotation: this.clampNumber(e.get(`imagePresentation.${s}.rotation`), 0, -180, 180)
     };
-    return t;
+    return i;
   }
   readPantheonIds(e) {
-    const t = e.getAll("pantheon.selected").map(String).filter(Boolean), i = this.list(e.get("pantheons")), r = this.text(e.get("pantheon.new.name"));
-    return r && t.push(this.pantheonId(r)), [.../* @__PURE__ */ new Set([...t, ...i])];
+    const i = e.getAll("pantheon.selected").map(String).filter(Boolean), s = this.list(e.get("pantheons")), n = this.text(e.get("pantheon.new.name"));
+    return n && i.push(this.pantheonId(n)), [.../* @__PURE__ */ new Set([...i, ...s])];
   }
   readPantheons(e) {
-    const t = new Set(e.getAll("pantheon.selected").map(String)), i = this.deityService.list().flatMap((n) => n.pantheons ?? []).filter((n) => t.has(n.id)), r = this.text(e.get("pantheon.new.name"));
-    return r && i.push({ id: this.pantheonId(r), name: r, color: this.text(e.get("pantheon.new.color")) || "#8f38e8", symbol: this.optional(e.get("pantheon.new.symbol")), order: this.clampNumber(e.get("pantheon.new.order"), 0, 0, 999) }), [...new Map(i.map((n) => [n.id, n])).values()];
+    const i = new Set(e.getAll("pantheon.selected").map(String)), s = this.deityService.list().flatMap((a) => a.pantheons ?? []).filter((a) => i.has(a.id)), n = this.text(e.get("pantheon.new.name"));
+    return n && s.push({ id: this.pantheonId(n), name: n, color: this.text(e.get("pantheon.new.color")) || "#8f38e8", symbol: this.optional(e.get("pantheon.new.symbol")), order: this.clampNumber(e.get("pantheon.new.order"), 0, 0, 999) }), [...new Map(s.map((a) => [a.id, a])).values()];
   }
   pantheonId(e) {
     return `pantheon-${e.toLocaleLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`;
   }
-  addCatalogSpell(e) {
-    const t = e.querySelector("[data-spell-picker]"), i = e.elements.namedItem("spells"), r = t == null ? void 0 : t.selectedOptions[0];
-    if (!(t != null && t.value) || !i || !r) return;
-    const n = r.dataset.rank ?? "1", a = `${n}=${t.value}`, o = i.value.split(/\r?\n/).filter(Boolean), l = o.findIndex((c) => c.startsWith(`${n}=`));
-    l >= 0 ? o[l] = a : o.push(a), i.value = o.join(`
-`), i.dispatchEvent(new Event("input", { bubbles: !0 }));
+  openSystemPicker(e, i) {
+    const s = i.dataset.picker ?? "", n = this.pickerChoices(s), a = this.pickerValues(e, s), o = s === "domains" || s === "alternateDomains" || s === "spells" || s === "attributes", l = D(), c = { domains: l.DOMAINS, alternateDomains: l.ALTERNATE_DOMAINS, weapons: l.FAVORED_WEAPON, spells: l.CLERIC_SPELLS, skills: l.TRAINED_SKILL, fonts: l.DIVINE_FONT, sanctifications: l.SANCTIFICATION, attributes: l.DIVINE_ATTRIBUTES, official: l.OFFICIAL_DEITY };
+    new ge(c[s] ?? l.PICKER_TITLE ?? "Selection", n, a, o, ({ items: p }) => {
+      var h, d;
+      const u = p.map((m) => m.value);
+      if (s === "weapons")
+        this.setValue(e, "favoredWeaponUuid", u[0] ?? ""), this.setValue(e, "favoredWeapon", ((h = p[0]) == null ? void 0 : h.slug) ?? "");
+      else if (s === "spells") {
+        const m = /* @__PURE__ */ new Map();
+        p.forEach((g) => m.set(g.rank ?? 1, g)), this.setValue(e, "spells", [...m.entries()].sort(([g], [I]) => g - I).map(([g, I]) => `${g}=${I.value}`).join(`
+`));
+      } else {
+        const m = { domains: "domains", alternateDomains: "alternateDomains", skills: "skill", fonts: "font", sanctifications: "sanctification", attributes: "divineAttributes", official: "replacement.sourceUuid" }[s];
+        m && this.setValue(e, m, o ? u.join(", ") : u[0] ?? "");
+      }
+      s === "official" && ((d = e.elements.namedItem("replacement.sourceUuid")) == null || d.dispatchEvent(new Event("change", { bubbles: !0 }))), this.refreshPickerControls(e), this.updateWizardPreview(this.element, e);
+    }).render(!0);
   }
-  async generateImageVariants(e, t) {
-    var o, l, c, d, h, u;
-    const i = ((o = e.elements.namedItem("image")) == null ? void 0 : o.value.trim()) ?? "", r = e.querySelector("[data-variant-status]");
-    if (!i) {
-      r && (r.textContent = "Bitte zuerst ein Porträt auswählen. / Select a portrait first.");
+  pickerChoices(e) {
+    return e === "official" ? this.officialChoices : e === "alternateDomains" ? this.systemCatalog.domains : this.systemCatalog[e] ?? [];
+  }
+  pickerValues(e, i) {
+    var a, o;
+    if (i === "spells") return Object.values(this.spells(((a = e.elements.namedItem("spells")) == null ? void 0 : a.value) ?? "") ?? {});
+    const s = { domains: "domains", alternateDomains: "alternateDomains", weapons: "favoredWeaponUuid", skills: "skill", fonts: "font", sanctifications: "sanctification", attributes: "divineAttributes", official: "replacement.sourceUuid" }[i];
+    if (!s) return [];
+    const n = ((o = e.elements.namedItem(s)) == null ? void 0 : o.value) ?? "";
+    return i === "domains" || i === "alternateDomains" || i === "attributes" ? this.list(n) : n ? [n] : [];
+  }
+  refreshPickerControls(e) {
+    const i = D();
+    e.querySelectorAll("[data-picker-control]").forEach((s) => {
+      const n = s.dataset.pickerControl ?? "", a = this.pickerChoices(n), o = this.pickerValues(e, n), l = o.flatMap((u) => {
+        const h = a.find((d) => d.value === u || n === "weapons" && d.slug === u);
+        return h ? [h] : [];
+      }), c = s.querySelector("[data-picker-label]");
+      c && (c.textContent = l.length ? l.map((u) => u.rank === void 0 || n !== "spells" ? u.label : `${u.rank}: ${u.label}`).join(", ") : o.length ? o.join(", ") : i.PICKER_NONE ?? "—");
+      const p = o.length > l.length;
+      s.classList.toggle("missing", p), s.title = p ? i.PICKER_MISSING ?? "Saved document is unavailable." : "";
+    });
+  }
+  async generateImageVariants(e, i) {
+    var l, c, p, u, h, d;
+    const s = ((l = e.elements.namedItem("image")) == null ? void 0 : l.value.trim()) ?? "", n = e.querySelector("[data-variant-status]");
+    if (!s) {
+      n && (n.textContent = "Bitte zuerst ein Porträt auswählen. / Select a portrait first.");
       return;
     }
-    const n = globalThis, a = ((d = (c = (l = n.foundry) == null ? void 0 : l.applications) == null ? void 0 : c.apps) == null ? void 0 : d.FilePicker) ?? n.FilePicker;
-    if (!(a != null && a.upload)) {
-      r && (r.textContent = "Der Foundry-Dateiupload ist nicht verfügbar. / File upload is unavailable.");
+    const a = globalThis, o = ((u = (p = (c = a.foundry) == null ? void 0 : c.applications) == null ? void 0 : p.apps) == null ? void 0 : u.FilePicker) ?? a.FilePicker;
+    if (!(o != null && o.upload)) {
+      n && (n.textContent = "Der Foundry-Dateiupload ist nicht verfügbar. / File upload is unavailable.");
       return;
     }
-    t.disabled = !0, r && (r.textContent = "Varianten werden erzeugt … / Creating variants …");
+    i.disabled = !0, n && (n.textContent = "Varianten werden erzeugt … / Creating variants …");
     try {
       try {
-        await ((h = a.createDirectory) == null ? void 0 : h.call(a, "data", "darkis-godforge"));
+        await ((h = o.createDirectory) == null ? void 0 : h.call(o, "data", "darkis-godforge"));
       } catch {
       }
-      const p = await this.loadImage(U(i)), m = (((u = e.elements.namedItem("name")) == null ? void 0 : u.value) || i.split("/").pop() || "deity").replace(/\.[^.]+$/, "").toLocaleLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "deity", E = [{ key: "icon", width: 512, height: 512 }, { key: "symbol", width: 1024, height: 1024 }, { key: "banner", width: 1600, height: 600 }], S = [];
-      for (const f of E) {
-        const y = e.elements.namedItem(`variant.${f.key}`);
-        if (!(y != null && y.checked)) continue;
-        const I = await this.renderImageVariant(p, f.width, f.height, this.imagePresentationFromForm(e, f.key)), A = new File([I], `${m}-${f.key}.webp`, { type: "image/webp" }), O = await a.upload("data", "darkis-godforge", A, {}, { notify: !1 }), R = O.path ?? O.url ?? `darkis-godforge/${A.name}`, w = e.elements.namedItem(f.key);
-        w && (w.value = R, w.dispatchEvent(new Event("input", { bubbles: !0 }))), S.push(f.key);
+      const m = await this.loadImage(V(s)), g = (((d = e.elements.namedItem("name")) == null ? void 0 : d.value) || s.split("/").pop() || "deity").replace(/\.[^.]+$/, "").toLocaleLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "deity", I = [{ key: "icon", width: 512, height: 512 }, { key: "symbol", width: 1024, height: 1024 }, { key: "banner", width: 1600, height: 600 }], f = [];
+      for (const y of I) {
+        const E = e.elements.namedItem(`variant.${y.key}`);
+        if (!(E != null && E.checked)) continue;
+        const S = await this.renderImageVariant(m, y.width, y.height, this.imagePresentationFromForm(e, y.key)), T = new File([S], `${g}-${y.key}.webp`, { type: "image/webp" }), O = await o.upload("data", "darkis-godforge", T, {}, { notify: !1 }), A = O.path ?? O.url ?? `darkis-godforge/${T.name}`, k = e.elements.namedItem(y.key);
+        k && (k.value = A, k.dispatchEvent(new Event("input", { bubbles: !0 }))), f.push(y.key);
       }
-      r && (r.textContent = S.length ? `✓ ${S.join(", ")}` : "Keine Variante gewählt. / No variant selected.");
-    } catch (p) {
-      console.error("Darkis GodForge | Could not create image variants.", p), r && (r.textContent = "Bildvarianten konnten nicht erzeugt werden. Prüfe Dateirechte und Browserkonsole.");
+      n && (n.textContent = f.length ? `✓ ${f.join(", ")}` : "Keine Variante gewählt. / No variant selected.");
+    } catch (m) {
+      console.error("Darkis GodForge | Could not create image variants.", m), n && (n.textContent = "Bildvarianten konnten nicht erzeugt werden. Prüfe Dateirechte und Browserkonsole.");
     } finally {
-      t.disabled = !1;
+      i.disabled = !1;
     }
   }
   loadImage(e) {
-    return new Promise((t, i) => {
-      const r = new Image();
-      r.onload = () => t(r), r.onerror = () => i(new Error("The portrait could not be loaded.")), r.src = e;
+    return new Promise((i, s) => {
+      const n = new Image();
+      n.onload = () => i(n), n.onerror = () => s(new Error("The portrait could not be loaded.")), n.src = e;
     });
   }
-  imagePresentationFromForm(e, t) {
-    var r;
-    const i = (n, a) => {
-      var o;
-      return this.clampNumber(((o = e.elements.namedItem(`imagePresentation.${t}.${n}`)) == null ? void 0 : o.value) ?? null, a, n === "rotation" ? -180 : n === "zoom" ? 1 : 0, n === "rotation" ? 180 : n === "zoom" ? 3 : 100);
+  imagePresentationFromForm(e, i) {
+    var n;
+    const s = (a, o) => {
+      var l;
+      return this.clampNumber(((l = e.elements.namedItem(`imagePresentation.${i}.${a}`)) == null ? void 0 : l.value) ?? null, o, a === "rotation" ? -180 : a === "zoom" ? 1 : 0, a === "rotation" ? 180 : a === "zoom" ? 3 : 100);
     };
-    return { fit: ((r = e.elements.namedItem(`imagePresentation.${t}.fit`)) == null ? void 0 : r.value) === "contain" ? "contain" : "cover", focusX: i("focusX", 50), focusY: i("focusY", 25), zoom: i("zoom", 1), rotation: i("rotation", 0) };
+    return { fit: ((n = e.elements.namedItem(`imagePresentation.${i}.fit`)) == null ? void 0 : n.value) === "contain" ? "contain" : "cover", focusX: s("focusX", 50), focusY: s("focusY", 25), zoom: s("zoom", 1), rotation: s("rotation", 0) };
   }
-  renderImageVariant(e, t, i, r) {
-    const n = document.createElement("canvas");
-    n.width = t, n.height = i;
-    const a = n.getContext("2d");
-    if (!a) return Promise.reject(new Error("Canvas is unavailable."));
-    a.clearRect(0, 0, t, i);
-    const o = (r.fit === "contain" ? Math.min(t / e.naturalWidth, i / e.naturalHeight) : Math.max(t / e.naturalWidth, i / e.naturalHeight)) * (r.zoom ?? 1);
-    return a.translate(t / 2, i / 2), a.rotate((r.rotation ?? 0) * Math.PI / 180), a.scale(o, o), a.drawImage(e, -(r.focusX / 100) * e.naturalWidth, -(r.focusY / 100) * e.naturalHeight), new Promise((l, c) => n.toBlob((d) => d ? l(d) : c(new Error("Image encoding failed.")), "image/webp", 0.9));
+  renderImageVariant(e, i, s, n) {
+    const a = document.createElement("canvas");
+    a.width = i, a.height = s;
+    const o = a.getContext("2d");
+    if (!o) return Promise.reject(new Error("Canvas is unavailable."));
+    o.clearRect(0, 0, i, s);
+    const l = (n.fit === "contain" ? Math.min(i / e.naturalWidth, s / e.naturalHeight) : Math.max(i / e.naturalWidth, s / e.naturalHeight)) * (n.zoom ?? 1);
+    return o.translate(i / 2, s / 2), o.rotate((n.rotation ?? 0) * Math.PI / 180), o.scale(l, l), o.drawImage(e, -(n.focusX / 100) * e.naturalWidth, -(n.focusY / 100) * e.naturalHeight), new Promise((c, p) => a.toBlob((u) => u ? c(u) : p(new Error("Image encoding failed.")), "image/webp", 0.9));
   }
   validateFormulaField(e) {
-    var i;
-    const t = (i = e.parentElement) == null ? void 0 : i.querySelector("[data-formula-status]");
-    if (t)
+    var s;
+    const i = (s = e.parentElement) == null ? void 0 : s.querySelector("[data-formula-status]");
+    if (i)
       try {
-        J(e.value.replace(/\b\d+d\d+\b/gi, "1"), { actor: { level: 1 }, target: {} }), t.textContent = "✓", t.dataset.valid = "true";
+        ie(e.value.replace(/\b\d+d\d+\b/gi, "1"), { actor: { level: 1 }, target: {} }), i.textContent = "✓", i.dataset.valid = "true";
       } catch {
-        t.textContent = "!", t.dataset.valid = "false";
+        i.textContent = "!", i.dataset.valid = "false";
       }
-  }
-  filterCatalog(e) {
-    var r, n;
-    const t = (r = this.element) == null ? void 0 : r.querySelector(`[data-catalog='${e.dataset.catalogSearch ?? ""}']`);
-    if (!t) return;
-    const i = e.value.toLocaleLowerCase();
-    for (const a of t.options) a.hidden = !!i && !((n = a.textContent) != null && n.toLocaleLowerCase().includes(i));
   }
   readGrantGroups(e) {
-    const t = e.querySelector("[data-grant-list]");
-    return t ? [...t.children].flatMap((i) => i instanceof HTMLElement && i.matches("[data-grant-group]") ? [this.readGrantGroup(i)] : []) : [];
+    const i = e.querySelector("[data-grant-list]");
+    return i ? [...i.children].flatMap((s) => s instanceof HTMLElement && s.matches("[data-grant-group]") ? [this.readGrantGroup(s)] : []) : [];
   }
   readGrantGroup(e) {
-    const t = e.querySelector(":scope > [data-grant-members]"), i = [];
-    for (const a of (t == null ? void 0 : t.children) ?? []) {
-      if (!(a instanceof HTMLElement)) continue;
-      if (a.matches("[data-grant-group]")) {
-        i.push(this.readGrantGroup(a));
+    const i = e.querySelector(":scope > [data-grant-members]"), s = [];
+    for (const o of (i == null ? void 0 : i.children) ?? []) {
+      if (!(o instanceof HTMLElement)) continue;
+      if (o.matches("[data-grant-group]")) {
+        s.push(this.readGrantGroup(o));
         continue;
       }
-      if (!a.matches("[data-grant-member]")) continue;
-      const o = this.input(a, "grant.ref");
-      if (!o) continue;
-      const l = this.input(a, "grant.overrideName"), c = this.input(a, "grant.overrideDescription"), d = this.input(a, "grant.overrideValue"), h = Number(d), u = l || c || d ? { name: l || void 0, description: c || void 0, value: d ? Number.isFinite(h) ? h : d : void 0 } : void 0;
-      i.push({ type: this.input(a, "grant.type") === "bonus" ? "bonus" : "ability", ref: o, overrides: u });
+      if (!o.matches("[data-grant-member]")) continue;
+      const l = this.input(o, "grant.ref");
+      if (!l) continue;
+      const c = this.input(o, "grant.overrideName"), p = this.input(o, "grant.overrideDescription"), u = this.input(o, "grant.overrideValue"), h = Number(u), d = c || p || u ? { name: c || void 0, description: p || void 0, value: u ? Number.isFinite(h) ? h : u : void 0 } : void 0;
+      s.push({ type: this.input(o, "grant.type") === "bonus" ? "bonus" : "ability", ref: l, overrides: d });
     }
-    const r = this.input(e, "grantGroup.mode") === "any" ? "any" : "all", n = Number(this.input(e, "grantGroup.pick") || 1);
-    return { id: this.input(e, "grantGroup.id") || crypto.randomUUID(), label: this.input(e, "grantGroup.label"), mode: r, pick: r === "any" ? Math.max(1, n) : void 0, grants: i };
+    const n = this.input(e, "grantGroup.mode") === "any" ? "any" : "all", a = Number(this.input(e, "grantGroup.pick") || 1);
+    return { id: this.input(e, "grantGroup.id") || crypto.randomUUID(), label: this.input(e, "grantGroup.label"), mode: n, pick: n === "any" ? Math.max(1, a) : void 0, grants: s };
   }
-  populateGrantGroup(e, t, i) {
-    var l, c, d;
-    const r = e.querySelector("template[data-template='grant-group']");
-    if (!r || !t) return;
-    const n = r.content.cloneNode(!0), a = n.querySelector("[data-grant-group]");
-    if (!a) return;
-    this.setValue(a, "grantGroup.id", i.id), this.setValue(a, "grantGroup.label", i.label), this.setValue(a, "grantGroup.mode", i.mode), this.setValue(a, "grantGroup.pick", String(i.pick ?? 1));
-    const o = a.querySelector(":scope > [data-grant-members]");
-    for (const h of i.grants) {
+  populateGrantGroup(e, i, s) {
+    var c, p, u;
+    const n = e.querySelector("template[data-template='grant-group']");
+    if (!n || !i) return;
+    const a = n.content.cloneNode(!0), o = a.querySelector("[data-grant-group]");
+    if (!o) return;
+    this.setValue(o, "grantGroup.id", s.id), this.setValue(o, "grantGroup.label", s.label), this.setValue(o, "grantGroup.mode", s.mode), this.setValue(o, "grantGroup.pick", String(s.pick ?? 1));
+    const l = o.querySelector(":scope > [data-grant-members]");
+    for (const h of s.grants) {
       if ("mode" in h) {
-        this.populateGrantGroup(e, o, h);
+        this.populateGrantGroup(e, l, h);
         continue;
       }
-      const u = e.querySelector("template[data-template='grant-member']");
-      if (!u || !o) continue;
-      const p = u.content.cloneNode(!0), m = p.querySelector("[data-grant-member]");
-      m && (this.setValue(m, "grant.type", h.type), this.setValue(m, "grant.ref", h.ref), this.setValue(m, "grant.overrideName", ((l = h.overrides) == null ? void 0 : l.name) ?? ""), this.setValue(m, "grant.overrideDescription", ((c = h.overrides) == null ? void 0 : c.description) ?? ""), this.setValue(m, "grant.overrideValue", ((d = h.overrides) == null ? void 0 : d.value) === void 0 ? "" : String(h.overrides.value)), o.append(p));
+      const d = e.querySelector("template[data-template='grant-member']");
+      if (!d || !l) continue;
+      const m = d.content.cloneNode(!0), g = m.querySelector("[data-grant-member]");
+      g && (this.setValue(g, "grant.type", h.type), this.setValue(g, "grant.ref", h.ref), this.setValue(g, "grant.overrideName", ((c = h.overrides) == null ? void 0 : c.name) ?? ""), this.setValue(g, "grant.overrideDescription", ((p = h.overrides) == null ? void 0 : p.description) ?? ""), this.setValue(g, "grant.overrideValue", ((u = h.overrides) == null ? void 0 : u.value) === void 0 ? "" : String(h.overrides.value)), l.append(m));
     }
-    t.append(n);
+    i.append(a);
   }
-  input(e, t) {
-    var i;
-    return (((i = e.querySelector(`[name='${t}']`)) == null ? void 0 : i.value) ?? "").trim();
+  input(e, i) {
+    var s;
+    return (((s = e.querySelector(`[name='${i}']`)) == null ? void 0 : s.value) ?? "").trim();
   }
-  setValue(e, t, i) {
-    const r = e.querySelector(`[name='${t}']`);
-    r && (r.value = i);
+  setValue(e, i, s) {
+    const n = e.querySelector(`[name='${i}']`);
+    n && (n.value = s);
   }
-  setChecked(e, t, i) {
-    const r = e.querySelector(`[name='${t}']`);
-    r && (r.checked = i);
+  setChecked(e, i, s) {
+    const n = e.querySelector(`[name='${i}']`);
+    n && (n.checked = s);
   }
   updateStackingWarnings(e) {
-    var n;
+    var a;
     if (!e) return;
-    const t = [...e.querySelectorAll("[data-bonus-row]")], i = (((n = e.querySelector("[name='skill']")) == null ? void 0 : n.value) ?? "").trim(), r = new Set(t.filter((a) => this.input(a, "bonus.modifierType") === "status").map((a) => this.input(a, "bonus.selector")).filter((a, o, l) => a && l.indexOf(a) !== o));
-    for (const a of t) {
-      const o = this.input(a, "bonus.selector"), l = a.querySelector("[data-stacking-warning]");
-      l && (l.hidden = !r.has(o));
-      const c = a.querySelector("[data-skill-overlap]");
-      c && (c.hidden = !i || o !== i);
+    const i = [...e.querySelectorAll("[data-bonus-row]")], s = (((a = e.querySelector("[name='skill']")) == null ? void 0 : a.value) ?? "").trim(), n = new Set(i.filter((o) => this.input(o, "bonus.modifierType") === "status").map((o) => this.input(o, "bonus.selector")).filter((o, l, c) => o && c.indexOf(o) !== l));
+    for (const o of i) {
+      const l = this.input(o, "bonus.selector"), c = o.querySelector("[data-stacking-warning]");
+      c && (c.hidden = !n.has(l));
+      const p = o.querySelector("[data-skill-overlap]");
+      p && (p.hidden = !s || l !== s);
     }
   }
   text(e) {
@@ -1630,36 +1761,36 @@ class X extends F() {
     return this.text(e) || void 0;
   }
   list(e) {
-    return this.text(e).split(",").map((t) => t.trim()).filter(Boolean);
+    return this.text(e).split(",").map((i) => i.trim()).filter(Boolean);
   }
   spells(e) {
-    return Object.fromEntries(this.text(e).split(/[\n,]+/).map((t) => t.trim()).flatMap((t) => {
-      const i = t.match(/^([1-9]|10)\s*=\s*(.+)$/);
-      return i ? [[i[1], i[2].trim()]] : [];
+    return Object.fromEntries(this.text(e).split(/[\n,]+/).map((i) => i.trim()).flatMap((i) => {
+      const s = i.match(/^([1-9]|10)\s*=\s*(.+)$/);
+      return s ? [[s[1], s[2].trim()]] : [];
     }));
   }
   formatSpells(e) {
-    return Object.entries(e ?? {}).sort(([t], [i]) => Number(t) - Number(i)).map(([t, i]) => `${t}=${i}`).join(`
+    return Object.entries(e ?? {}).sort(([i], [s]) => Number(i) - Number(s)).map(([i, s]) => `${i}=${s}`).join(`
 `);
   }
-  visibility(e, t) {
-    const i = String(e ?? "");
-    return i === "public" || i === "selection" || i === "followers" || i === "owner" || i === "trusted" || i === "gm" || i === "hidden-until-selected" ? i : t;
+  visibility(e, i) {
+    const s = String(e ?? "");
+    return s === "public" || s === "selection" || s === "followers" || s === "owner" || s === "trusted" || s === "gm" || s === "hidden-until-selected" ? s : i;
   }
   status(e) {
-    const t = String(e ?? "");
-    return t === "test" || t === "published" || t === "disabled" || t === "archived" ? t : "draft";
+    const i = String(e ?? "");
+    return i === "test" || i === "published" || i === "disabled" || i === "archived" ? i : "draft";
   }
   replacementMode(e) {
-    const t = String(e ?? "");
-    return t === "replace" || t === "hide" ? t : "none";
+    const i = String(e ?? "");
+    return i === "replace" || i === "hide" ? i : "none";
   }
   effectTarget(e) {
     return e === "target" || e === "allies" || e === "enemies" || e === "group" ? e : "self";
   }
-  clampNumber(e, t, i, r) {
-    const n = Number(e);
-    return Number.isFinite(n) ? Math.min(r, Math.max(i, n)) : t;
+  clampNumber(e, i, s, n) {
+    const a = Number(e);
+    return Number.isFinite(a) ? Math.min(n, Math.max(s, a)) : i;
   }
   modifierType(e) {
     return e === "item" || e === "circumstance" || e === "untyped" ? e : "status";
@@ -1680,87 +1811,87 @@ class X extends F() {
     return e === "rounds" || e === "minutes" || e === "hours" || e === "encounter" || e === "scene" || e === "until-reset" ? e : "instant";
   }
 }
-g(X, "DEFAULT_OPTIONS", { id: "darkis-godforge-deity-editor", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.NEW_DEITY", resizable: !0 }, position: { width: 980, height: 760 } }), g(X, "PARTS", { main: { template: "modules/darkis-godforge/templates/deity-editor.hbs" } });
-class pe extends F() {
-  constructor(e, t, i) {
-    super(), this.deity = e, this.deityService = t, this.adapters = i;
+b(ee, "DEFAULT_OPTIONS", { id: "darkis-godforge-deity-editor", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.NEW_DEITY", resizable: !0 }, position: { width: 980, height: 760 } }), b(ee, "PARTS", { main: { template: "modules/darkis-godforge/templates/deity-editor.hbs" } });
+class Ee extends q() {
+  constructor(t, e, i) {
+    super(), this.deity = t, this.deityService = e, this.adapters = i;
   }
   async _prepareContext() {
-    var e, t, i, r, n, a;
-    return v(), { ui: _(), deity: { ...this.deity, image: U(this.deity.image), imageFit: ((t = (e = this.deity.imagePresentation) == null ? void 0 : e.image) == null ? void 0 : t.fit) === "contain" ? "contain" : "cover", imagePosition: `${((r = (i = this.deity.imagePresentation) == null ? void 0 : i.image) == null ? void 0 : r.focusX) ?? 50}% ${((a = (n = this.deity.imagePresentation) == null ? void 0 : n.image) == null ? void 0 : a.focusY) ?? 25}%` } };
+    var t, e, i, s, n, a;
+    return w(), { ui: D(), deity: { ...this.deity, image: V(this.deity.image), imageFit: ((e = (t = this.deity.imagePresentation) == null ? void 0 : t.image) == null ? void 0 : e.fit) === "contain" ? "contain" : "cover", imagePosition: `${((s = (i = this.deity.imagePresentation) == null ? void 0 : i.image) == null ? void 0 : s.focusX) ?? 50}% ${((a = (n = this.deity.imagePresentation) == null ? void 0 : n.image) == null ? void 0 : a.focusY) ?? 25}%` } };
   }
   _onRender() {
-    var e, t;
-    (t = (e = this.element) == null ? void 0 : e.querySelector("[data-action='edit']")) == null || t.addEventListener("click", () => {
-      this.deityService && new X(this.deityService, (i) => {
+    var t, e;
+    (e = (t = this.element) == null ? void 0 : t.querySelector("[data-action='edit']")) == null || e.addEventListener("click", () => {
+      this.deityService && new ee(this.deityService, (i) => {
         this.deity = i, this.render(!0);
       }, this.adapters, this.deity).render(!0);
     });
   }
 }
-g(pe, "DEFAULT_OPTIONS", { id: "darkis-godforge-deity-detail", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: !0 }, position: { width: 1200, height: 820 } }), g(pe, "PARTS", { main: { template: "modules/darkis-godforge/templates/deity-detail.hbs" } });
-class me extends F() {
-  constructor(e, t) {
-    super(), this.deities = e, this.adapters = t;
+b(Ee, "DEFAULT_OPTIONS", { id: "darkis-godforge-deity-detail", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: !0 }, position: { width: 1200, height: 820 } }), b(Ee, "PARTS", { main: { template: "modules/darkis-godforge/templates/deity-detail.hbs" } });
+class ye extends q() {
+  constructor(t, e) {
+    super(), this.deities = t, this.adapters = e;
   }
   async _prepareContext() {
     var n, a, o;
-    v();
-    const e = ((a = (n = b()) == null ? void 0 : n.system) == null ? void 0 : a.id) ?? "", t = await (((o = this.adapters.tryGet(e)) == null ? void 0 : o.listOfficialDeities()) ?? Promise.resolve([])), i = this.deities.list(), r = t.map((l) => {
-      const c = i.find((d) => d.replacement.sourceUuid === l.sourceUuid && d.replacement.mode !== "none");
-      return { ...l, mappingMode: (c == null ? void 0 : c.replacement.mode) ?? "none", inheritedCount: Object.values((c == null ? void 0 : c.replacement.inherit) ?? {}).filter(Boolean).length, options: i.map((d) => ({ id: d.id, name: d.name, selected: d.id === (c == null ? void 0 : c.id) })) };
+    w();
+    const t = ((a = (n = v()) == null ? void 0 : n.system) == null ? void 0 : a.id) ?? "", e = await (((o = this.adapters.tryGet(t)) == null ? void 0 : o.listOfficialDeities()) ?? Promise.resolve([])), i = this.deities.list().filter((l) => l.kind !== "lore"), s = e.map((l) => {
+      const c = i.find((p) => p.replacement.sourceUuid === l.sourceUuid && p.replacement.mode !== "none");
+      return { ...l, mappingMode: (c == null ? void 0 : c.replacement.mode) ?? "none", inheritedCount: Object.values((c == null ? void 0 : c.replacement.inherit) ?? {}).filter(Boolean).length, options: i.map((p) => ({ id: p.id, name: p.name, selected: p.id === (c == null ? void 0 : c.id) })) };
     });
-    return { ui: _(), rows: r, systemId: e };
+    return { ui: D(), rows: s, systemId: t };
   }
   _onRender() {
-    var t;
-    v();
-    const e = (t = this.element) == null ? void 0 : t.querySelector("form");
-    e == null || e.querySelectorAll("[data-source-row]").forEach((i) => {
-      const r = i.querySelector("[name='replacement.mode']");
-      r && (r.value = i.dataset.mode ?? "none");
-    }), e == null || e.addEventListener("submit", (i) => {
-      var r, n;
-      i.preventDefault(), v();
-      for (const a of e.querySelectorAll("[data-source-row]")) {
-        const o = a.dataset.sourceUuid ?? "", l = ((r = a.querySelector("[name='replacement.deity']")) == null ? void 0 : r.value) ?? "", c = ((n = a.querySelector("[name='replacement.mode']")) == null ? void 0 : n.value) ?? "none", d = c === "hide" || c === "replace" ? c : "none";
-        for (const h of this.deities.list().filter((u) => u.replacement.sourceUuid === o && u.id !== l)) this.deities.update(h.id, { replacement: { sourceUuid: "", mode: "none", contexts: [] } });
+    var e;
+    w();
+    const t = (e = this.element) == null ? void 0 : e.querySelector("form");
+    t == null || t.querySelectorAll("[data-source-row]").forEach((i) => {
+      const s = i.querySelector("[name='replacement.mode']");
+      s && (s.value = i.dataset.mode ?? "none");
+    }), t == null || t.addEventListener("submit", (i) => {
+      var s, n;
+      i.preventDefault(), w();
+      for (const a of t.querySelectorAll("[data-source-row]")) {
+        const o = a.dataset.sourceUuid ?? "", l = ((s = a.querySelector("[name='replacement.deity']")) == null ? void 0 : s.value) ?? "", c = ((n = a.querySelector("[name='replacement.mode']")) == null ? void 0 : n.value) ?? "none", p = c === "hide" || c === "replace" ? c : "none";
+        for (const u of this.deities.list().filter((h) => h.replacement.sourceUuid === o && h.id !== l)) this.deities.update(u.id, { replacement: { sourceUuid: "", mode: "none", contexts: [] } });
         if (l) {
-          const h = this.deities.get(l);
-          this.deities.update(l, { replacement: { ...h == null ? void 0 : h.replacement, sourceUuid: o, mode: d, contexts: ["characterBuilder", "compendium", "actorSheet", "searches", "leveler"] } });
+          const u = this.deities.get(l);
+          this.deities.update(l, { replacement: { ...u == null ? void 0 : u.replacement, sourceUuid: o, mode: p, contexts: ["characterBuilder", "compendium", "actorSheet", "searches", "leveler"] } });
         }
       }
       this.render(!0);
     });
   }
 }
-g(me, "DEFAULT_OPTIONS", { id: "darkis-godforge-replacements", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.REPLACEMENTS", resizable: !0 }, position: { width: 1100, height: 760 } }), g(me, "PARTS", { main: { template: "modules/darkis-godforge/templates/replacement-manager.hbs" } });
-class fe extends F() {
-  constructor(t, i, r, n = "transfer") {
+b(ye, "DEFAULT_OPTIONS", { id: "darkis-godforge-replacements", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.REPLACEMENTS", resizable: !0 }, position: { width: 1100, height: 760 } }), b(ye, "PARTS", { main: { template: "modules/darkis-godforge/templates/replacement-manager.hbs" } });
+class Ie extends q() {
+  constructor(e, i, s, n = "transfer") {
     super();
-    g(this, "pendingImport");
-    g(this, "preview", null);
-    g(this, "error", "");
-    this.deities = t, this.api = i, this.randomContent = r, this.mode = n;
+    b(this, "pendingImport");
+    b(this, "preview", null);
+    b(this, "error", "");
+    this.deities = e, this.api = i, this.randomContent = s, this.mode = n;
   }
   async _prepareContext() {
-    v();
-    const t = this.deities.list();
-    return { ui: _(), preview: this.preview, error: this.error, deityCount: t.length, isTransfer: this.mode === "transfer", isMigration: this.mode === "migration", currentSchema: N, pendingMigrations: t.filter((i) => i.schemaVersion < N).length };
+    w();
+    const e = this.deities.list();
+    return { ui: D(), preview: this.preview, error: this.error, deityCount: e.length, isTransfer: this.mode === "transfer", isMigration: this.mode === "migration", currentSchema: N, pendingMigrations: e.filter((i) => i.schemaVersion < N).length };
   }
   _onRender() {
-    var i, r, n;
-    v();
-    const t = this.element;
-    (i = t == null ? void 0 : t.querySelector("[data-action='export']")) == null || i.addEventListener("click", () => this.downloadExport()), (r = t == null ? void 0 : t.querySelector("[data-import-file]")) == null || r.addEventListener("change", (a) => {
+    var i, s, n;
+    w();
+    const e = this.element;
+    (i = e == null ? void 0 : e.querySelector("[data-action='export']")) == null || i.addEventListener("click", () => this.downloadExport()), (s = e == null ? void 0 : e.querySelector("[data-import-file]")) == null || s.addEventListener("change", (a) => {
       var o;
       return void this.previewFile((o = a.target.files) == null ? void 0 : o[0]);
-    }), (n = t == null ? void 0 : t.querySelector("[data-action='apply-import']")) == null || n.addEventListener("click", () => {
+    }), (n = e == null ? void 0 : e.querySelector("[data-action='apply-import']")) == null || n.addEventListener("click", async () => {
       var a, o, l;
-      if (v(), !!this.pendingImport) {
+      if (w(), !!this.pendingImport) {
         try {
-          const c = this.readRandomContent(this.pendingImport), d = this.api.importDeities(this.pendingImport);
-          c && this.randomContent.replace(c), this.pendingImport = void 0, this.preview = null, this.error = "", (l = (o = (a = k()) == null ? void 0 : a.notifications) == null ? void 0 : o.info) == null || l.call(o, `${d} ${_().IMPORTED}`);
+          const c = this.readRandomContent(this.pendingImport), p = await this.api.importDeities(this.pendingImport);
+          c && this.randomContent.replace(c), this.pendingImport = void 0, this.preview = null, this.error = "", (l = (o = (a = L()) == null ? void 0 : a.notifications) == null ? void 0 : o.info) == null || l.call(o, `${p} ${D().IMPORTED}`);
         } catch (c) {
           this.error = c instanceof Error ? c.message : String(c);
         }
@@ -1769,48 +1900,48 @@ class fe extends F() {
     });
   }
   downloadExport() {
-    v();
-    const t = JSON.stringify({ ...this.api.exportDeities(), randomContent: this.randomContent.snapshot() }, null, 2), i = URL.createObjectURL(new Blob([t], { type: "application/json" })), r = document.createElement("a");
-    r.href = i, r.download = `darkis-godforge-${(/* @__PURE__ */ new Date()).toISOString().slice(0, 10)}.json`, r.click(), URL.revokeObjectURL(i);
+    w();
+    const e = JSON.stringify({ ...this.api.exportDeities(), randomContent: this.randomContent.snapshot() }, null, 2), i = URL.createObjectURL(new Blob([e], { type: "application/json" })), s = document.createElement("a");
+    s.href = i, s.download = `darkis-godforge-${(/* @__PURE__ */ new Date()).toISOString().slice(0, 10)}.json`, s.click(), URL.revokeObjectURL(i);
   }
-  async previewFile(t) {
-    var i, r;
-    if (t) {
+  async previewFile(e) {
+    var i, s;
+    if (e) {
       try {
-        const n = JSON.parse(await t.text()), a = Ze(n), o = new Set(this.deities.list().map((c) => c.id));
+        const n = JSON.parse(await e.text()), a = rt(n), o = new Set(this.deities.list().map((c) => c.id));
         this.pendingImport = n;
         const l = this.readRandomContent(n);
-        this.preview = { total: a.length, created: a.filter((c) => !o.has(c.id)).length, updated: a.filter((c) => o.has(c.id)).length, tables: ((i = l == null ? void 0 : l.tables) == null ? void 0 : i.length) ?? 0, wheels: ((r = l == null ? void 0 : l.wheels) == null ? void 0 : r.length) ?? 0 }, this.error = "";
+        this.preview = { total: a.length, created: a.filter((c) => !o.has(c.id)).length, updated: a.filter((c) => o.has(c.id)).length, tables: ((i = l == null ? void 0 : l.tables) == null ? void 0 : i.length) ?? 0, wheels: ((s = l == null ? void 0 : l.wheels) == null ? void 0 : s.length) ?? 0 }, this.error = "";
       } catch (n) {
         this.pendingImport = void 0, this.preview = null, this.error = n instanceof Error ? n.message : String(n);
       }
       this.render(!0);
     }
   }
-  readRandomContent(t) {
-    if (!t || typeof t != "object" || !("randomContent" in t)) return null;
-    const i = t.randomContent;
-    if (!et(i)) throw new Error("Invalid GodForge random content.");
+  readRandomContent(e) {
+    if (!e || typeof e != "object" || !("randomContent" in e)) return null;
+    const i = e.randomContent;
+    if (!nt(i)) throw new Error("Invalid GodForge random content.");
     return i;
   }
 }
-g(fe, "DEFAULT_OPTIONS", { id: "darkis-godforge-data-manager", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.IMPORT_EXPORT", resizable: !0 }, position: { width: 900, height: 700 } }), g(fe, "PARTS", { main: { template: "modules/darkis-godforge/templates/data-manager.hbs" } });
-class ge extends F() {
-  constructor(t, i = "tables") {
+b(Ie, "DEFAULT_OPTIONS", { id: "darkis-godforge-data-manager", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.IMPORT_EXPORT", resizable: !0 }, position: { width: 900, height: 700 } }), b(Ie, "PARTS", { main: { template: "modules/darkis-godforge/templates/data-manager.hbs" } });
+class be extends q() {
+  constructor(e, i = "tables") {
     super();
-    g(this, "result", null);
-    g(this, "error", "");
-    this.randomContent = t, this.mode = i;
+    b(this, "result", null);
+    b(this, "error", "");
+    this.randomContent = e, this.mode = i;
   }
   async _prepareContext() {
-    v();
-    const t = this.randomContent.listTables(), i = _();
+    w();
+    const e = this.randomContent.listTables(), i = D();
     return {
       ui: i,
-      tables: t,
-      wheels: this.randomContent.listWheels().map((r) => {
+      tables: e,
+      wheels: this.randomContent.listWheels().map((s) => {
         var n;
-        return { ...r, tableName: ((n = t.find((a) => a.id === r.tableId)) == null ? void 0 : n.name) ?? "—" };
+        return { ...s, tableName: ((n = e.find((a) => a.id === s.tableId)) == null ? void 0 : n.name) ?? "—" };
       }),
       result: this.result,
       error: this.error,
@@ -1823,166 +1954,166 @@ class ge extends F() {
     };
   }
   _onRender() {
-    var i, r, n;
-    v();
-    const t = this.element;
-    (i = t == null ? void 0 : t.querySelector("[data-action='add-entry']")) == null || i.addEventListener("click", () => {
-      const a = t.querySelector("[data-template='random-entry']"), o = t.querySelector("[data-entry-list]");
+    var i, s, n;
+    w();
+    const e = this.element;
+    (i = e == null ? void 0 : e.querySelector("[data-action='add-entry']")) == null || i.addEventListener("click", () => {
+      const a = e.querySelector("[data-template='random-entry']"), o = e.querySelector("[data-entry-list]");
       a && o && o.append(a.content.cloneNode(!0));
-    }), t == null || t.addEventListener("click", (a) => {
+    }), e == null || e.addEventListener("click", (a) => {
       var l;
       const o = a.target.closest("[data-action='remove-entry']");
       (l = o == null ? void 0 : o.closest("[data-entry-row]")) == null || l.remove();
-    }), (r = t == null ? void 0 : t.querySelector("[data-table-form]")) == null || r.addEventListener("submit", (a) => {
+    }), (s = e == null ? void 0 : e.querySelector("[data-table-form]")) == null || s.addEventListener("submit", (a) => {
       a.preventDefault(), this.createTable(a.currentTarget);
-    }), (n = t == null ? void 0 : t.querySelector("[data-wheel-form]")) == null || n.addEventListener("submit", (a) => {
+    }), (n = e == null ? void 0 : e.querySelector("[data-wheel-form]")) == null || n.addEventListener("submit", (a) => {
       a.preventDefault(), this.createWheel(a.currentTarget);
-    }), t == null || t.querySelectorAll("[data-test-table]").forEach((a) => a.addEventListener("click", () => this.runAction(() => {
+    }), e == null || e.querySelectorAll("[data-test-table]").forEach((a) => a.addEventListener("click", () => this.runAction(() => {
       const o = this.randomContent.drawTable(a.dataset.testTable ?? "", Math.random);
       this.result = o.entry;
-    }))), t == null || t.querySelectorAll("[data-test-wheel]").forEach((a) => a.addEventListener("click", () => this.runAction(() => {
+    }))), e == null || e.querySelectorAll("[data-test-wheel]").forEach((a) => a.addEventListener("click", () => this.runAction(() => {
       const o = this.randomContent.spinWheel(a.dataset.testWheel ?? "", Math.random).draw;
       this.result = o.entry;
     })));
   }
-  createTable(t) {
-    v();
-    const i = new FormData(t), r = [...t.querySelectorAll("[data-entry-row]")].flatMap((n) => {
+  createTable(e) {
+    w();
+    const i = new FormData(e), s = [...e.querySelectorAll("[data-entry-row]")].flatMap((n) => {
       const a = this.input(n, "entry.label");
       return a ? [{ id: crypto.randomUUID(), label: a, weight: Math.max(0, Number(this.input(n, "entry.weight") || 1)), category: this.category(this.input(n, "entry.category")), description: this.input(n, "entry.description") || void 0, visibleToPlayers: !0 }] : [];
     });
     this.runAction(() => {
-      this.randomContent.createTable({ name: String(i.get("table.name") ?? "").trim(), formula: String(i.get("table.formula") ?? "1d100").trim(), visibility: this.visibility(i.get("table.visibility")), entries: r });
+      this.randomContent.createTable({ name: String(i.get("table.name") ?? "").trim(), formula: String(i.get("table.formula") ?? "1d100").trim(), visibility: this.visibility(i.get("table.visibility")), entries: s });
     });
   }
-  createWheel(t) {
-    v();
-    const i = new FormData(t);
+  createWheel(e) {
+    w();
+    const i = new FormData(e);
     this.runAction(() => {
       this.randomContent.createWheel({ name: String(i.get("wheel.name") ?? "").trim(), tableId: String(i.get("wheel.tableId") ?? ""), visibility: this.visibility(i.get("wheel.visibility")), duration: Math.max(1, Number(i.get("wheel.duration") ?? 6)), minimumSpins: Math.max(1, Number(i.get("wheel.minimumSpins") ?? 5)) });
     });
   }
-  input(t, i) {
-    var r;
-    return ((r = t.querySelector(`[name='${i}']`)) == null ? void 0 : r.value.trim()) ?? "";
+  input(e, i) {
+    var s;
+    return ((s = e.querySelector(`[name='${i}']`)) == null ? void 0 : s.value.trim()) ?? "";
   }
-  visibility(t) {
-    const i = String(t ?? "");
+  visibility(e) {
+    const i = String(e ?? "");
     return i === "gm" || i === "owner" || i === "followers" ? i : "public";
   }
-  category(t) {
-    return t === "positive" || t === "negative" || t === "catastrophic" || t === "jackpot" ? t : "neutral";
+  category(e) {
+    return e === "positive" || e === "negative" || e === "catastrophic" || e === "jackpot" ? e : "neutral";
   }
-  runAction(t) {
+  runAction(e) {
     try {
-      t(), this.error = "", this.render(!0);
+      e(), this.error = "", this.render(!0);
     } catch (i) {
       this.error = i instanceof Error ? i.message : String(i), x("Random content action failed.", i), this.render(!0);
     }
   }
 }
-g(ge, "DEFAULT_OPTIONS", { id: "darkis-godforge-random-manager", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.RANDOM_TABLES", resizable: !0 }, position: { width: 1100, height: 800 } }), g(ge, "PARTS", { main: { template: "modules/darkis-godforge/templates/random-manager.hbs" } });
-class ye extends F() {
-  constructor(e, t) {
-    super(), this.deities = e, this.api = t;
+b(be, "DEFAULT_OPTIONS", { id: "darkis-godforge-random-manager", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.RANDOM_TABLES", resizable: !0 }, position: { width: 1100, height: 800 } }), b(be, "PARTS", { main: { template: "modules/darkis-godforge/templates/random-manager.hbs" } });
+class ve extends q() {
+  constructor(t, e) {
+    super(), this.deities = t, this.api = e;
   }
   async _prepareContext() {
-    var i, r;
-    v();
-    const e = (((r = (i = b()) == null ? void 0 : i.actors) == null ? void 0 : r.contents) ?? []).flatMap((n) => {
+    var i, s;
+    w();
+    const t = (((s = (i = v()) == null ? void 0 : i.actors) == null ? void 0 : s.contents) ?? []).flatMap((n) => {
       var c;
       const a = n;
       if (a.type && a.type !== "character") return [];
       const o = (c = a.flags) == null ? void 0 : c["darkis-godforge"], l = this.deities.get((o == null ? void 0 : o.deityId) ?? "");
       return [{ id: a.id, name: a.name ?? a.id, deityName: (l == null ? void 0 : l.name) ?? "—", hasDeity: !!l }];
-    }), t = this.deities.list().filter((n) => n.status !== "archived").map((n) => ({ id: n.id, name: n.name, choiceGroups: n.grantGroups.flatMap((a) => ee(a)) }));
-    return { ui: _(), actors: e, deities: t };
+    }), e = this.deities.list().filter((n) => n.kind !== "lore" && n.status !== "archived").map((n) => ({ id: n.id, name: n.name, choiceGroups: n.grantGroups.flatMap((a) => se(a)) }));
+    return { ui: D(), actors: t, deities: e };
   }
   _onRender() {
-    var r;
-    v();
-    const e = this.element, t = e == null ? void 0 : e.querySelector("[name='deityId']"), i = () => e == null ? void 0 : e.querySelectorAll("[data-deity-choices]").forEach((n) => {
-      n.hidden = n.dataset.deityChoices !== (t == null ? void 0 : t.value);
+    var s;
+    w();
+    const t = this.element, e = t == null ? void 0 : t.querySelector("[name='deityId']"), i = () => t == null ? void 0 : t.querySelectorAll("[data-deity-choices]").forEach((n) => {
+      n.hidden = n.dataset.deityChoices !== (e == null ? void 0 : e.value);
     });
-    t == null || t.addEventListener("change", i), i(), (r = e == null ? void 0 : e.querySelector("form")) == null || r.addEventListener("submit", (n) => {
-      var h, u;
+    e == null || e.addEventListener("change", i), i(), (s = t == null ? void 0 : t.querySelector("form")) == null || s.addEventListener("submit", (n) => {
+      var u, h;
       n.preventDefault();
-      const a = n.currentTarget, o = new FormData(a), l = (u = (h = b()) == null ? void 0 : h.actors) == null ? void 0 : u.get(String(o.get("actorId") ?? "")), c = String(o.get("deityId") ?? "");
+      const a = n.currentTarget, o = new FormData(a), l = (h = (u = v()) == null ? void 0 : u.actors) == null ? void 0 : h.get(String(o.get("actorId") ?? "")), c = String(o.get("deityId") ?? "");
       if (!l || !c) return;
-      const d = {};
-      e.querySelectorAll(`[data-deity-choices='${Bt(c)}'] input[data-group]:checked`).forEach((p) => {
+      const p = {};
+      t.querySelectorAll(`[data-deity-choices='${Yt(c)}'] input[data-group]:checked`).forEach((d) => {
         var m;
-        (d[m = p.dataset.group ?? ""] ?? (d[m] = [])).push(p.value);
-      }), this.api.assignDeity(l, c, d).then(() => this.render(!0)).catch((p) => x("Character assignment failed.", p));
-    }), e == null || e.querySelectorAll("[data-action='reset-daily-usages']").forEach((n) => n.addEventListener("click", () => {
+        (p[m = d.dataset.group ?? ""] ?? (p[m] = [])).push(d.value);
+      }), this.api.assignDeity(l, c, p).then(() => this.render(!0)).catch((d) => x("Character assignment failed.", d));
+    }), t == null || t.querySelectorAll("[data-action='reset-daily-usages']").forEach((n) => n.addEventListener("click", () => {
       var o, l;
-      const a = (l = (o = b()) == null ? void 0 : o.actors) == null ? void 0 : l.get(n.dataset.actorId ?? "");
+      const a = (l = (o = v()) == null ? void 0 : o.actors) == null ? void 0 : l.get(n.dataset.actorId ?? "");
       a && (n.disabled = !0, this.api.resetActorUsages(a, "daily-preparations").then(() => {
-        var c, d, h;
-        return (h = (d = (c = k()) == null ? void 0 : c.notifications) == null ? void 0 : d.info) == null || h.call(d, _().RESET_DAILY_COMPLETE ?? "Daily-preparation uses were reset."), this.render(!0);
+        var c, p, u;
+        return (u = (p = (c = L()) == null ? void 0 : c.notifications) == null ? void 0 : p.info) == null || u.call(p, D().RESET_DAILY_COMPLETE ?? "Daily-preparation uses were reset."), this.render(!0);
       }).catch((c) => {
         n.disabled = !1, x("Daily usage reset failed.", c);
       }));
     }));
   }
 }
-g(ye, "DEFAULT_OPTIONS", { id: "darkis-godforge-character-manager", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.CHARACTERS", resizable: !0 }, position: { width: 900, height: 700 } }), g(ye, "PARTS", { main: { template: "modules/darkis-godforge/templates/character-manager.hbs" } });
-function Bt(s) {
-  return typeof CSS < "u" ? CSS.escape(s) : s.replace(/["'\\]/g, "\\$&");
+b(ve, "DEFAULT_OPTIONS", { id: "darkis-godforge-character-manager", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.CHARACTERS", resizable: !0 }, position: { width: 900, height: 700 } }), b(ve, "PARTS", { main: { template: "modules/darkis-godforge/templates/character-manager.hbs" } });
+function Yt(r) {
+  return typeof CSS < "u" ? CSS.escape(r) : r.replace(/["'\\]/g, "\\$&");
 }
-class Q extends F() {
-  constructor(t, i = new ve(), r = new it(t, i), n = new tt()) {
+class te extends q() {
+  constructor(e, i = new De(), s = new ot(e, i), n = new at()) {
     super();
-    g(this, "searchTerm", "");
-    g(this, "sectionFilter", "overview");
-    g(this, "searchTimer", null);
-    g(this, "keydownRoot", null);
-    g(this, "handleRootKeydown", (t) => {
+    b(this, "searchTerm", "");
+    b(this, "sectionFilter", "overview");
+    b(this, "searchTimer", null);
+    b(this, "keydownRoot", null);
+    b(this, "handleRootKeydown", (e) => {
       var i;
-      if ((t.ctrlKey || t.metaKey) && t.key.toLocaleLowerCase() === "k") {
-        t.preventDefault();
-        const r = (i = this.element) == null ? void 0 : i.querySelector("[data-search]");
-        r == null || r.focus(), r == null || r.select();
+      if ((e.ctrlKey || e.metaKey) && e.key.toLocaleLowerCase() === "k") {
+        e.preventDefault();
+        const s = (i = this.element) == null ? void 0 : i.querySelector("[data-search]");
+        s == null || s.focus(), s == null || s.select();
       }
     });
-    this.deityService = t, this.adapters = i, this.api = r, this.randomContent = n;
+    this.deityService = e, this.adapters = i, this.api = s, this.randomContent = n;
   }
   async _prepareContext() {
-    var d, h, u, p, m, E, S, f;
-    v();
-    const t = _(), i = this.deityService.list().map((y) => {
-      var A, O, R, w, q, Re;
-      const I = qt(y).filter((nt) => nt.level === "error").length;
+    var p, u, h, d, m, g, I, f;
+    w();
+    const e = D(), i = this.deityService.list().map((y) => {
+      var S, T, O, A, k, $;
+      const E = Kt(y).filter((X) => X.level === "error").length;
       return {
         ...y,
-        image: U(y.image),
-        imagePosition: `${((O = (A = y.imagePresentation) == null ? void 0 : A.image) == null ? void 0 : O.focusX) ?? 50}% ${((w = (R = y.imagePresentation) == null ? void 0 : R.image) == null ? void 0 : w.focusY) ?? 25}%`,
-        imageFit: ((Re = (q = y.imagePresentation) == null ? void 0 : q.image) == null ? void 0 : Re.fit) === "contain" ? "contain" : "cover",
-        errors: I,
-        statusLabel: t[`STATUS_${y.status.toUpperCase()}`] ?? y.status,
-        updatedLabel: Wt(y.updatedAt)
+        image: V(y.image),
+        imagePosition: `${((T = (S = y.imagePresentation) == null ? void 0 : S.image) == null ? void 0 : T.focusX) ?? 50}% ${((A = (O = y.imagePresentation) == null ? void 0 : O.image) == null ? void 0 : A.focusY) ?? 25}%`,
+        imageFit: (($ = (k = y.imagePresentation) == null ? void 0 : k.image) == null ? void 0 : $.fit) === "contain" ? "contain" : "cover",
+        errors: E,
+        statusLabel: e[`STATUS_${y.status.toUpperCase()}`] ?? y.status,
+        updatedLabel: Jt(y.updatedAt)
       };
-    }), r = this.searchTerm.toLocaleLowerCase(), n = i.filter((y) => this.matchesSection(y) && (!r || `${y.name} ${y.title} ${y.domains.join(" ")}`.toLocaleLowerCase().includes(r))), a = ((u = (h = (d = b()) == null ? void 0 : d.actors) == null ? void 0 : h.contents) == null ? void 0 : u.filter($t).length) ?? 0, o = b(), l = ((m = (p = o == null ? void 0 : o.modules) == null ? void 0 : p.get("darkis-godforge")) == null ? void 0 : m.version) ?? "—", c = ((E = o == null ? void 0 : o.system) == null ? void 0 : E.id) ?? "—";
+    }), s = this.searchTerm.toLocaleLowerCase(), n = i.filter((y) => this.matchesSection(y) && (!s || `${y.name} ${y.title} ${y.domains.join(" ")}`.toLocaleLowerCase().includes(s))), a = ((h = (u = (p = v()) == null ? void 0 : p.actors) == null ? void 0 : u.contents) == null ? void 0 : h.filter(Xt).length) ?? 0, o = v(), l = ((m = (d = o == null ? void 0 : o.modules) == null ? void 0 : d.get("darkis-godforge")) == null ? void 0 : m.version) ?? "—", c = ((g = o == null ? void 0 : o.system) == null ? void 0 : g.id) ?? "—";
     return {
-      ui: t,
+      ui: e,
       deities: n,
       hasAnyDeities: i.length > 0,
       searchTerm: this.searchTerm,
       nav: { [this.sectionFilter]: !0 },
-      recent: [...i].sort((y, I) => I.updatedAt.localeCompare(y.updatedAt)).slice(0, 6),
+      recent: [...i].sort((y, E) => E.updatedAt.localeCompare(y.updatedAt)).slice(0, 6),
       stats: {
         deities: i.length,
         pantheons: new Set(i.flatMap((y) => y.pantheonIds ?? [])).size,
         published: i.filter((y) => y.status === "published").length,
-        bonuses: i.reduce((y, I) => y + I.passiveBonuses.length, 0),
-        abilities: i.reduce((y, I) => y + I.abilities.length, 0),
+        bonuses: i.reduce((y, E) => y + E.passiveBonuses.length, 0),
+        abilities: i.reduce((y, E) => y + E.abilities.length, 0),
         invalid: i.filter((y) => y.errors > 0).length,
         assignedActors: a
       },
       systemInfo: {
         foundry: (o == null ? void 0 : o.version) ?? "—",
         system: c,
-        systemVersion: ((S = o == null ? void 0 : o.system) == null ? void 0 : S.version) ?? "—",
+        systemVersion: ((I = o == null ? void 0 : o.system) == null ? void 0 : I.version) ?? "—",
         moduleVersion: l,
         adapter: ((f = this.adapters.tryGet(c)) == null ? void 0 : f.id) ?? "—",
         schema: N
@@ -1990,541 +2121,565 @@ class Q extends F() {
     };
   }
   _onRender() {
-    var r, n, a, o, l;
-    v();
-    const t = this.element;
-    if (!t) return;
-    t.querySelectorAll("[data-action='create']").forEach((c) => c.addEventListener("click", () => new X(this.deityService, () => void this.render(!0), this.adapters).render(!0))), t.querySelectorAll("[data-action='codex']").forEach((c) => c.addEventListener("click", () => new H(this.deityService).render(!0))), t.querySelectorAll("[data-action='player-preview']").forEach((c) => c.addEventListener("click", () => new H(this.deityService, void 0, void 0, void 0, void 0, { isGM: !1, selection: !0 }).render(!0))), t.querySelectorAll("[data-section]").forEach((c) => c.addEventListener("click", () => {
-      const d = c.dataset.section;
-      (d === "overview" || d === "deities" || d === "pantheons" || d === "abilities" || d === "bonuses") && (this.sectionFilter = d, this.render(!0));
-    })), (r = t.querySelector("[data-manager='replacements']")) == null || r.addEventListener("click", () => void new me(this.deityService, this.adapters).render(!0)), t.querySelectorAll("[data-manager='data']").forEach((c) => c.addEventListener("click", () => {
-      const d = c.dataset.managerMode === "migration" ? "migration" : "transfer";
-      new fe(this.deityService, this.api, this.randomContent, d).render(!0);
-    })), t.querySelectorAll("[data-manager='random']").forEach((c) => c.addEventListener("click", () => {
-      const d = c.dataset.managerMode, h = d === "wheels" || d === "test" ? d : "tables";
-      new ge(this.randomContent, h).render(!0);
-    })), (n = t.querySelector("[data-manager='characters']")) == null || n.addEventListener("click", () => void new ye(this.deityService, this.api).render(!0)), (a = t.querySelector("[data-action='toggle-context']")) == null || a.addEventListener("click", () => {
+    var s, n, a, o, l;
+    w();
+    const e = this.element;
+    if (!e) return;
+    e.querySelectorAll("[data-action='create']").forEach((c) => c.addEventListener("click", () => new ee(this.deityService, () => void this.render(!0), this.adapters).render(!0))), e.querySelectorAll("[data-action='codex']").forEach((c) => c.addEventListener("click", () => new B(this.deityService).render(!0))), e.querySelectorAll("[data-action='player-preview']").forEach((c) => c.addEventListener("click", () => new B(this.deityService, void 0, void 0, void 0, void 0, { isGM: !1, selection: !0 }).render(!0))), e.querySelectorAll("[data-section]").forEach((c) => c.addEventListener("click", () => {
+      const p = c.dataset.section;
+      (p === "overview" || p === "deities" || p === "pantheons" || p === "abilities" || p === "bonuses") && (this.sectionFilter = p, this.render(!0));
+    })), (s = e.querySelector("[data-manager='replacements']")) == null || s.addEventListener("click", () => void new ye(this.deityService, this.adapters).render(!0)), e.querySelectorAll("[data-manager='data']").forEach((c) => c.addEventListener("click", () => {
+      const p = c.dataset.managerMode === "migration" ? "migration" : "transfer";
+      new Ie(this.deityService, this.api, this.randomContent, p).render(!0);
+    })), e.querySelectorAll("[data-manager='random']").forEach((c) => c.addEventListener("click", () => {
+      const p = c.dataset.managerMode, u = p === "wheels" || p === "test" ? p : "tables";
+      new be(this.randomContent, u).render(!0);
+    })), (n = e.querySelector("[data-manager='characters']")) == null || n.addEventListener("click", () => void new ve(this.deityService, this.api).render(!0)), (a = e.querySelector("[data-action='toggle-context']")) == null || a.addEventListener("click", () => {
       var c;
-      return (c = t.querySelector(".dg-app-shell")) == null ? void 0 : c.classList.toggle("context-open");
-    }), (o = t.querySelector("[data-action='settings']")) == null || o.addEventListener("click", () => this.openSettings()), t.querySelectorAll("[data-scroll]").forEach((c) => c.addEventListener("click", () => {
-      var d;
-      return (d = t.querySelector(`[data-section-target='${c.dataset.scroll ?? ""}']`)) == null ? void 0 : d.scrollIntoView({ behavior: "smooth", block: "start" });
-    })), t.querySelectorAll("[data-deity]").forEach((c) => c.addEventListener("click", () => {
-      const d = this.deityService.get(c.dataset.deity ?? "");
-      d && new pe(d, this.deityService, this.adapters).render(!0);
+      return (c = e.querySelector(".dg-app-shell")) == null ? void 0 : c.classList.toggle("context-open");
+    }), (o = e.querySelector("[data-action='settings']")) == null || o.addEventListener("click", () => this.openSettings()), e.querySelectorAll("[data-scroll]").forEach((c) => c.addEventListener("click", () => {
+      var p;
+      return (p = e.querySelector(`[data-section-target='${c.dataset.scroll ?? ""}']`)) == null ? void 0 : p.scrollIntoView({ behavior: "smooth", block: "start" });
+    })), e.querySelectorAll("[data-deity]").forEach((c) => c.addEventListener("click", () => {
+      const p = this.deityService.get(c.dataset.deity ?? "");
+      p && new Ee(p, this.deityService, this.adapters).render(!0);
     }));
-    const i = t.querySelector("[data-search]");
+    const i = e.querySelector("[data-search]");
     i && (i.value = this.searchTerm), i == null || i.addEventListener("input", () => {
       this.searchTerm = i.value, this.searchTimer && clearTimeout(this.searchTimer), this.searchTimer = setTimeout(() => void this.render(!0), 140);
-    }), this.keydownRoot !== t && ((l = this.keydownRoot) == null || l.removeEventListener("keydown", this.handleRootKeydown), t.addEventListener("keydown", this.handleRootKeydown), this.keydownRoot = t);
+    }), this.keydownRoot !== e && ((l = this.keydownRoot) == null || l.removeEventListener("keydown", this.handleRootKeydown), e.addEventListener("keydown", this.handleRootKeydown), this.keydownRoot = e);
   }
   _onClose() {
-    var t;
-    this.searchTimer && clearTimeout(this.searchTimer), this.searchTimer = null, (t = this.keydownRoot) == null || t.removeEventListener("keydown", this.handleRootKeydown), this.keydownRoot = null;
+    var e;
+    this.searchTimer && clearTimeout(this.searchTimer), this.searchTimer = null, (e = this.keydownRoot) == null || e.removeEventListener("keydown", this.handleRootKeydown), this.keydownRoot = null;
   }
   openSettings() {
     var n, a, o, l, c;
-    const t = globalThis, i = ((o = (a = (n = t.foundry) == null ? void 0 : n.applications) == null ? void 0 : a.settings) == null ? void 0 : o.SettingsConfig) ?? t.SettingsConfig;
+    const e = globalThis, i = ((o = (a = (n = e.foundry) == null ? void 0 : n.applications) == null ? void 0 : a.settings) == null ? void 0 : o.SettingsConfig) ?? e.SettingsConfig;
     if (i) {
       new i({ initialCategory: "darkis-godforge" }).render(!0);
       return;
     }
-    const r = (c = (l = b()) == null ? void 0 : l.settings) == null ? void 0 : c.sheet;
-    r && r.render(!0);
+    const s = (c = (l = v()) == null ? void 0 : l.settings) == null ? void 0 : c.sheet;
+    s && s.render(!0);
   }
-  matchesSection(t) {
+  matchesSection(e) {
     var i;
-    return this.sectionFilter === "pantheons" ? !!((i = t.pantheonIds) != null && i.length) : this.sectionFilter === "abilities" ? t.abilities.length > 0 : this.sectionFilter === "bonuses" ? t.passiveBonuses.length > 0 : !0;
+    return this.sectionFilter === "pantheons" ? !!((i = e.pantheonIds) != null && i.length) : this.sectionFilter === "abilities" ? e.abilities.length > 0 : this.sectionFilter === "bonuses" ? e.passiveBonuses.length > 0 : !0;
   }
 }
-g(Q, "DEFAULT_OPTIONS", { id: "darkis-godforge-dashboard", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: !0 }, position: { width: 1440, height: 900 } }), g(Q, "PARTS", { main: { template: "modules/darkis-godforge/templates/dashboard.hbs" } });
-function $t(s) {
-  var t;
-  const e = (t = s.flags) == null ? void 0 : t["darkis-godforge"];
-  return !!(e && typeof e == "object" && "deityId" in e);
+b(te, "DEFAULT_OPTIONS", { id: "darkis-godforge-dashboard", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: !0 }, position: { width: 1440, height: 900 } }), b(te, "PARTS", { main: { template: "modules/darkis-godforge/templates/dashboard.hbs" } });
+function Xt(r) {
+  var e;
+  const t = (e = r.flags) == null ? void 0 : e["darkis-godforge"];
+  return !!(t && typeof t == "object" && "deityId" in t);
 }
-function Wt(s) {
-  const e = new Date(s);
-  return Number.isNaN(e.getTime()) ? "—" : new Intl.DateTimeFormat(void 0, { dateStyle: "medium", timeStyle: "short" }).format(e);
+function Jt(r) {
+  const t = new Date(r);
+  return Number.isNaN(t.getTime()) ? "—" : new Intl.DateTimeFormat(void 0, { dateStyle: "medium", timeStyle: "short" }).format(t);
 }
-class Ee extends Z() {
-  constructor(e, t, i, r) {
-    super(), this.actor = e, this.api = t, this.socketRouter = i, this.openCodex = r;
+class Se extends K() {
+  constructor(t, e, i, s) {
+    super(), this.actor = t, this.api = e, this.socketRouter = i, this.openCodex = s;
   }
   async _prepareContext() {
-    const e = this.api.getCharacterWidgetData(this.actor);
-    return { ui: _(), actorId: this.actor.id, ...e, deity: e.deity ? { ...e.deity, image: U(e.deity.image) } : null, abilities: e.abilities.map((t) => ({ ...t, remaining: t.uses ? Math.max(0, t.uses.max - t.uses.used) : null, available: !t.uses || t.uses.used < t.uses.max })) };
+    const t = this.api.getCharacterWidgetData(this.actor);
+    return { ui: D(), actorId: this.actor.id, ...t, deity: t.deity ? { ...t.deity, image: V(t.deity.image) } : null, abilities: t.abilities.map((e) => ({ ...e, remaining: e.uses ? Math.max(0, e.uses.max - e.uses.used) : null, available: !e.uses || e.uses.used < e.uses.max })) };
   }
   _onRender() {
-    var t;
-    const e = this.element;
-    (t = e == null ? void 0 : e.querySelector("[data-action='codex']")) == null || t.addEventListener("click", this.openCodex), e == null || e.querySelectorAll("[data-ability]").forEach((i) => i.addEventListener("click", () => void this.socketRouter.activate({ actorId: this.actor.id, abilityId: i.dataset.ability ?? "", options: {} }).then(() => this.render(!0)).catch((r) => x("Ability activation failed.", r))));
+    var e;
+    const t = this.element;
+    (e = t == null ? void 0 : t.querySelector("[data-action='codex']")) == null || e.addEventListener("click", this.openCodex), t == null || t.querySelectorAll("[data-ability]").forEach((i) => i.addEventListener("click", () => void this.socketRouter.activate({ actorId: this.actor.id, abilityId: i.dataset.ability ?? "", options: {} }).then(() => this.render(!0)).catch((s) => x("Ability activation failed.", s))));
   }
 }
-g(Ee, "DEFAULT_OPTIONS", { id: "darkis-godforge-hub", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.HUB", resizable: !0 }, position: { width: 520, height: 650 } }), g(Ee, "PARTS", { main: { template: "modules/darkis-godforge/templates/hub.hbs" } });
-class jt {
+b(Se, "DEFAULT_OPTIONS", { id: "darkis-godforge-hub", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.HUB", resizable: !0 }, position: { width: 520, height: 650 } }), b(Se, "PARTS", { main: { template: "modules/darkis-godforge/templates/hub.hbs" } });
+class Qt {
   constructor() {
-    g(this, "definitions", /* @__PURE__ */ new Map());
-    g(this, "persistDefinition");
+    b(this, "definitions", /* @__PURE__ */ new Map());
+    b(this, "persistDefinition");
+    b(this, "persistenceQueue", Promise.resolve());
+    b(this, "persistenceError", null);
   }
-  setPersistence(e) {
-    this.persistDefinition = e;
+  setPersistence(t) {
+    this.persistDefinition = t;
   }
   list() {
     return [...this.definitions.values()];
   }
-  get(e) {
-    return this.definitions.get(e) ?? null;
+  get(t) {
+    return this.definitions.get(t) ?? null;
   }
-  save(e) {
-    const t = Je(e).definition;
-    return this.definitions.set(t.id, structuredClone(t)), this.persistDefinition && this.persistDefinition(structuredClone(t)).catch((i) => console.error("Darkis GodForge | Could not persist deity.", i)), t;
+  save(t) {
+    const e = st(t).definition;
+    if (this.definitions.set(e.id, structuredClone(e)), this.persistDefinition) {
+      const i = this.persistDefinition;
+      this.persistenceQueue = this.persistenceQueue.then(async () => {
+        try {
+          await i(structuredClone(e));
+        } catch (s) {
+          this.persistenceError ?? (this.persistenceError = s), console.error("Darkis GodForge | Could not persist deity.", s);
+        }
+      });
+    }
+    return e;
   }
-  create(e) {
-    const t = (/* @__PURE__ */ new Date()).toISOString(), i = { ...structuredClone(e), id: crypto.randomUUID(), schemaVersion: N, revision: 1, createdAt: t, updatedAt: t, checksum: "pending" };
+  async flushPersistence() {
+    if (await this.persistenceQueue, this.persistenceError) {
+      const t = this.persistenceError;
+      throw this.persistenceError = null, t;
+    }
+  }
+  create(t) {
+    const e = (/* @__PURE__ */ new Date()).toISOString(), i = { ...structuredClone(t), id: crypto.randomUUID(), schemaVersion: N, revision: 1, createdAt: e, updatedAt: e, checksum: "pending" };
     return i.checksum = this.checksum(i), this.save(i);
   }
-  update(e, t) {
-    const i = this.get(e);
-    if (!i) throw new Error(`Unknown deity: ${e}`);
-    const r = { ...i, ...structuredClone(t), id: e, revision: i.revision + 1, updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
-    return r.checksum = this.checksum(r), this.save(r);
+  update(t, e) {
+    const i = this.get(t);
+    if (!i) throw new Error(`Unknown deity: ${t}`);
+    const s = { ...i, ...structuredClone(e), id: t, revision: i.revision + 1, updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
+    return s.checksum = this.checksum(s), this.save(s);
   }
-  delete(e) {
-    return this.definitions.delete(e);
+  delete(t) {
+    return this.definitions.delete(t);
   }
-  checksum(e) {
-    const t = JSON.stringify({ ...e, checksum: void 0 });
+  checksum(t) {
+    const e = JSON.stringify({ ...t, checksum: void 0 });
     let i = 2166136261;
-    for (let r = 0; r < t.length; r += 1) i = Math.imul(i ^ t.charCodeAt(r), 16777619);
+    for (let s = 0; s < e.length; s += 1) i = Math.imul(i ^ e.charCodeAt(s), 16777619);
     return (i >>> 0).toString(16);
   }
 }
-const ae = "darkis-godforge";
-class zt {
-  constructor(e) {
-    this.collection = e;
+const ce = "darkis-godforge";
+class Zt {
+  constructor(t) {
+    this.collection = t;
   }
   load() {
-    return this.collection.contents.flatMap((e) => {
+    return this.collection.contents.flatMap((t) => {
       var i;
-      const t = (i = e.flags) == null ? void 0 : i[ae];
-      return t && typeof t == "object" && "deity" in t && Ce(t.deity) ? [t.deity] : [];
+      const e = (i = t.flags) == null ? void 0 : i[ce];
+      return e && typeof e == "object" && "deity" in e && Me(e.deity) ? [e.deity] : [];
     });
   }
-  async save(e) {
-    const t = this.collection.contents.find((n) => {
-      var o;
-      const a = (o = n.flags) == null ? void 0 : o[ae];
-      return a && typeof a == "object" && "deity" in a && Ce(a.deity) && a.deity.id === e.id;
-    }), i = { [ae]: { schemaVersion: e.schemaVersion, deity: e } };
-    return t ? (await t.update({ flags: i }), t.uuid) : this.collection.create ? (await this.collection.create({ name: e.name, flags: i })).uuid : null;
+  async save(t) {
+    const e = this.collection.contents.find((a) => {
+      var l;
+      const o = (l = a.flags) == null ? void 0 : l[ce];
+      return o && typeof o == "object" && "deity" in o && Me(o.deity) && o.deity.id === t.id;
+    }), i = { [ce]: { schemaVersion: t.schemaVersion, deity: t } };
+    if (e)
+      return await e.update({ name: t.name, flags: i }), e.uuid;
+    const s = ft(this.collection);
+    if (!s) throw new Error("Foundry JournalEntry document class is unavailable.");
+    const n = await s.create({ name: t.name, flags: i });
+    if (!n) throw new Error(`Foundry did not create a journal for deity ${t.id}.`);
+    return n.uuid;
   }
 }
-function Yt(s) {
-  if (!s || typeof s != "object" || !("registerModule" in s)) return null;
-  const t = s.registerModule("darkis-godforge");
-  if (!t || typeof t != "object" || !("register" in t) || !("executeAsGM" in t)) return null;
-  const i = t;
+function ei(r) {
+  if (!r || typeof r != "object" || !("registerModule" in r)) return null;
+  const e = r.registerModule("darkis-godforge");
+  if (!e || typeof e != "object" || !("register" in e) || !("executeAsGM" in e)) return null;
+  const i = e;
   return {
-    register: (r, n) => i.register(r, async function(a) {
+    register: (s, n) => i.register(s, async function(a) {
       var l;
       const o = (l = this.socketdata) == null ? void 0 : l.userId;
       if (!o) throw new Error("Socketlib did not provide an authenticated sender.");
       return n(a, o);
     }),
-    executeAsGM: (r, n) => i.executeAsGM(r, n)
+    executeAsGM: (s, n) => i.executeAsGM(s, n)
   };
 }
-function xe(s, e, t) {
-  var d;
-  const i = s.actor;
-  if (!i || !Xt(i) || !Qt(i)) return;
-  const r = Kt(e), n = (r == null ? void 0 : r.closest(".application, .window-app, .app")) ?? r, a = n == null ? void 0 : n.querySelector(".window-header");
+function We(r, t, e) {
+  var p;
+  const i = r.actor;
+  if (!i || !ii(i) || !si(i)) return;
+  const s = ti(t), n = (s == null ? void 0 : s.closest(".application, .window-app, .app")) ?? s, a = n == null ? void 0 : n.querySelector(".window-header");
   if (!a) return;
-  (d = a.querySelector(".darkis-godforge-sheet-button")) == null || d.remove();
-  const o = P("DARKIS_GODFORGE.UI.OPEN_HUB"), l = document.createElement("a");
-  l.className = "darkis-godforge-sheet-button header-control", l.title = o, l.setAttribute("aria-label", o), l.setAttribute("role", "button"), l.innerHTML = '<i class="fas fa-hammer" aria-hidden="true"></i>', l.addEventListener("click", (h) => {
-    h.preventDefault(), h.stopPropagation(), t(i);
+  (p = a.querySelector(".darkis-godforge-sheet-button")) == null || p.remove();
+  const o = G("DARKIS_GODFORGE.UI.OPEN_HUB"), l = document.createElement("a");
+  l.className = "darkis-godforge-sheet-button header-control", l.title = o, l.setAttribute("aria-label", o), l.setAttribute("role", "button"), l.innerHTML = '<i class="fas fa-hammer" aria-hidden="true"></i>', l.addEventListener("click", (u) => {
+    u.preventDefault(), u.stopPropagation(), e(i);
   });
   const c = a.querySelector("button.close, a.close, .header-button.close, [data-action='close']");
   c ? c.before(l) : a.append(l);
 }
-function Kt(s) {
+function ti(r) {
   var i;
-  if (s instanceof HTMLElement) return s;
-  const e = s, t = (e == null ? void 0 : e[0]) ?? ((i = e == null ? void 0 : e.get) == null ? void 0 : i.call(e, 0));
-  return t instanceof HTMLElement ? t : null;
+  if (r instanceof HTMLElement) return r;
+  const t = r, e = (t == null ? void 0 : t[0]) ?? ((i = t == null ? void 0 : t.get) == null ? void 0 : i.call(t, 0));
+  return e instanceof HTMLElement ? e : null;
 }
-function Xt(s) {
-  var t;
-  const e = (t = s.flags) == null ? void 0 : t["darkis-godforge"];
-  return !!(e && typeof e == "object" && "deityId" in e);
+function ii(r) {
+  var e;
+  const t = (e = r.flags) == null ? void 0 : e["darkis-godforge"];
+  return !!(t && typeof t == "object" && "deityId" in t);
 }
-function Qt(s) {
-  var t, i;
-  const e = (t = b()) == null ? void 0 : t.user;
-  return (e == null ? void 0 : e.isGM) === !0 || ((i = s.testUserPermission) == null ? void 0 : i.call(s, e, "OWNER")) === !0;
+function si(r) {
+  var e, i;
+  const t = (e = v()) == null ? void 0 : e.user;
+  return (t == null ? void 0 : t.isGM) === !0 || ((i = r.testUserPermission) == null ? void 0 : i.call(r, t, "OWNER")) === !0;
 }
-const D = "darkis-godforge";
-function Jt(s, e, t) {
-  return class extends Q {
+const R = "darkis-godforge";
+function ri(r, t, e) {
+  return class extends te {
     constructor() {
-      super(s, void 0, e, t);
+      super(r, void 0, t, e);
     }
   };
 }
-function Zt(s, e, t, i, r = () => {
+function ni(r, t, e, i, s = () => {
 }) {
-  if (!s || typeof s != "object" || Array.isArray(s)) return;
-  const n = s, a = Math.max(-1, ...Object.values(n).map((o) => o.order ?? -1)) + 1;
-  n[D] = {
-    name: D,
+  if (!r || typeof r != "object" || Array.isArray(r)) return;
+  const n = r, a = Math.max(-1, ...Object.values(n).map((o) => o.order ?? -1)) + 1;
+  n[R] = {
+    name: R,
     title: "DARKIS_GODFORGE.UI.TITLE",
     icon: "fas fa-hammer",
     order: a,
     visible: !0,
     tools: {
-      hub: { name: "hub", title: "DARKIS_GODFORGE.UI.OPEN_HUB", icon: "fas fa-star", order: 0, button: !0, visible: !0, onChange: (o, l) => r() },
-      codex: { name: "codex", title: "DARKIS_GODFORGE.UI.OPEN_CODEX", icon: "fas fa-book-open", order: 1, button: !0, visible: !0, onChange: (o, l) => t() },
-      dashboard: { name: "dashboard", title: "DARKIS_GODFORGE.UI.OPEN_DASHBOARD", icon: "fas fa-hammer", order: 2, button: !0, visible: i, onChange: (o, l) => e() }
+      hub: { name: "hub", title: "DARKIS_GODFORGE.UI.OPEN_HUB", icon: "fas fa-star", order: 0, button: !0, visible: !0, onChange: (o, l) => s() },
+      codex: { name: "codex", title: "DARKIS_GODFORGE.UI.OPEN_CODEX", icon: "fas fa-book-open", order: 1, button: !0, visible: !0, onChange: (o, l) => e() },
+      dashboard: { name: "dashboard", title: "DARKIS_GODFORGE.UI.OPEN_DASHBOARD", icon: "fas fa-hammer", order: 2, button: !0, visible: i, onChange: (o, l) => t() }
     }
   };
 }
-function ei(s, e, t, i, r, n, a) {
-  const o = Ie();
+function ai(r, t, e, i, s, n, a) {
+  const o = we();
   o && (o.Hooks.once("init", () => {
-    var h, u;
-    const l = He("init");
+    var u, h;
+    const l = je("init");
     if (!l) return;
-    qe(l, s, t, i, a);
-    const c = ((u = (h = l.modules) == null ? void 0 : h.get(D)) == null ? void 0 : u.languages) ?? [{ lang: "de", name: "Deutsch" }, { lang: "en", name: "English" }], d = Object.fromEntries([["auto", "DARKIS_GODFORGE.SETTINGS.AUTO"], ...c.map((p) => [p.lang, p.name])]);
+    ze(l, r, e, i, a);
+    const c = ((h = (u = l.modules) == null ? void 0 : u.get(R)) == null ? void 0 : h.languages) ?? [{ lang: "de", name: "Deutsch" }, { lang: "en", name: "English" }], p = Object.fromEntries([["auto", "DARKIS_GODFORGE.SETTINGS.AUTO"], ...c.map((d) => [d.lang, d.name])]);
     if (!l.settings) console.error("Darkis GodForge | game.settings is unavailable during init.");
     else {
       if (!l.settings.registerMenu) console.error("Darkis GodForge | game.settings.registerMenu is unavailable during init.");
       else try {
-        l.settings.registerMenu(D, "dashboard", { name: "DARKIS_GODFORGE.SETTINGS.MENU_NAME", label: "DARKIS_GODFORGE.SETTINGS.MENU_LABEL", hint: "DARKIS_GODFORGE.SETTINGS.MENU_HINT", icon: "fas fa-hammer", type: Jt(e, s, n), restricted: !0 });
-      } catch (p) {
-        console.error("Darkis GodForge | Could not register dashboard settings menu.", p);
+        l.settings.registerMenu(R, "dashboard", { name: "DARKIS_GODFORGE.SETTINGS.MENU_NAME", label: "DARKIS_GODFORGE.SETTINGS.MENU_LABEL", hint: "DARKIS_GODFORGE.SETTINGS.MENU_HINT", icon: "fas fa-hammer", type: ri(t, r, n), restricted: !0 });
+      } catch (d) {
+        console.error("Darkis GodForge | Could not register dashboard settings menu.", d);
       }
       try {
-        l.settings.register(D, "language", { name: "DARKIS_GODFORGE.SETTINGS.LANGUAGE", hint: "DARKIS_GODFORGE.SETTINGS.LANGUAGE_HINT", scope: "client", config: !0, type: String, default: "auto", choices: d, onChange: (p) => {
-          if (typeof p != "string" || p === "auto") return;
-          const m = c.find((E) => E.lang === p);
-          m != null && m.path && Ge(p, `modules/${D}/${m.path}`);
+        l.settings.register(R, "language", { name: "DARKIS_GODFORGE.SETTINGS.LANGUAGE", hint: "DARKIS_GODFORGE.SETTINGS.LANGUAGE_HINT", scope: "client", config: !0, type: String, default: "auto", choices: p, onChange: (d) => {
+          if (typeof d != "string" || d === "auto") return;
+          const m = c.find((g) => g.lang === d);
+          m != null && m.path && xe(d, `modules/${R}/${m.path}`);
         } });
-      } catch (p) {
-        console.error("Darkis GodForge | Could not register language setting.", p);
+      } catch (d) {
+        console.error("Darkis GodForge | Could not register language setting.", d);
       }
       try {
-        l.settings.register(D, "random-content", { scope: "world", config: !1, type: Object, default: { tables: [], wheels: [] } });
-      } catch (p) {
-        console.error("Darkis GodForge | Could not register random content storage.", p);
+        l.settings.register(R, "random-content", { scope: "world", config: !1, type: Object, default: { tables: [], wheels: [] } });
+      } catch (d) {
+        console.error("Darkis GodForge | Could not register random content storage.", d);
       }
     }
     if (!l.keybindings) console.error("Darkis GodForge | game.keybindings is unavailable during init.");
     else try {
-      l.keybindings.register(D, "open-dashboard", { name: "DARKIS_GODFORGE.UI.OPEN_DASHBOARD", editable: [], onDown: () => {
-        var p, m;
-        return ((m = (p = b()) == null ? void 0 : p.user) == null ? void 0 : m.isGM) !== !0 ? !1 : (t(), !0);
-      } }), l.keybindings.register(D, "open-hub", { name: "DARKIS_GODFORGE.UI.OPEN_HUB", editable: [{ key: "KeyG" }], restricted: !1, onDown: () => (a == null || a(), !0) }), l.keybindings.register(D, "open-codex", { name: "DARKIS_GODFORGE.UI.OPEN_CODEX", editable: [{ key: "KeyG", modifiers: ["Shift"] }], restricted: !1, onDown: () => (i(), !0) });
-    } catch (p) {
-      console.error("Darkis GodForge | Could not register keybindings.", p);
+      l.keybindings.register(R, "open-dashboard", { name: "DARKIS_GODFORGE.UI.OPEN_DASHBOARD", editable: [], onDown: () => {
+        var d, m;
+        return ((m = (d = v()) == null ? void 0 : d.user) == null ? void 0 : m.isGM) !== !0 ? !1 : (e(), !0);
+      } }), l.keybindings.register(R, "open-hub", { name: "DARKIS_GODFORGE.UI.OPEN_HUB", editable: [{ key: "KeyG" }], restricted: !1, onDown: () => (a == null || a(), !0) }), l.keybindings.register(R, "open-codex", { name: "DARKIS_GODFORGE.UI.OPEN_CODEX", editable: [{ key: "KeyG", modifiers: ["Shift"] }], restricted: !1, onDown: () => (i(), !0) });
+    } catch (d) {
+      console.error("Darkis GodForge | Could not register keybindings.", d);
     }
   }), o.Hooks.on("getSceneControlButtons", (...l) => {
-    var c, d;
-    Zt(l[0], t, i, ((d = (c = b()) == null ? void 0 : c.user) == null ? void 0 : d.isGM) === !0, () => a == null ? void 0 : a());
+    var c, p;
+    ni(l[0], e, i, ((p = (c = v()) == null ? void 0 : c.user) == null ? void 0 : p.isGM) === !0, () => a == null ? void 0 : a());
   }), o.Hooks.on("renderCharacterSheetPF2e", (l, c) => {
-    a && xe(l, c, a);
+    a && We(l, c, a);
   }), o.Hooks.on("renderActorSheet", (l, c) => {
-    a && xe(l, c, a);
+    a && We(l, c, a);
   }), o.Hooks.on("pf2e.restForTheNight", (l) => {
-    var h, u, p, m;
-    if (((u = (h = b()) == null ? void 0 : h.system) == null ? void 0 : u.id) !== "pf2e" || !l || typeof l != "object" || !("id" in l)) return;
+    var u, h, d, m;
+    if (((h = (u = v()) == null ? void 0 : u.system) == null ? void 0 : h.id) !== "pf2e" || !l || typeof l != "object" || !("id" in l)) return;
     const c = l;
-    (((m = (p = b()) == null ? void 0 : p.user) == null ? void 0 : m.isGM) === !0 || !r ? s.resetActorUsages(c, "daily-preparations") : r.reset({ actorId: c.id, reset: "daily-preparations" })).catch((E) => console.error("Darkis GodForge | Could not reset daily-preparation usages.", E));
+    (((m = (d = v()) == null ? void 0 : d.user) == null ? void 0 : m.isGM) === !0 || !s ? r.resetActorUsages(c, "daily-preparations") : s.reset({ actorId: c.id, reset: "daily-preparations" })).catch((g) => console.error("Darkis GodForge | Could not reset daily-preparation usages.", g));
   }), o.Hooks.once("ready", async () => {
-    var c, d, h, u, p, m, E, S, f, y;
-    const l = He("ready");
+    var c, p, u, h, d, m, g, I, f, y;
+    const l = je("ready");
     if (l) {
-      qe(l, s, t, i, a);
+      ze(l, r, e, i, a);
       try {
-        const I = (d = (c = l.settings) == null ? void 0 : c.get) == null ? void 0 : d.call(c, D, "language"), A = (p = (u = (h = l.modules) == null ? void 0 : h.get(D)) == null ? void 0 : u.languages) == null ? void 0 : p.find((O) => O.lang === I);
-        typeof I == "string" && (A != null && A.path) && await Ge(I, `modules/${D}/${A.path}`);
-      } catch (I) {
-        console.error("Darkis GodForge | Could not load the selected language.", I);
+        const E = (p = (c = l.settings) == null ? void 0 : c.get) == null ? void 0 : p.call(c, R, "language"), S = (d = (h = (u = l.modules) == null ? void 0 : u.get(R)) == null ? void 0 : h.languages) == null ? void 0 : d.find((T) => T.lang === E);
+        typeof E == "string" && (S != null && S.path) && await xe(E, `modules/${R}/${S.path}`);
+      } catch (E) {
+        console.error("Darkis GodForge | Could not load the selected language.", E);
       }
       try {
         if (l.journal) {
-          const I = new zt(l.journal);
-          for (const A of I.load()) e.save(A);
-          e.setPersistence((A) => I.save(A));
+          const E = new Zt(l.journal);
+          for (const S of E.load()) t.save(S);
+          t.setPersistence((S) => E.save(S));
         }
-      } catch (I) {
-        console.error("Darkis GodForge | Could not load deity journals.", I);
+      } catch (E) {
+        console.error("Darkis GodForge | Could not load deity journals.", E);
       }
       try {
         if (n) {
-          const I = (E = (m = l.settings) == null ? void 0 : m.get) == null ? void 0 : E.call(m, D, "random-content");
-          n.load(I && typeof I == "object" ? I : null), (S = l.settings) != null && S.set && n.setPersistence((A) => l.settings.set(D, "random-content", A));
+          const E = (g = (m = l.settings) == null ? void 0 : m.get) == null ? void 0 : g.call(m, R, "random-content");
+          n.load(E && typeof E == "object" ? E : null), (I = l.settings) != null && I.set && n.setPersistence((S) => l.settings.set(R, "random-content", S));
         }
-      } catch (I) {
-        console.error("Darkis GodForge | Could not load random content.", I);
+      } catch (E) {
+        console.error("Darkis GodForge | Could not load random content.", E);
       }
       try {
-        const I = Yt((y = (f = l.modules) == null ? void 0 : f.get("socketlib")) == null ? void 0 : y.api);
-        I && r && (r.setTransport(I), r.register());
-      } catch (I) {
-        console.error("Darkis GodForge | Could not initialize socketlib integration.", I);
+        const E = ei((y = (f = l.modules) == null ? void 0 : f.get("socketlib")) == null ? void 0 : y.api);
+        E && s && (s.setTransport(E), s.register());
+      } catch (E) {
+        console.error("Darkis GodForge | Could not initialize socketlib integration.", E);
       }
     }
   }));
 }
-function He(s) {
-  const e = b();
-  return e || console.error(`Darkis GodForge | The Foundry game singleton is unavailable during ${s}.`), e ?? null;
+function je(r) {
+  const t = v();
+  return t || console.error(`Darkis GodForge | The Foundry game singleton is unavailable during ${r}.`), t ?? null;
 }
-function qe(s, e, t, i, r) {
+function ze(r, t, e, i, s) {
   var o;
-  const n = (o = s.modules) == null ? void 0 : o.get(D);
+  const n = (o = r.modules) == null ? void 0 : o.get(R);
   if (!n) {
     console.error("Darkis GodForge | Module entry is unavailable; public API could not be exposed.");
     return;
   }
-  const a = e;
-  a.openDashboard = t, a.openCodex = i, r && (a.openHub = r), n.api = a;
+  const a = t;
+  a.openDashboard = e, a.openCodex = i, s && (a.openHub = s), n.api = a;
 }
-class ti {
-  constructor(e, t, i) {
-    g(this, "activations", /* @__PURE__ */ new Map());
-    this.api = e, this.authority = t, this.transport = i;
+class oi {
+  constructor(t, e, i) {
+    b(this, "activations", /* @__PURE__ */ new Map());
+    this.api = t, this.authority = e, this.transport = i;
   }
-  setTransport(e) {
-    this.transport = e;
+  setTransport(t) {
+    this.transport = t;
   }
   register() {
-    var e, t, i;
-    (e = this.transport) == null || e.register("activateAbility", async (r, n) => this.handleActivation(this.parseRequest(r, n), !1)), (t = this.transport) == null || t.register("assignDeity", async (r, n) => this.handleAssignment(this.parseAssignment(r, n), !1)), (i = this.transport) == null || i.register("resetUsages", async (r, n) => this.handleReset(this.parseReset(r, n), !1));
+    var t, e, i;
+    (t = this.transport) == null || t.register("activateAbility", async (s, n) => this.handleActivation(this.parseRequest(s, n), !1)), (e = this.transport) == null || e.register("assignDeity", async (s, n) => this.handleAssignment(this.parseAssignment(s, n), !1)), (i = this.transport) == null || i.register("resetUsages", async (s, n) => this.handleReset(this.parseReset(s, n), !1));
   }
-  async activate(e) {
-    const t = { ...e, activationId: crypto.randomUUID(), userId: this.authority.currentUserId };
-    if (this.updateStatus(t.activationId, "requested"), !this.authority.isGM) {
+  async activate(t) {
+    const e = { ...t, activationId: crypto.randomUUID(), userId: this.authority.currentUserId };
+    if (this.updateStatus(e.activationId, "requested"), !this.authority.isGM) {
       if (!this.transport) throw new Error("GM authority is unavailable.");
-      await this.transport.executeAsGM("activateAbility", t);
+      await this.transport.executeAsGM("activateAbility", e);
       return;
     }
-    await this.handleActivation(t, !0);
+    await this.handleActivation(e, !0);
   }
-  async assign(e) {
-    const t = { ...e, activationId: crypto.randomUUID(), userId: this.authority.currentUserId };
-    if (this.updateStatus(t.activationId, "requested"), !this.authority.isGM) {
+  async assign(t) {
+    const e = { ...t, activationId: crypto.randomUUID(), userId: this.authority.currentUserId };
+    if (this.updateStatus(e.activationId, "requested"), !this.authority.isGM) {
       if (!this.transport) throw new Error("GM authority is unavailable.");
-      await this.transport.executeAsGM("assignDeity", t);
+      await this.transport.executeAsGM("assignDeity", e);
       return;
     }
-    await this.handleAssignment(t, !0);
+    await this.handleAssignment(e, !0);
   }
-  async reset(e) {
-    const t = { ...e, activationId: crypto.randomUUID(), userId: this.authority.currentUserId };
-    if (this.updateStatus(t.activationId, "requested"), !this.authority.isGM) {
+  async reset(t) {
+    const e = { ...t, activationId: crypto.randomUUID(), userId: this.authority.currentUserId };
+    if (this.updateStatus(e.activationId, "requested"), !this.authority.isGM) {
       if (!this.transport) {
-        const i = this.authority.resolveActor(t.actorId);
-        if (!i || !this.authority.ownsActor(i, t.userId)) throw new Error("GM authority is unavailable.");
-        await this.api.resetActorUsages(i, t.reset);
+        const i = this.authority.resolveActor(e.actorId);
+        if (!i || !this.authority.ownsActor(i, e.userId)) throw new Error("GM authority is unavailable.");
+        await this.api.resetActorUsages(i, e.reset);
         return;
       }
-      await this.transport.executeAsGM("resetUsages", t);
+      await this.transport.executeAsGM("resetUsages", e);
       return;
     }
-    await this.handleReset(t, !0);
+    await this.handleReset(e, !0);
   }
-  status(e) {
-    return this.activations.get(e) ?? null;
+  status(t) {
+    return this.activations.get(t) ?? null;
   }
-  async handleActivation(e, t) {
-    if (this.activations.has(e.activationId) && this.activations.get(e.activationId) !== "requested") throw new Error("Activation request has already been processed.");
-    this.updateStatus(e.activationId, "requested");
-    const i = this.authority.resolveActor(e.actorId);
+  async handleActivation(t, e) {
+    if (this.activations.has(t.activationId) && this.activations.get(t.activationId) !== "requested") throw new Error("Activation request has already been processed.");
+    this.updateStatus(t.activationId, "requested");
+    const i = this.authority.resolveActor(t.actorId);
     if (!i)
-      throw this.updateStatus(e.activationId, "aborted"), new Error("Target actor was not found.");
-    if (!this.isAuthorizedRequester(i, e.userId, t))
-      throw this.updateStatus(e.activationId, "aborted"), new Error("User is not allowed to modify this actor.");
-    this.updateStatus(e.activationId, "validated"), this.updateStatus(e.activationId, "running");
+      throw this.updateStatus(t.activationId, "aborted"), new Error("Target actor was not found.");
+    if (!this.isAuthorizedRequester(i, t.userId, e))
+      throw this.updateStatus(t.activationId, "aborted"), new Error("User is not allowed to modify this actor.");
+    this.updateStatus(t.activationId, "validated"), this.updateStatus(t.activationId, "running");
     try {
-      await this.api.activateAbility(i, e.abilityId, e.options), this.updateStatus(e.activationId, "completed");
-    } catch (r) {
-      throw this.updateStatus(e.activationId, "aborted"), r;
+      await this.api.activateAbility(i, t.abilityId, t.options), this.updateStatus(t.activationId, "completed");
+    } catch (s) {
+      throw this.updateStatus(t.activationId, "aborted"), s;
     }
   }
-  async handleAssignment(e, t) {
-    if (this.activations.has(e.activationId) && this.activations.get(e.activationId) !== "requested") throw new Error("Assignment request has already been processed.");
-    this.updateStatus(e.activationId, "requested");
-    const i = this.authority.resolveActor(e.actorId);
+  async handleAssignment(t, e) {
+    if (this.activations.has(t.activationId) && this.activations.get(t.activationId) !== "requested") throw new Error("Assignment request has already been processed.");
+    this.updateStatus(t.activationId, "requested");
+    const i = this.authority.resolveActor(t.actorId);
     if (!i)
-      throw this.updateStatus(e.activationId, "aborted"), new Error("Target actor was not found.");
-    if (!this.isAuthorizedRequester(i, e.userId, t))
-      throw this.updateStatus(e.activationId, "aborted"), new Error("User is not allowed to modify this actor.");
-    if (!t && !this.api.isDeitySelectableByPlayer(e.deityId))
-      throw this.updateStatus(e.activationId, "aborted"), new Error("Deity is not available for player selection.");
-    this.updateStatus(e.activationId, "validated"), this.updateStatus(e.activationId, "running");
+      throw this.updateStatus(t.activationId, "aborted"), new Error("Target actor was not found.");
+    if (!this.isAuthorizedRequester(i, t.userId, e))
+      throw this.updateStatus(t.activationId, "aborted"), new Error("User is not allowed to modify this actor.");
+    if (!e && !this.api.isDeitySelectableByPlayer(t.deityId))
+      throw this.updateStatus(t.activationId, "aborted"), new Error("Deity is not available for player selection.");
+    this.updateStatus(t.activationId, "validated"), this.updateStatus(t.activationId, "running");
     try {
-      await this.api.assignDeity(i, e.deityId, e.choices), this.updateStatus(e.activationId, "completed");
-    } catch (r) {
-      throw this.updateStatus(e.activationId, "aborted"), r;
+      await this.api.assignDeity(i, t.deityId, t.choices), this.updateStatus(t.activationId, "completed");
+    } catch (s) {
+      throw this.updateStatus(t.activationId, "aborted"), s;
     }
   }
-  async handleReset(e, t) {
-    if (this.activations.has(e.activationId) && this.activations.get(e.activationId) !== "requested") throw new Error("Reset request has already been processed.");
-    this.updateStatus(e.activationId, "requested");
-    const i = this.authority.resolveActor(e.actorId);
+  async handleReset(t, e) {
+    if (this.activations.has(t.activationId) && this.activations.get(t.activationId) !== "requested") throw new Error("Reset request has already been processed.");
+    this.updateStatus(t.activationId, "requested");
+    const i = this.authority.resolveActor(t.actorId);
     if (!i)
-      throw this.updateStatus(e.activationId, "aborted"), new Error("Target actor was not found.");
-    if (!this.isAuthorizedRequester(i, e.userId, t))
-      throw this.updateStatus(e.activationId, "aborted"), new Error("User is not allowed to reset this actor.");
-    this.updateStatus(e.activationId, "validated"), this.updateStatus(e.activationId, "running");
+      throw this.updateStatus(t.activationId, "aborted"), new Error("Target actor was not found.");
+    if (!this.isAuthorizedRequester(i, t.userId, e))
+      throw this.updateStatus(t.activationId, "aborted"), new Error("User is not allowed to reset this actor.");
+    this.updateStatus(t.activationId, "validated"), this.updateStatus(t.activationId, "running");
     try {
-      await this.api.resetActorUsages(i, e.reset), this.updateStatus(e.activationId, "completed");
-    } catch (r) {
-      throw this.updateStatus(e.activationId, "aborted"), r;
+      await this.api.resetActorUsages(i, t.reset), this.updateStatus(t.activationId, "completed");
+    } catch (s) {
+      throw this.updateStatus(t.activationId, "aborted"), s;
     }
   }
-  isAuthorizedRequester(e, t, i) {
-    return i ? this.authority.isGM && t === this.authority.currentUserId : this.authority.isGMUser(t) ? !1 : this.authority.ownsActor(e, t);
+  isAuthorizedRequester(t, e, i) {
+    return i ? this.authority.isGM && e === this.authority.currentUserId : this.authority.isGMUser(e) ? !1 : this.authority.ownsActor(t, e);
   }
-  parseRequest(e, t) {
-    if (!e || typeof e != "object" || !this.validId(t)) throw new Error("Invalid socket request.");
-    const i = e;
+  parseRequest(t, e) {
+    if (!t || typeof t != "object" || !this.validId(e)) throw new Error("Invalid socket request.");
+    const i = t;
     if (!this.validId(i.activationId) || !this.validId(i.actorId) || !this.validId(i.abilityId)) throw new Error("Invalid socket request.");
-    return { activationId: i.activationId, actorId: i.actorId, userId: t, abilityId: i.abilityId, options: {} };
+    return { activationId: i.activationId, actorId: i.actorId, userId: e, abilityId: i.abilityId, options: {} };
   }
-  parseAssignment(e, t) {
-    if (!e || typeof e != "object" || !this.validId(t)) throw new Error("Invalid socket request.");
-    const i = e;
+  parseAssignment(t, e) {
+    if (!t || typeof t != "object" || !this.validId(e)) throw new Error("Invalid socket request.");
+    const i = t;
     if (!this.validId(i.activationId) || !this.validId(i.actorId) || !this.validId(i.deityId)) throw new Error("Invalid socket request.");
-    return { activationId: i.activationId, actorId: i.actorId, userId: t, deityId: i.deityId, choices: this.parseChoices(i.choices) };
+    return { activationId: i.activationId, actorId: i.actorId, userId: e, deityId: i.deityId, choices: this.parseChoices(i.choices) };
   }
-  parseReset(e, t) {
-    if (!e || typeof e != "object" || !this.validId(t)) throw new Error("Invalid socket request.");
-    const i = e;
+  parseReset(t, e) {
+    if (!t || typeof t != "object" || !this.validId(e)) throw new Error("Invalid socket request.");
+    const i = t;
     if (!this.validId(i.activationId) || !this.validId(i.actorId) || !this.validReset(i.reset)) throw new Error("Invalid socket request.");
-    return { activationId: i.activationId, actorId: i.actorId, userId: t, reset: i.reset };
+    return { activationId: i.activationId, actorId: i.actorId, userId: e, reset: i.reset };
   }
-  parseChoices(e) {
-    if (e === void 0) return {};
-    if (!e || typeof e != "object" || Array.isArray(e)) throw new Error("Invalid socket request.");
-    const t = Object.entries(e);
-    if (t.length > 50) throw new Error("Invalid socket request.");
+  parseChoices(t) {
+    if (t === void 0) return {};
+    if (!t || typeof t != "object" || Array.isArray(t)) throw new Error("Invalid socket request.");
+    const e = Object.entries(t);
+    if (e.length > 50) throw new Error("Invalid socket request.");
     const i = {};
-    for (const [r, n] of t) {
-      if (!this.validId(r) || !Array.isArray(n) || n.length > 50 || n.some((a) => !this.validId(a))) throw new Error("Invalid socket request.");
-      i[r] = [...new Set(n)];
+    for (const [s, n] of e) {
+      if (!this.validId(s) || !Array.isArray(n) || n.length > 50 || n.some((a) => !this.validId(a))) throw new Error("Invalid socket request.");
+      i[s] = [...new Set(n)];
     }
     return i;
   }
-  validId(e) {
-    return typeof e == "string" && e.length > 0 && e.length <= 256;
+  validId(t) {
+    return typeof t == "string" && t.length > 0 && t.length <= 256;
   }
-  validReset(e) {
-    return typeof e == "string" && ["ten-minute-rest", "refocus", "daily-preparations", "encounter-end", "scene-change", "calendar-day", "calendar-week", "calendar-month", "calendar-year", "custom-rest", "manual", "daily", "weekly", "encounter"].includes(e);
+  validReset(t) {
+    return typeof t == "string" && ["ten-minute-rest", "refocus", "daily-preparations", "encounter-end", "scene-change", "calendar-day", "calendar-week", "calendar-month", "calendar-year", "custom-rest", "manual", "daily", "weekly", "encounter"].includes(t);
   }
-  updateStatus(e, t) {
-    if (!this.activations.has(e) && this.activations.size >= 1e3) {
+  updateStatus(t, e) {
+    if (!this.activations.has(t) && this.activations.size >= 1e3) {
       const i = this.activations.keys().next().value;
       i && this.activations.delete(i);
     }
-    this.activations.set(e, t);
+    this.activations.set(t, e);
   }
 }
-const te = new jt(), _e = new ve(), j = new it(te, _e), st = new tt();
-let Be = null;
-function $e() {
-  if (!De()) {
-    Oe();
+const re = new Qt(), ke = new De(), Y = new ot(re, ke), lt = new at();
+let Ke = null;
+function Ye() {
+  if (!Ce()) {
+    Ne();
     return;
   }
-  Be ?? (Be = new Q(te, _e, j, st)), Be.render(!0).catch((s) => {
-    var e, t, i;
-    console.error("Darkis GodForge | Could not open dashboard.", s), (i = (t = (e = k()) == null ? void 0 : e.notifications) == null ? void 0 : t.error) == null || i.call(t, P("DARKIS_GODFORGE.ERROR.DASHBOARD_OPEN"));
+  Ke ?? (Ke = new te(re, ke, Y, lt)), Ke.render(!0).catch((r) => {
+    var t, e, i;
+    console.error("Darkis GodForge | Could not open dashboard.", r), (i = (e = (t = L()) == null ? void 0 : t.notifications) == null ? void 0 : e.error) == null || i.call(e, G("DARKIS_GODFORGE.ERROR.DASHBOARD_OPEN"));
   });
 }
-function rt() {
-  new H(te, void 0, j, Ne, ri()).render(!0).catch((e) => {
-    var t, i, r;
-    console.error("Darkis GodForge | Could not open codex.", e), (r = (i = (t = k()) == null ? void 0 : t.notifications) == null ? void 0 : i.error) == null || r.call(i, P("DARKIS_GODFORGE.ERROR.CODEX_OPEN"));
+function ct() {
+  new B(re, void 0, Y, Pe, di()).render(!0).catch((t) => {
+    var e, i, s;
+    console.error("Darkis GodForge | Could not open codex.", t), (s = (i = (e = L()) == null ? void 0 : e.notifications) == null ? void 0 : i.error) == null || s.call(i, G("DARKIS_GODFORGE.ERROR.CODEX_OPEN"));
   });
 }
-const We = /* @__PURE__ */ new Map();
-function ii(s) {
-  ni(s).then((e) => {
-    e && si(e);
-  }).catch((e) => {
-    var t, i, r;
-    console.error("Darkis GodForge | Could not select a character for the follower hub.", e), (r = (i = (t = k()) == null ? void 0 : t.notifications) == null ? void 0 : i.error) == null || r.call(i, P("DARKIS_GODFORGE.ERROR.HUB_OPEN"));
+const Xe = /* @__PURE__ */ new Map();
+function li(r) {
+  hi(r).then((t) => {
+    t && ci(t);
+  }).catch((t) => {
+    var e, i, s;
+    console.error("Darkis GodForge | Could not select a character for the follower hub.", t), (s = (i = (e = L()) == null ? void 0 : e.notifications) == null ? void 0 : i.error) == null || s.call(i, G("DARKIS_GODFORGE.ERROR.HUB_OPEN"));
   });
 }
-function si(s) {
-  let e = We.get(s.id);
-  e || (e = new Ee(s, j, Ne, rt), We.set(s.id, e)), e.render(!0).catch((t) => {
-    var i, r, n;
-    console.error("Darkis GodForge | Could not open hub.", t), (n = (r = (i = k()) == null ? void 0 : i.notifications) == null ? void 0 : r.error) == null || n.call(r, P("DARKIS_GODFORGE.ERROR.HUB_OPEN"));
+function ci(r) {
+  let t = Xe.get(r.id);
+  t || (t = new Se(r, Y, Pe, ct), Xe.set(r.id, t)), t.render(!0).catch((e) => {
+    var i, s, n;
+    console.error("Darkis GodForge | Could not open hub.", e), (n = (s = (i = L()) == null ? void 0 : i.notifications) == null ? void 0 : s.error) == null || n.call(s, G("DARKIS_GODFORGE.ERROR.HUB_OPEN"));
   });
 }
-const je = Ie(), Ne = new ti(j, { get currentUserId() {
-  var s, e;
-  return ((e = (s = b()) == null ? void 0 : s.user) == null ? void 0 : e.id) ?? "unknown";
+const Je = we(), Pe = new oi(Y, { get currentUserId() {
+  var r, t;
+  return ((t = (r = v()) == null ? void 0 : r.user) == null ? void 0 : t.id) ?? "unknown";
 }, get isGM() {
-  var s, e;
-  return ((e = (s = b()) == null ? void 0 : s.user) == null ? void 0 : e.isGM) ?? !1;
-}, isGMUser: (s) => {
-  var e, t, i;
-  return ((i = (t = (e = b()) == null ? void 0 : e.users) == null ? void 0 : t.get(s)) == null ? void 0 : i.isGM) === !0;
-}, ownsActor: (s, e) => {
-  var i, r, n;
-  const t = ((r = (i = b()) == null ? void 0 : i.users) == null ? void 0 : r.get(e)) ?? { id: e };
-  return ((n = s.testUserPermission) == null ? void 0 : n.call(s, t, "OWNER")) ?? !1;
-}, resolveActor: (s) => {
-  var e, t;
-  return ((t = (e = b()) == null ? void 0 : e.actors) == null ? void 0 : t.get(s)) ?? null;
+  var r, t;
+  return ((t = (r = v()) == null ? void 0 : r.user) == null ? void 0 : t.isGM) ?? !1;
+}, isGMUser: (r) => {
+  var t, e, i;
+  return ((i = (e = (t = v()) == null ? void 0 : t.users) == null ? void 0 : e.get(r)) == null ? void 0 : i.isGM) === !0;
+}, ownsActor: (r, t) => {
+  var i, s, n;
+  const e = ((s = (i = v()) == null ? void 0 : i.users) == null ? void 0 : s.get(t)) ?? { id: t };
+  return ((n = r.testUserPermission) == null ? void 0 : n.call(r, e, "OWNER")) ?? !1;
+}, resolveActor: (r) => {
+  var t, e;
+  return ((e = (t = v()) == null ? void 0 : t.actors) == null ? void 0 : e.get(r)) ?? null;
 } });
-je ? (ei(j, te, $e, rt, Ne, st, ii), je.Hooks.once("ready", () => {
-  var e, t, i, r, n;
-  const s = (t = (e = b()) == null ? void 0 : e.system) == null ? void 0 : t.id;
-  s && !_e.supports(s) && ((n = (r = (i = k()) == null ? void 0 : i.notifications) == null ? void 0 : r.warn) == null || n.call(r, P("DARKIS_GODFORGE.ERROR.UNSUPPORTED_SYSTEM").replace("{system}", s)));
-})) : typeof document < "u" && $e();
-function ri() {
-  var t, i, r, n;
-  const s = globalThis.canvas, e = ((i = (t = s == null ? void 0 : s.tokens) == null ? void 0 : t.controlled) == null ? void 0 : i.map((a) => a.actor).filter((a) => !!a)) ?? [];
-  return e.length === 1 ? e[0] : (n = (r = b()) == null ? void 0 : r.user) == null ? void 0 : n.character;
+Je ? (ai(Y, re, Ye, ct, Pe, lt, li), Je.Hooks.once("ready", () => {
+  var t, e, i, s, n;
+  const r = (e = (t = v()) == null ? void 0 : t.system) == null ? void 0 : e.id;
+  r && !ke.supports(r) && ((n = (s = (i = L()) == null ? void 0 : i.notifications) == null ? void 0 : s.warn) == null || n.call(s, G("DARKIS_GODFORGE.ERROR.UNSUPPORTED_SYSTEM").replace("{system}", r)));
+})) : typeof document < "u" && Ye();
+function di() {
+  var e, i, s, n;
+  const r = globalThis.canvas, t = ((i = (e = r == null ? void 0 : r.tokens) == null ? void 0 : e.controlled) == null ? void 0 : i.map((a) => a.actor).filter((a) => !!a)) ?? [];
+  return t.length === 1 ? t[0] : (n = (s = v()) == null ? void 0 : s.user) == null ? void 0 : n.character;
 }
-async function ni(s) {
-  var d, h, u, p, m, E, S, f, y, I, A, O, R;
-  if (s) return s;
-  const e = (((h = (d = globalThis.canvas) == null ? void 0 : d.tokens) == null ? void 0 : h.controlled) ?? []).map((w) => w.actor).filter((w) => !!w);
-  if (e.length === 1) return e[0];
-  const t = (p = (u = b()) == null ? void 0 : u.user) == null ? void 0 : p.character;
-  if (t) return t;
-  const i = (m = b()) == null ? void 0 : m.user, r = (((S = (E = b()) == null ? void 0 : E.actors) == null ? void 0 : S.contents) ?? []).filter((w) => {
-    var q;
-    return !!(w && typeof w == "object" && "id" in w && i && ((q = w.testUserPermission) == null ? void 0 : q.call(w, i, "OWNER")) === !0);
+async function hi(r) {
+  var p, u, h, d, m, g, I, f, y, E, S, T, O;
+  if (r) return r;
+  const t = (((u = (p = globalThis.canvas) == null ? void 0 : p.tokens) == null ? void 0 : u.controlled) ?? []).map((A) => A.actor).filter((A) => !!A);
+  if (t.length === 1) return t[0];
+  const e = (d = (h = v()) == null ? void 0 : h.user) == null ? void 0 : d.character;
+  if (e) return e;
+  const i = (m = v()) == null ? void 0 : m.user, s = (((I = (g = v()) == null ? void 0 : g.actors) == null ? void 0 : I.contents) ?? []).filter((A) => {
+    var k;
+    return !!(A && typeof A == "object" && "id" in A && i && ((k = A.testUserPermission) == null ? void 0 : k.call(A, i, "OWNER")) === !0);
   });
-  if (r.length === 1) return r[0];
-  const n = (I = (y = (f = globalThis.foundry) == null ? void 0 : f.applications) == null ? void 0 : y.api) == null ? void 0 : I.DialogV2, a = "Der Anhänger-Hub zeigt Gottheit, Boni und Wunder eines Charakters.";
+  if (s.length === 1) return s[0];
+  const n = (E = (y = (f = globalThis.foundry) == null ? void 0 : f.applications) == null ? void 0 : y.api) == null ? void 0 : E.DialogV2, a = "Der Anhänger-Hub zeigt Gottheit, Boni und Wunder eines Charakters.";
   if (!n) {
-    (R = (O = (A = k()) == null ? void 0 : A.notifications) == null ? void 0 : O.warn) == null || R.call(O, a);
+    (O = (T = (S = L()) == null ? void 0 : S.notifications) == null ? void 0 : T.warn) == null || O.call(T, a);
     return;
   }
-  if (!r.length) {
+  if (!s.length) {
     await n.prompt({ window: { title: "Anhänger-Hub" }, content: `<p>${a}</p><p>Lege einen eigenen Charakter fest oder kontrolliere einen Token.</p>`, rejectClose: !1, ok: { label: "Verstanden" } });
     return;
   }
-  const o = r.map((w) => `<option value="${Ue(w.id)}">${Ue(w.name ?? w.id)}</option>`).join(""), l = await n.input({ window: { title: "Anhänger-Hub – Charakter auswählen" }, content: `<p>${a}</p><label>Charakter<select name="actorId">${o}</select></label>`, rejectClose: !1, ok: { label: "Anhänger-Hub öffnen" } }), c = typeof (l == null ? void 0 : l.actorId) == "string" ? l.actorId : "";
-  return r.find((w) => w.id === c);
+  const o = s.map((A) => `<option value="${He(A.id)}">${He(A.name ?? A.id)}</option>`).join(""), l = await n.input({ window: { title: "Anhänger-Hub – Charakter auswählen" }, content: `<p>${a}</p><label>Charakter<select name="actorId">${o}</select></label>`, rejectClose: !1, ok: { label: "Anhänger-Hub öffnen" } }), c = typeof (l == null ? void 0 : l.actorId) == "string" ? l.actorId : "";
+  return s.find((A) => A.id === c);
 }
 export {
-  Q as GodForgeDashboard,
-  j as api,
-  te as deityService,
-  st as randomContentService,
-  _e as registry,
-  Ne as socketRouter
+  te as GodForgeDashboard,
+  Y as api,
+  re as deityService,
+  lt as randomContentService,
+  ke as registry,
+  Pe as socketRouter
 };
