@@ -9,7 +9,7 @@ export class GodForgePickerDialog extends handlebarsApplicationBase() {
   static PARTS = { main: { template: "modules/darkis-godforge/templates/picker-dialog.hbs" } };
   private readonly selected = new Set<string>();
 
-  constructor(private readonly title: string, private readonly choices: SystemChoice[], selected: string[], private readonly multiple: boolean, private readonly onChoose: (selection: PickerSelection) => void) {
+  constructor(private readonly dialogTitle: string, private readonly choices: SystemChoice[], selected: string[], private readonly multiple: boolean, private readonly onChoose: (selection: PickerSelection) => void) {
     super();
     selected.forEach((value) => this.selected.add(value));
   }
@@ -17,7 +17,7 @@ export class GodForgePickerDialog extends handlebarsApplicationBase() {
   async _prepareContext(): Promise<Record<string, unknown>> {
     const items = this.choices.map((item, index) => ({ ...item, token: String(index), selected: this.selected.has(item.value), traitText: item.traits?.join(", ") ?? "", rankText: item.rank === undefined ? "" : String(item.rank), available: item.available !== false }));
     const unique = (values: Array<string | undefined>): string[] => [...new Set(values.filter((value): value is string => Boolean(value)))].sort((a, b) => a.localeCompare(b));
-    return { ui: uiText(), title: this.title, items, multiple: this.multiple, categories: unique(items.map((item) => item.category)), groups: unique(items.map((item) => item.group)), sources: unique(items.map((item) => item.source)), ranks: [...new Set(items.flatMap((item) => item.rank === undefined ? [] : [item.rank]))].sort((a, b) => a - b), traits: unique(items.flatMap((item) => item.traits ?? [])) };
+    return { ui: uiText(), title: this.dialogTitle, items, multiple: this.multiple, categories: unique(items.map((item) => item.category)), groups: unique(items.map((item) => item.group)), sources: unique(items.map((item) => item.source)), ranks: [...new Set(items.flatMap((item) => item.rank === undefined ? [] : [item.rank]))].sort((a, b) => a - b), traits: unique(items.flatMap((item) => item.traits ?? [])) };
   }
 
   _onRender(): void {

@@ -64,12 +64,14 @@ export class GodForgeAbilityBuilder extends gmApplicationBase() {
     const selected = this.graph.nodes.find((node) => node.id === this.selectedId);
     const nodes = this.graph.nodes.map((node) => {
       const ports = graphPorts(node);
+      const libraryItem = library.find((item) => item.category === node.category && item.type === node.type);
       return {
         ...node,
+        label: localizedNodeLabel(node, ui),
         selected: node.id === this.selectedId,
         connecting: node.id === this.connectFrom,
         style: `left:${node.x}px;top:${node.y}px;height:${Math.max(88, 58 + Math.max(ports.filter((entry) => entry.direction === "input").length, ports.filter((entry) => entry.direction === "output").length) * 24)}px`,
-        icon: library.find((item) => item.category === node.category && item.type === node.type)?.icon ?? "fa-circle-nodes",
+        icon: libraryItem?.icon ?? "fa-circle-nodes",
         hasError: validation.issues.some((issue) => issue.nodeId === node.id),
         miniStyle: `left:${node.x / 20}px;top:${node.y / 20}px`,
         categoryLabel: ui[`CATEGORY_${node.category.toUpperCase()}`] ?? node.category,
@@ -224,7 +226,10 @@ export class GodForgeAbilityBuilder extends gmApplicationBase() {
         conditionFacts: { always: true, "actor.level": 5, "actor.hpPercent": 66, "target.hpPercent": 60 },
         triggerEvent: this.graph.nodes.find((node) => node.category === "trigger")?.type ?? "manual",
         rollDice: async () => 5,
-        rollStatistic: async () => ({ total: 15, degree: "success" })
+        rollStatistic: async () => ({ total: 15, degree: "success" }),
+        choose: async (_prompt, options) => options[0]?.id ?? "",
+        runMacro: async () => undefined,
+        rollTable: async () => ui.SIMULATION_RANDOM_TABLE ?? "Simulated random-table result"
       });
       this.simulation = [
         `${this.graph.nodes.length} ${ui.NODES ?? "nodes"} · ${this.graph.edges.length} ${ui.CONNECTIONS ?? "connections"}`,
@@ -285,3 +290,11 @@ function decoratePorts(ports: ReturnType<typeof graphPorts>, ui: Record<string, 
 function portPoint(node: AbilityGraphNode, portName: string, direction: "input" | "output"): { x: number; y: number } { const ports = graphPorts(node).filter((entry) => entry.direction === direction); const index = Math.max(0, ports.findIndex((entry) => entry.port === portName)); return { x: node.x + (direction === "output" ? 220 : 0), y: node.y + 42 + index * 24 }; }
 function graphIssueText(code: string, ui: Record<string, string>): string { return ui[`GRAPH_ISSUE_${code.replace(/[.-]/g, "_").toUpperCase()}`] ?? (ui.GRAPH_ISSUE_GENERIC ?? "Invalid graph element ({code}).").replace("{code}", code); }
 function localizeOutline(line: string, ui: Record<string, string>): string { return line.replace(/^Trigger:/, `${ui.CATEGORY_TRIGGER ?? "Trigger"}:`).replace(/^Logic:/, `${ui.CATEGORY_LOGIC ?? "Logic"}:`).replace(/^Action:/, `${ui.CATEGORY_ACTION ?? "Action"}:`).replace(/^Result:/, `${ui.CATEGORY_RESULT ?? "Result"}:`); }
+function localizedNodeLabel(node: AbilityGraphNode, ui: Record<string, string>): string {
+  const localized = ui[nodeKey(node.type)];
+  if (!localized) return node.label;
+  const libraryLabel = library.find((item) => item.category === node.category && item.type === node.type)?.label;
+  const legacyLabels = new Set([libraryLabel, node.type, titleCase(node.type), node.type === "manual" ? "Manual" : "", node.type === "random-wheel" ? "Random Wheel" : ""].filter(Boolean));
+  return !node.label || legacyLabels.has(node.label) ? localized : node.label;
+}
+function titleCase(value: string): string { return value.split("-").map((part) => part ? part[0]!.toUpperCase() + part.slice(1) : part).join(" "); }

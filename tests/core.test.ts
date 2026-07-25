@@ -243,7 +243,20 @@ describe("random content management", () => { it("creates persistent table and w
 describe("API data workflows", () => { it("exports the current schema, imports deity data and caches catalog reads", async () => { const service = new DeityService(); service.save(deity); const api = new GodForgeApi(service, new AdapterRegistry()); const first = await api.getSelectableDeities({}); expect(await api.getSelectableDeities({})).toBe(first); const exported = api.exportDeities("2026-07-20T00:00:00.000Z"); expect(exported.schemaVersion).toBe(4); expect(await api.importDeities(exported)).toBe(1); expect(api.drawRandomDeity(() => 0).entry.id).toBe("a"); }); });
 describe("security and replacement regressions", () => { it("allows Foundry image paths and blocks unsafe schemes", () => { expect(escapeHtml(`<img src=x onerror=alert(1)>`)).toContain("&lt;img"); expect(safeImageUrl("worlds/noclaris/gods/tenebris.webp")).toBe("worlds/noclaris/gods/tenebris.webp"); expect(safeImageUrl("modules/darkis-godforge/assets/a.png")).toBe("modules/darkis-godforge/assets/a.png"); expect(safeImageUrl("assets/a.png")).toBe("assets/a.png"); expect(safeImageUrl("https://x.com/a&b.png")).toBe("https://x.com/a&b.png"); expect(safeImageUrl("javascript:alert(1)")).toBe("icons/svg/eye.svg"); }); it("hides an official Compendium UUID only in the configured context", async () => { const sourceUuid = "Compendium.pf2e.deities.Item.abc123"; vi.stubGlobal("game", { system: { id: "pf2e" }, packs: { contents: [{ collection: "pf2e.deities", documentName: "Item", metadata: { system: "pf2e" }, getIndex: async () => [{ _id: "abc123", name: "Official", type: "deity", system: { domains: ["sun"] } }] }] } }); const service = new DeityService(); service.save({ ...deity, id: "homebrew", replacement: { sourceUuid, mode: "hide", contexts: ["characterBuilder"] } }); const api = new GodForgeApi(service, new AdapterRegistry()); expect((await api.getSelectableDeities({ systemId: "pf2e", catalogContext: "characterBuilder" })).map((entry) => entry.sourceUuid)).not.toContain(sourceUuid); expect((await api.getSelectableDeities({ systemId: "pf2e", catalogContext: "compendium" })).map((entry) => entry.sourceUuid)).toContain(sourceUuid); vi.unstubAllGlobals(); }); });
 describe("socketlib bridge", () => { it("forwards Socketlib's authenticated sender instead of payload identity", async () => { let registered = ""; let socketHandler: ((this: { socketdata?: { userId?: string } }, payload: unknown) => Promise<unknown>) | undefined; const transport = createSocketlibTransport({ registerModule: () => ({ register: (name: string, handler: typeof socketHandler) => { registered = name; socketHandler = handler; }, executeAsGM: async () => "ok" }) }); expect(transport).not.toBeNull(); const receiver = vi.fn(); transport?.register("activateAbility", receiver); expect(registered).toBe("activateAbility"); await socketHandler?.call({ socketdata: { userId: "authenticated-player" } }, { userId: "forged-gm" }); expect(receiver).toHaveBeenCalledWith({ userId: "forged-gm" }, "authenticated-player"); }); });
-describe("localization catalogs", () => { it("keeps every English and German localization key in parity", () => { expect(localizationLeafKeys(german)).toEqual(localizationLeafKeys(english)); }); });
+describe("localization catalogs", () => {
+  it("keeps every English and German localization key in parity", () => {
+    expect(localizationLeafKeys(german)).toEqual(localizationLeafKeys(english));
+  });
+
+  it("defines every static template UI key", () => {
+    const ui = english.DARKIS_GODFORGE.UI as Record<string, string>;
+    for (const file of readdirSync("templates").filter((name) => name.endsWith(".hbs"))) {
+      const source = readFileSync(`templates/${file}`, "utf8");
+      const keys = [...source.matchAll(/\bui\.([A-Z0-9_]+)/g)].map((match) => match[1] ?? "");
+      expect(keys.filter((key) => !(key in ui)), `${file} references undefined UI localization keys`).toEqual([]);
+    }
+  });
+});
 describe("permission defaults", () => {
   it("fails closed when Foundry has not provided a user", () => {
     vi.unstubAllGlobals();
@@ -317,9 +330,12 @@ describe("dashboard markup regressions", () => {
   it("uses a reusable filtered picker for known system values", () => {
     const template = readFileSync("templates/picker-dialog.hbs", "utf8");
     const implementation = readFileSync("scripts/applications/picker-dialog.ts", "utf8");
+    const editor = readFileSync("scripts/applications/deity-editor.ts", "utf8");
     for (const filter of ["search", "category", "rank", "trait", "source", "available", "remaster"]) expect(template).toContain(`data-picker-${filter}`);
     expect(template).toContain("data-picker-preview-name");
     expect(implementation).toContain('getData("text/plain")');
+    expect(implementation).not.toContain("private readonly title:");
+    expect(editor).toContain("await dialog.render(true)");
   });
 });
 describe("Foundry entry points", () => {

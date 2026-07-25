@@ -520,36 +520,36 @@ export class GodForgeDeityEditor extends gmApplicationBase() {
     if (label) label.textContent = uiText().LOADING ?? "Loading …";
     try {
       await this.loadPickerData(key);
+      const choices = this.pickerChoices(key);
+      const selected = this.pickerValues(form, key);
+      const multiple = key === "domains" || key === "alternateDomains" || key === "spells" || key === "attributes";
+      const ui = uiText();
+      const titles: Partial<Record<string, string>> = { domains: ui.DOMAINS, alternateDomains: ui.ALTERNATE_DOMAINS, weapons: ui.FAVORED_WEAPON, spells: ui.CLERIC_SPELLS, skills: ui.TRAINED_SKILL, fonts: ui.DIVINE_FONT, sanctifications: ui.SANCTIFICATION, attributes: ui.DIVINE_ATTRIBUTES, official: ui.OFFICIAL_DEITY };
+      const dialog = new GodForgePickerDialog(titles[key] ?? ui.PICKER_TITLE ?? "Selection", choices, selected, multiple, ({ items }) => {
+        const values = items.map((item) => item.value);
+        if (key === "weapons") {
+          this.setValue(form, "favoredWeaponUuid", values[0] ?? "");
+          this.setValue(form, "favoredWeapon", items[0]?.slug ?? "");
+        } else if (key === "spells") {
+          const byRank = new Map<number, SystemChoice>();
+          items.forEach((item) => byRank.set(item.rank ?? 1, item));
+          this.setValue(form, "spells", [...byRank.entries()].sort(([a], [b]) => a - b).map(([rank, item]) => `${rank}=${item.value}`).join("\n"));
+        } else {
+          const field = { domains: "domains", alternateDomains: "alternateDomains", skills: "skill", fonts: "font", sanctifications: "sanctification", attributes: "divineAttributes", official: "replacement.sourceUuid" }[key];
+          if (field) this.setValue(form, field, multiple ? values.join(", ") : values[0] ?? "");
+        }
+        if (key === "official") (form.elements.namedItem("replacement.sourceUuid") as HTMLInputElement | null)?.dispatchEvent(new Event("change", { bubbles: true }));
+        this.refreshPickerControls(form);
+        this.updateWizardPreview(this.element!, form);
+      });
+      await dialog.render(true);
     } catch (error) {
       reportActionError("Darkis GodForge | Could not load picker data.", error);
-      if (label) label.textContent = previousLabel;
-      return;
     } finally {
+      if (label) label.textContent = previousLabel;
       actualButton.disabled = false;
       actualButton.classList.remove("loading");
     }
-    const choices = this.pickerChoices(key);
-    const selected = this.pickerValues(form, key);
-    const multiple = key === "domains" || key === "alternateDomains" || key === "spells" || key === "attributes";
-    const ui = uiText();
-    const titles: Partial<Record<string, string>> = { domains: ui.DOMAINS, alternateDomains: ui.ALTERNATE_DOMAINS, weapons: ui.FAVORED_WEAPON, spells: ui.CLERIC_SPELLS, skills: ui.TRAINED_SKILL, fonts: ui.DIVINE_FONT, sanctifications: ui.SANCTIFICATION, attributes: ui.DIVINE_ATTRIBUTES, official: ui.OFFICIAL_DEITY };
-    void new GodForgePickerDialog(titles[key] ?? ui.PICKER_TITLE ?? "Selection", choices, selected, multiple, ({ items }) => {
-      const values = items.map((item) => item.value);
-      if (key === "weapons") {
-        this.setValue(form, "favoredWeaponUuid", values[0] ?? "");
-        this.setValue(form, "favoredWeapon", items[0]?.slug ?? "");
-      } else if (key === "spells") {
-        const byRank = new Map<number, SystemChoice>();
-        items.forEach((item) => byRank.set(item.rank ?? 1, item));
-        this.setValue(form, "spells", [...byRank.entries()].sort(([a], [b]) => a - b).map(([rank, item]) => `${rank}=${item.value}`).join("\n"));
-      } else {
-        const field = { domains: "domains", alternateDomains: "alternateDomains", skills: "skill", fonts: "font", sanctifications: "sanctification", attributes: "divineAttributes", official: "replacement.sourceUuid" }[key];
-        if (field) this.setValue(form, field, multiple ? values.join(", ") : values[0] ?? "");
-      }
-      if (key === "official") (form.elements.namedItem("replacement.sourceUuid") as HTMLInputElement | null)?.dispatchEvent(new Event("change", { bubbles: true }));
-      this.refreshPickerControls(form);
-      this.updateWizardPreview(this.element!, form);
-    }).render(true);
   }
 
   private async loadPickerData(key: string): Promise<void> {

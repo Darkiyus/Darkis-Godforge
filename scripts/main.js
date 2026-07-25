@@ -48,12 +48,12 @@ function li(r) {
   const t = globalThis;
   return (r == null ? void 0 : r.documentClass) ?? ((i = (e = t.foundry) == null ? void 0 : e.documents) == null ? void 0 : i.JournalEntry) ?? ((o = (s = t.CONFIG) == null ? void 0 : s.JournalEntry) == null ? void 0 : o.documentClass) ?? null;
 }
-function De(r) {
+function _e(r) {
   if (!r || typeof r != "object") return !1;
   const t = r;
   return typeof t.id == "string" && typeof t.name == "string" && typeof t.schemaVersion == "number" && Array.isArray(t.domains) && Array.isArray(t.abilities);
 }
-async function Ke(r) {
+async function Xe(r) {
   var s, o, n, a, l, c, u, d, h, p, f, m, b;
   const e = (((o = (s = S()) == null ? void 0 : s.packs) == null ? void 0 : o.contents) ?? []).filter((E) => {
     var g;
@@ -74,15 +74,15 @@ function di(r) {
   const t = r.systemValues;
   return { classId: r.classId, deityId: r.deityId, grants: r.grants, domains: { available: t.domains, alternate: t.alternateDomains, pick: r.classId === "cleric" ? 1 : 0 }, divineAttributes: t.divineAttributes, grantedSpells: t.spells, divineFont: r.classId === "cleric" ? t.font : void 0, favoredWeapon: t.favoredWeapon, trainedSkill: r.classId === "cleric" ? t.skill : void 0, sanctification: t.sanctification, cause: r.classId === "champion" ? t.cause : void 0 };
 }
-const _e = /* @__PURE__ */ new Map();
-function Xe(r, t) {
+const Ce = /* @__PURE__ */ new Map();
+function Je(r, t) {
   var o, n;
-  const e = `${r}:${((n = (o = S()) == null ? void 0 : o.system) == null ? void 0 : n.version) ?? ""}`, i = _e.get(e);
+  const e = `${r}:${((n = (o = S()) == null ? void 0 : o.system) == null ? void 0 : n.version) ?? ""}`, i = Ce.get(e);
   if (i) return i;
   const s = hi(r, t).catch((a) => {
-    throw _e.delete(e), a;
+    throw Ce.delete(e), a;
   });
-  return _e.set(e, s), s;
+  return Ce.set(e, s), s;
 }
 async function hi(r, t) {
   var c, u, d, h, p, f;
@@ -99,10 +99,10 @@ async function hi(r, t) {
       const g = E.system ?? {}, y = {
         value: `Compendium.${m.collection}.Item.${E._id}`,
         label: E.name,
-        slug: Ne(g.slug) ?? E.name.toLocaleLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+        slug: Oe(g.slug) ?? E.name.toLocaleLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
         img: E.img,
-        category: Ne(g.category),
-        group: Ne(g.group),
+        category: Oe(g.category),
+        group: Oe(g.group),
         traits: mi(((d = g.traits) == null ? void 0 : d.value) ?? g.traits),
         source: ((h = m.metadata) == null ? void 0 : h.label) ?? m.collection,
         rank: gi(g.rank ?? ((p = g.level) == null ? void 0 : p.value) ?? g.level),
@@ -112,13 +112,13 @@ async function hi(r, t) {
       E.type === "weapon" ? o.push(y) : n.push(y);
     }
   return {
-    skills: Ce(e.skills, t),
-    domains: Ce(e.deityDomains ?? e.domains, []),
-    weapons: lt(o),
-    spells: lt(n),
+    skills: Ne(e.skills, t),
+    domains: Ne(e.deityDomains ?? e.domains, []),
+    weapons: dt(o),
+    spells: dt(n),
     fonts: [x("heal", "Heilen / Heal"), x("harm", "Schaden / Harm"), x("heal-harm", "Heilen oder Schaden / Either"), x("none", "Keine / None")],
     sanctifications: [x("holy", "Heilig / Holy"), x("unholy", "Unheilig / Unholy"), x("holy-unholy", "Heilig oder unheilig / Either"), x("none", "Keine / None")],
-    attributes: Ce(e.abilities ?? e.attributes, ["str", "dex", "con", "int", "wis", "cha"])
+    attributes: Ne(e.abilities ?? e.attributes, ["str", "dex", "con", "int", "wis", "cha"])
   };
 }
 function pi(r) {
@@ -126,7 +126,7 @@ function pi(r) {
   const t = globalThis, e = r === "sfrpg" ? "SFRPG" : "PF2E";
   return ((i = t.CONFIG) == null ? void 0 : i[e]) ?? {};
 }
-function Ce(r, t) {
+function Ne(r, t) {
   return !r || typeof r != "object" ? t.map((e) => x(e, Ht(e))) : Object.entries(r).map(([e, i]) => x(e, fi(i, e))).sort((e, i) => e.label.localeCompare(i.label));
 }
 function fi(r, t) {
@@ -134,7 +134,7 @@ function fi(r, t) {
   const e = typeof r == "string" ? r : r && typeof r == "object" ? String(r.label ?? r.name ?? t) : t, i = (n = (o = (s = S()) == null ? void 0 : s.i18n) == null ? void 0 : o.localize) == null ? void 0 : n.call(o, e);
   return i && i !== e ? i : e.includes(".") ? Ht(t) : e;
 }
-function lt(r) {
+function dt(r) {
   return [...new Map(r.map((t) => [t.value, t])).values()].sort((t, e) => t.label.localeCompare(e.label));
 }
 function x(r, t) {
@@ -143,7 +143,7 @@ function x(r, t) {
 function Ht(r) {
   return r.replaceAll("-", " ").replace(/\b\w/g, (t) => t.toUpperCase());
 }
-function Ne(r) {
+function Oe(r) {
   if (typeof r == "string") return r;
   if (r && typeof r == "object" && typeof r.value == "string") return String(r.value);
 }
@@ -174,7 +174,7 @@ class Ei {
     return e ? (await e.createItem(Vt(t, t.id))).uuid : null;
   }
   async listOfficialDeities() {
-    return Ke(this.id);
+    return Xe(this.id);
   }
   listSkills() {
     var e, i;
@@ -182,7 +182,7 @@ class Ei {
     return t ? Object.keys(t).sort() : [...this.capabilities.selectors];
   }
   listEditorCatalog() {
-    return Xe(this.id, this.listSkills());
+    return Je(this.id, this.listSkills());
   }
   buildPassiveBonus(t) {
     return { key: "FlatModifier", selector: t.selector, value: t.value, type: t.modifierType, slug: t.id };
@@ -200,7 +200,7 @@ class bi {
     return null;
   }
   async listOfficialDeities() {
-    return Ke(this.id);
+    return Xe(this.id);
   }
   listSkills() {
     var e, i;
@@ -208,7 +208,7 @@ class bi {
     return t ? Object.keys(t).sort() : [...this.capabilities.selectors];
   }
   listEditorCatalog() {
-    return Xe(this.id, this.listSkills());
+    return Je(this.id, this.listSkills());
   }
   buildPassiveBonus(t) {
     return { key: "Modifier", selector: t.selector, value: t.value, type: t.modifierType, slug: t.id };
@@ -226,7 +226,7 @@ class vi {
     return e ? (await e.createItem(Vt(t, t.id))).uuid : null;
   }
   async listOfficialDeities() {
-    return Ke(this.id);
+    return Xe(this.id);
   }
   listSkills() {
     var e, i;
@@ -234,7 +234,7 @@ class vi {
     return t ? Object.keys(t).sort() : [...this.capabilities.selectors];
   }
   listEditorCatalog() {
-    return Xe(this.id, this.listSkills());
+    return Je(this.id, this.listSkills());
   }
   buildPassiveBonus(t) {
     return { key: "FlatModifier", selector: t.selector, value: t.value, type: t.modifierType, slug: t.id };
@@ -243,7 +243,7 @@ class vi {
     return { classId: t.classId, deityId: t.deityId, system: t.systemValues, grants: t.grants };
   }
 }
-class Je {
+class Qe {
   constructor() {
     v(this, "adapters", /* @__PURE__ */ new Map());
     this.register(new Ei()), this.register(new vi()), this.register(new bi());
@@ -314,15 +314,15 @@ function Si(r, t, e, i = { isGM: !0 }) {
     return o ? [{ id: o.id, name: o.name, title: o.title ?? "", image: o.image, domains: o.domains ?? [] }] : [];
   });
 }
-function ye(r, t) {
+function Ee(r, t) {
   var o;
   const e = Array.isArray(t) ? t : t ? [t] : [];
-  if (r.mode === "all") return r.grants.flatMap((n) => "mode" in n ? ye(n, e) : [n.ref]);
+  if (r.mode === "all") return r.grants.flatMap((n) => "mode" in n ? Ee(n, e) : [n.ref]);
   const i = ((o = e.find((n) => n.groupId === r.id)) == null ? void 0 : o.refs) ?? [], s = r.grants.map((n) => "mode" in n ? n.id : n.ref);
   if (!r.pick || i.length !== r.pick || i.some((n) => !s.includes(n))) throw new Error(`Grant group ${r.id} requires ${r.pick ?? 1} valid choice(s).`);
   return i.flatMap((n) => {
     const a = r.grants.find((l) => ("mode" in l ? l.id : l.ref) === n);
-    return a && "mode" in a ? ye(a, e) : a ? [a.ref] : [];
+    return a && "mode" in a ? Ee(a, e) : a ? [a.ref] : [];
   });
 }
 function qt(r, t) {
@@ -341,7 +341,7 @@ function Bt(r) {
   if (!e || e.join("") !== t) throw new Error("Formula contains an unsupported term.");
   return e;
 }
-function Qe(r) {
+function Ze(r) {
   const t = r.replace(/\s/g, ""), e = t.match(/\b\d+d\d+\b/g) ?? [], i = t.replace(/\b\d+d\d+\b/g, "0");
   if (e.some((s) => !/^\d+d\d+$/.test(s))) return !1;
   try {
@@ -350,14 +350,14 @@ function Qe(r) {
     return !1;
   }
 }
-function Se(r, t) {
+function Te(r, t) {
   const e = r.replace(/\s/g, "");
-  if (!Qe(e)) throw new Error("Formula contains an unsupported term.");
+  if (!Ze(e)) throw new Error("Formula contains an unsupported term.");
   if (Ci.test(e)) throw new Error("Dice formulas require Foundry Roll at runtime.");
   return new Wt(Bt(e), t).parse();
 }
 async function Oi(r, t, e) {
-  if (!Qe(r)) throw new Error("Formula contains an unsupported term.");
+  if (!Ze(r)) throw new Error("Formula contains an unsupported term.");
   const i = r.replace(/\s/g, "").match(/\b\d+d\d+\b/g) ?? [];
   let s = r;
   for (const o of [...new Set(i)]) {
@@ -365,7 +365,7 @@ async function Oi(r, t, e) {
     if (!Number.isFinite(n)) throw new Error("Dice result is not a finite number.");
     s = s.replace(new RegExp(`\\b${o}\\b`, "g"), String(n));
   }
-  return Se(s, t);
+  return Te(s, t);
 }
 class Wt {
   constructor(t, e) {
@@ -522,7 +522,7 @@ async function Pe(r, t, e) {
   if (r.type === "heal" || r.type === "damage") {
     const o = /\b\d+d\d+\b/.test(r.formula) ? t.rollDice ? await Oi(r.formula, t.facts, t.rollDice) : (() => {
       throw new Error("Dice terms require a Foundry Roll resolver.");
-    })() : Se(r.formula, t.facts);
+    })() : Te(r.formula, t.facts);
     for (const n of z(r.target, t))
       r.type === "heal" ? (e.healing += o, n.hp !== void 0 && (n.hp = Math.min(n.maxHp ?? Number.MAX_SAFE_INTEGER, n.hp + o))) : (e.damage += o, n.hp !== void 0 && (n.hp = Math.max(0, n.hp - o)));
     return;
@@ -547,7 +547,7 @@ function z(r, t) {
   return r === "allies" ? t.allies ?? [] : r === "enemies" ? t.enemies ?? [] : [...new Map([t.actor, t.target, ...t.allies ?? [], ...t.enemies ?? []].filter((e) => !!e).map((e) => [e.id, e])).values()];
 }
 function le(r, t) {
-  return typeof r == "number" ? r : Se(r, t.facts);
+  return typeof r == "number" ? r : Te(r, t.facts);
 }
 function Ri(r, t, e, i) {
   const s = [];
@@ -588,7 +588,7 @@ function ki(r) {
 }
 function Li(r, t, e = []) {
   if (!t.trim()) throw new Error("Class identifier is required for deity coupling.");
-  const i = r.grantGroups.flatMap((s) => ye(s, e));
+  const i = r.grantGroups.flatMap((s) => Ee(s, e));
   return { deityId: r.id, classId: t, grants: i, choices: e, systemValues: { domains: r.domains, alternateDomains: r.alternateDomains ?? [], divineAttributes: r.divineAttributes ?? [], spells: r.spells ?? {}, font: r.font, favoredWeapon: r.favoredWeapon, skill: r.skill, sanctification: r.sanctification, cause: r.cause } };
 }
 function de(r, t) {
@@ -615,8 +615,8 @@ const ee = {
     gmNotes: "gm"
   },
   showMechanicsInSelection: !1
-}, Ze = 1, dt = 200, ut = 400, ht = 262144;
-function Ee(r) {
+}, et = 1, ut = 200, ht = 400, pt = 262144;
+function be(r) {
   if (r.category === "trigger") return [
     O("next", "flow", "output", "Next"),
     O("actor", "actor", "output", "Actor"),
@@ -637,7 +637,7 @@ function Ee(r) {
     O("degree", "degree", "output", "Degree")
   ), t) : (t.push(O("next", "flow", "output", "Next")), ["heal", "damage", "resource", "counter"].includes(r.type) && t.push(O("result", "number", "output", "Result")), t));
 }
-const Pi = /* @__PURE__ */ new Set(["trigger", "logic", "action", "result"]), pt = /* @__PURE__ */ new Set(["flow", "actor", "number", "boolean", "text", "roll", "degree", "item", "event"]), Yt = /* @__PURE__ */ new Set([
+const Pi = /* @__PURE__ */ new Set(["trigger", "logic", "action", "result"]), ft = /* @__PURE__ */ new Set(["flow", "actor", "number", "boolean", "text", "roll", "degree", "item", "event"]), Yt = /* @__PURE__ */ new Set([
   "manual",
   "roll-complete",
   "skill-check",
@@ -684,16 +684,16 @@ const Pi = /* @__PURE__ */ new Set(["trigger", "logic", "action", "result"]), pt
   "sound"
 ]), Ui = /* @__PURE__ */ new Set(["condition", "branch", "chance", "compare", "choice", "limit", "merge"]), Gi = /* @__PURE__ */ new Set(["success", "failure", "critical-success", "critical-failure", "approved", "denied", "summary", "message", "end"]);
 function Fi() {
-  return { schemaVersion: Ze, approval: "gm", nodes: [], edges: [] };
+  return { schemaVersion: et, approval: "gm", nodes: [], edges: [] };
 }
 function G(r) {
   var d, h;
   const t = [];
   if (!r || typeof r != "object") return { valid: !1, issues: [{ code: "graph.invalid", message: "Graph data must be an object." }], reachable: [] };
   const e = r;
-  if (e.schemaVersion !== Ze && t.push({ code: "graph.schema", message: `Unsupported graph schema: ${String(e.schemaVersion)}.` }), e.approval !== "gm" && t.push({ code: "graph.approval", message: "Every executable graph must require GM approval." }), Array.isArray(e.nodes) || t.push({ code: "graph.nodes", message: "Graph nodes must be an array." }), Array.isArray(e.edges) || t.push({ code: "graph.edges", message: "Graph edges must be an array." }), t.length) return { valid: !1, issues: t, reachable: [] };
+  if (e.schemaVersion !== et && t.push({ code: "graph.schema", message: `Unsupported graph schema: ${String(e.schemaVersion)}.` }), e.approval !== "gm" && t.push({ code: "graph.approval", message: "Every executable graph must require GM approval." }), Array.isArray(e.nodes) || t.push({ code: "graph.nodes", message: "Graph nodes must be an array." }), Array.isArray(e.edges) || t.push({ code: "graph.edges", message: "Graph edges must be an array." }), t.length) return { valid: !1, issues: t, reachable: [] };
   const i = e.nodes, s = e.edges;
-  i.length > dt && t.push({ code: "graph.node-limit", message: `A graph may contain at most ${dt} nodes.` }), s.length > ut && t.push({ code: "graph.edge-limit", message: `A graph may contain at most ${ut} edges.` }), new TextEncoder().encode(JSON.stringify(r)).length > ht && t.push({ code: "graph.size-limit", message: `A graph may contain at most ${ht} bytes.` });
+  i.length > ut && t.push({ code: "graph.node-limit", message: `A graph may contain at most ${ut} nodes.` }), s.length > ht && t.push({ code: "graph.edge-limit", message: `A graph may contain at most ${ht} edges.` }), new TextEncoder().encode(JSON.stringify(r)).length > pt && t.push({ code: "graph.size-limit", message: `A graph may contain at most ${pt} bytes.` });
   const o = /* @__PURE__ */ new Map();
   for (const p of i) {
     if (!p || typeof p != "object") {
@@ -701,7 +701,7 @@ function G(r) {
       continue;
     }
     const f = p;
-    if (!Oe(f.id)) {
+    if (!Re(f.id)) {
       t.push({ code: "node.id", message: "Every graph node needs a valid ID." });
       continue;
     }
@@ -709,7 +709,7 @@ function G(r) {
       t.push({ code: "node.duplicate", message: `Duplicate node ID: ${f.id}.`, nodeId: f.id });
       continue;
     }
-    Pi.has(f.category) || t.push({ code: "node.category", message: `Unknown node category: ${String(f.category)}.`, nodeId: f.id }), (!Oe(f.type) || !qi(f.category, f.type)) && t.push({ code: "node.type", message: `Unknown node type: ${String(f.type)}.`, nodeId: f.id }), (typeof f.label != "string" || f.label.length > 160) && t.push({ code: "node.label", message: "Node labels must contain at most 160 characters.", nodeId: f.id }), (!gt(f.x) || !gt(f.y)) && t.push({ code: "node.position", message: "Node positions must be finite coordinates.", nodeId: f.id }), (!f.config || typeof f.config != "object" || Array.isArray(f.config)) && t.push({ code: "node.config", message: "Node configuration must be an object.", nodeId: f.id }), o.set(f.id, f);
+    Pi.has(f.category) || t.push({ code: "node.category", message: `Unknown node category: ${String(f.category)}.`, nodeId: f.id }), (!Re(f.type) || !qi(f.category, f.type)) && t.push({ code: "node.type", message: `Unknown node type: ${String(f.type)}.`, nodeId: f.id }), (typeof f.label != "string" || f.label.length > 160) && t.push({ code: "node.label", message: "Node labels must contain at most 160 characters.", nodeId: f.id }), (!yt(f.x) || !yt(f.y)) && t.push({ code: "node.position", message: "Node positions must be finite coordinates.", nodeId: f.id }), (!f.config || typeof f.config != "object" || Array.isArray(f.config)) && t.push({ code: "node.config", message: "Node configuration must be an object.", nodeId: f.id }), o.set(f.id, f);
   }
   const n = [], a = /* @__PURE__ */ new Set();
   for (const p of s) {
@@ -718,7 +718,7 @@ function G(r) {
       continue;
     }
     const f = p;
-    if (!Oe(f.id)) {
+    if (!Re(f.id)) {
       t.push({ code: "edge.id", message: "Every graph edge needs a valid ID." });
       continue;
     }
@@ -726,9 +726,9 @@ function G(r) {
       t.push({ code: "edge.duplicate", message: `Duplicate edge ID: ${f.id}.`, edgeId: f.id });
       continue;
     }
-    a.add(f.id), (!f.from || !f.to || !o.has(f.from.nodeId) || !o.has(f.to.nodeId)) && t.push({ code: "edge.endpoint", message: "Edge endpoints must reference existing nodes.", edgeId: f.id }), (!f.from || !f.to || !pt.has(f.from.type) || !pt.has(f.to.type) || f.from.type !== f.to.type) && t.push({ code: "edge.port-type", message: "Connected ports must have the same supported type.", edgeId: f.id });
+    a.add(f.id), (!f.from || !f.to || !o.has(f.from.nodeId) || !o.has(f.to.nodeId)) && t.push({ code: "edge.endpoint", message: "Edge endpoints must reference existing nodes.", edgeId: f.id }), (!f.from || !f.to || !ft.has(f.from.type) || !ft.has(f.to.type) || f.from.type !== f.to.type) && t.push({ code: "edge.port-type", message: "Connected ports must have the same supported type.", edgeId: f.id });
     const m = f.from, b = f.to, E = m ? o.get(m.nodeId) : void 0, g = b ? o.get(b.nodeId) : void 0;
-    E && m && !Ee(E).some((y) => y.direction === "output" && y.port === m.port && y.type === m.type) && t.push({ code: "edge.output-port", message: "The source port is not available on this node.", edgeId: f.id }), g && b && !Ee(g).some((y) => y.direction === "input" && y.port === b.port && y.type === b.type) && t.push({ code: "edge.input-port", message: "The target port is not available on this node.", edgeId: f.id }), ((d = f.from) == null ? void 0 : d.nodeId) === ((h = f.to) == null ? void 0 : h.nodeId) && t.push({ code: "edge.self", message: "A node cannot connect to itself.", edgeId: f.id }), n.push(f);
+    E && m && !be(E).some((y) => y.direction === "output" && y.port === m.port && y.type === m.type) && t.push({ code: "edge.output-port", message: "The source port is not available on this node.", edgeId: f.id }), g && b && !be(g).some((y) => y.direction === "input" && y.port === b.port && y.type === b.type) && t.push({ code: "edge.input-port", message: "The target port is not available on this node.", edgeId: f.id }), ((d = f.from) == null ? void 0 : d.nodeId) === ((h = f.to) == null ? void 0 : h.nodeId) && t.push({ code: "edge.self", message: "A node cannot connect to itself.", edgeId: f.id }), n.push(f);
   }
   const l = [...o.values()].filter((p) => p.category === "trigger");
   !l.length && o.size && t.push({ code: "graph.trigger", message: "An executable graph needs at least one trigger." });
@@ -766,13 +766,13 @@ function te(r) {
   let s = t;
   for (const [n, a] of r.effects.entries()) {
     const l = Vi(a, n);
-    e.push(l), i.push(mt(s.id, l.id)), s = l;
+    e.push(l), i.push(gt(s.id, l.id)), s = l;
   }
   if (!r.effects.length) {
     const n = { id: crypto.randomUUID(), category: "result", type: "end", label: "End", x: 360, y: 120, config: {} };
-    e.push(n), i.push(mt(t.id, n.id));
+    e.push(n), i.push(gt(t.id, n.id));
   }
-  return { schemaVersion: Ze, approval: "gm", nodes: e, edges: i };
+  return { schemaVersion: et, approval: "gm", nodes: e, edges: i };
 }
 function xi(r) {
   const t = G(r);
@@ -809,7 +809,7 @@ function xi(r) {
 function $i(r) {
   return r.nodes.slice().sort((t, e) => t.x - e.x || t.y - e.y).map((t) => `${Ki(t.category)}: ${t.label || t.type}`);
 }
-function ft(r) {
+function mt(r) {
   const t = /* @__PURE__ */ new Map(), e = /* @__PURE__ */ new Map();
   for (const n of r.nodes) t.set(n.id, 0);
   for (const n of r.edges.filter((a) => a.from.type === "flow")) {
@@ -845,13 +845,13 @@ function zt(r) {
   if (r.category === "result" && (r.type === "summary" || r.type === "message")) return { type: "message", text: String(t.text ?? r.label) };
   if (r.category !== "action") return null;
   const e = Ji(t.target);
-  return r.type === "heal" || r.type === "damage" ? { type: r.type, formula: String(t.formula ?? "1"), target: e } : r.type === "temporary-hp" ? { type: "resource", resource: "hp", operation: "add", formula: String(t.formula ?? "1"), target: e } : r.type === "modifier" || r.type === "damage-dice" ? { type: "modifier", selector: String(t.selector ?? (r.type === "damage-dice" ? "strike-damage" : "all")), value: ie(t.value ?? t.formula ?? 1), modifierType: Qi(t.modifierType), target: e, duration: yt(t.duration) } : r.type === "condition" ? { type: "condition", condition: String(t.condition ?? t.aux ?? "frightened"), target: e, operation: t.operation === "remove" || t.operation === "suppress" ? t.operation : "add", duration: yt(t.duration) } : r.type === "resource" || r.type === "item" ? { type: "resource", resource: r.type === "item" ? "item" : Zi(t.resource), operation: er(t.operation), formula: String(t.formula ?? "1"), target: e, itemUuid: or(t.itemUuid ?? t.uuid) } : r.type === "roll" ? { type: "roll", roll: rr(t.roll ?? t.operation), selector: String(t.selector ?? "perception"), dc: nr(t.dc), keep: sr(t.keep), target: e } : r.type === "movement" ? { type: "movement", mode: tr(t.mode ?? t.operation), distance: ie(t.distance ?? t.formula ?? 5), target: e } : r.type === "counter" ? { type: "counter", key: String(t.key ?? t.selector ?? "counter"), operation: ir(t.operation), value: ie(t.value ?? t.formula ?? 1) } : r.type === "random-wheel" ? { type: "random-wheel", tableId: String(t.tableId ?? t.uuid ?? ""), visibility: t.visibility === "public" || t.visibility === "user" ? t.visibility : "gm" } : r.type === "macro" ? { type: "macro", command: String(t.command ?? t.code ?? "") } : r.type === "message" || r.type === "information" || r.type === "sound" ? { type: "message", text: String(t.text ?? r.label) } : null;
+  return r.type === "heal" || r.type === "damage" ? { type: r.type, formula: String(t.formula ?? "1"), target: e } : r.type === "temporary-hp" ? { type: "resource", resource: "hp", operation: "add", formula: String(t.formula ?? "1"), target: e } : r.type === "modifier" || r.type === "damage-dice" ? { type: "modifier", selector: String(t.selector ?? (r.type === "damage-dice" ? "strike-damage" : "all")), value: ie(t.value ?? t.formula ?? 1), modifierType: Qi(t.modifierType), target: e, duration: Et(t.duration) } : r.type === "condition" ? { type: "condition", condition: String(t.condition ?? t.aux ?? "frightened"), target: e, operation: t.operation === "remove" || t.operation === "suppress" ? t.operation : "add", duration: Et(t.duration) } : r.type === "resource" || r.type === "item" ? { type: "resource", resource: r.type === "item" ? "item" : Zi(t.resource), operation: er(t.operation), formula: String(t.formula ?? "1"), target: e, itemUuid: or(t.itemUuid ?? t.uuid) } : r.type === "roll" ? { type: "roll", roll: rr(t.roll ?? t.operation), selector: String(t.selector ?? "perception"), dc: nr(t.dc), keep: sr(t.keep), target: e } : r.type === "movement" ? { type: "movement", mode: tr(t.mode ?? t.operation), distance: ie(t.distance ?? t.formula ?? 5), target: e } : r.type === "counter" ? { type: "counter", key: String(t.key ?? t.selector ?? "counter"), operation: ir(t.operation), value: ie(t.value ?? t.formula ?? 1) } : r.type === "random-wheel" ? { type: "random-wheel", tableId: String(t.tableId ?? t.uuid ?? ""), visibility: t.visibility === "public" || t.visibility === "user" ? t.visibility : "gm" } : r.type === "macro" ? { type: "macro", command: String(t.command ?? t.code ?? "") } : r.type === "message" || r.type === "information" || r.type === "sound" ? { type: "message", text: String(t.text ?? r.label) } : null;
 }
 function Hi(r) {
   const t = r.config.condition;
-  return t && typeof t == "object" ? t : r.type === "chance" ? { type: "compare", key: "random.percent", operator: "lte", value: ie(r.config.threshold ?? r.config.equals ?? 50) } : r.type === "compare" ? { type: "compare", key: String(r.config.fact ?? "actor.level"), operator: ar(r.config.operator), value: Et(r.config.equals ?? r.config.value ?? 1) } : { type: "fact", key: String(r.config.fact ?? r.config.selector ?? "always"), equals: Et(r.config.equals ?? !0) };
+  return t && typeof t == "object" ? t : r.type === "chance" ? { type: "compare", key: "random.percent", operator: "lte", value: ie(r.config.threshold ?? r.config.equals ?? 50) } : r.type === "compare" ? { type: "compare", key: String(r.config.fact ?? "actor.level"), operator: ar(r.config.operator), value: bt(r.config.equals ?? r.config.value ?? 1) } : { type: "fact", key: String(r.config.fact ?? r.config.selector ?? "always"), equals: bt(r.config.equals ?? !0) };
 }
-function mt(r, t) {
+function gt(r, t) {
   return { id: crypto.randomUUID(), from: { nodeId: r, port: "next", type: "flow" }, to: { nodeId: t, port: "in", type: "flow" } };
 }
 function qi(r, t) {
@@ -860,10 +860,10 @@ function qi(r, t) {
 function Bi(r) {
   return r && Yt.has(r) ? r : "manual";
 }
-function Oe(r) {
+function Re(r) {
   return typeof r == "string" && r.length > 0 && r.length <= 128 && /^[a-zA-Z0-9._:-]+$/.test(r);
 }
-function gt(r) {
+function yt(r) {
   return typeof r == "number" && Number.isFinite(r) && Math.abs(r) <= 1e5;
 }
 function Wi(r, t) {
@@ -936,7 +936,7 @@ function sr(r) {
 function or(r) {
   return typeof r == "string" && r ? r : void 0;
 }
-function yt(r) {
+function Et(r) {
   const t = Number(r);
   return Number.isFinite(t) ? t : void 0;
 }
@@ -947,7 +947,7 @@ function ie(r) {
 function nr(r) {
   return r == null || r === "" ? void 0 : ie(r);
 }
-function Et(r) {
+function bt(r) {
   return typeof r == "boolean" ? r : ie(r);
 }
 function ar(r) {
@@ -981,8 +981,8 @@ function Kt(r) {
 function cr(r, t = !1) {
   if (typeof r.deity == "string" && r.fields && typeof r.fields == "object") {
     const o = r.fields, n = {
-      deity: be(r.deity, ee.deity),
-      fields: Object.fromEntries(Object.entries(ee.fields).map(([a, l]) => [a, be(o[a], l)])),
+      deity: ve(r.deity, ee.deity),
+      fields: Object.fromEntries(Object.entries(ee.fields).map(([a, l]) => [a, ve(o[a], l)])),
       showMechanicsInSelection: r.showMechanicsInSelection === !0
     };
     return t && (n.fields.domains = "followers", n.fields.spells = "followers", n.fields.favoredWeapon = "followers", n.fields.gmNotes = "gm"), n;
@@ -1004,15 +1004,15 @@ function dr(r) {
     const s = i;
     t[e] = {
       fit: s.fit === "contain" ? "contain" : "cover",
-      focusX: bt(s.focusX, 50),
-      focusY: bt(s.focusY, 25),
+      focusX: vt(s.focusX, 50),
+      focusY: vt(s.focusY, 25),
       zoom: Me(s.zoom, 1, 1, 3),
       rotation: Me(s.rotation, 0, -180, 180)
     };
   }
   return t;
 }
-function bt(r, t) {
+function vt(r, t) {
   return Me(r, t, 0, 100);
 }
 function Me(r, t, e, i) {
@@ -1025,12 +1025,12 @@ function ur(r, t) {
 function hr(r) {
   if (!r || typeof r != "object") return r;
   const t = r;
-  return { ...t, enabled: t.enabled !== !1, visibility: be(t.visibility, t.visible === !1 ? "gm" : "followers") };
+  return { ...t, enabled: t.enabled !== !1, visibility: ve(t.visibility, t.visible === !1 ? "gm" : "followers") };
 }
 function pr(r) {
   if (!r || typeof r != "object") return r;
   const t = r, e = { trigger: typeof t.trigger == "string" ? t.trigger : void 0, effects: Array.isArray(t.effects) ? t.effects : [] }, i = G(t.graph).valid ? structuredClone(t.graph) : te(e);
-  return { ...t, effects: e.effects, graph: i, enabled: t.enabled !== !1, visibility: be(t.visibility, "followers") };
+  return { ...t, effects: e.effects, graph: i, enabled: t.enabled !== !1, visibility: ve(t.visibility, "followers") };
 }
 function fr(r) {
   if (!r || typeof r != "object") return { enabled: !1, defaultState: "revealed", revealedToUsers: [], revealedToActors: [] };
@@ -1040,14 +1040,14 @@ function fr(r) {
     defaultState: e,
     rumorName: typeof t.rumorName == "string" ? t.rumorName.slice(0, 160) : void 0,
     rumorText: typeof t.rumorText == "string" ? t.rumorText.slice(0, 2e3) : void 0,
-    revealedToUsers: vt(t.revealedToUsers),
-    revealedToActors: vt(t.revealedToActors)
+    revealedToUsers: It(t.revealedToUsers),
+    revealedToActors: It(t.revealedToActors)
   };
 }
-function vt(r) {
+function It(r) {
   return Array.isArray(r) ? [...new Set(r.filter((t) => typeof t == "string" && t.length <= 128))].slice(0, 500) : [];
 }
-function be(r, t) {
+function ve(r, t) {
   return r === "public" || r === "selection" || r === "followers" || r === "owner" || r === "trusted" || r === "gm" || r === "hidden-until-selected" ? r : t;
 }
 function mr(r, t = (/* @__PURE__ */ new Date()).toISOString()) {
@@ -1062,7 +1062,7 @@ function Xt(r) {
   if (!gr(r)) throw new Error("Invalid GodForge export: expected a valid deity export.");
   return r.deities.map((t) => Kt(t).definition);
 }
-function et(r, t) {
+function tt(r, t) {
   const e = r.filter((a) => Number.isFinite(a.weight) && a.weight > 0), i = e.reduce((a, l) => a + l.weight, 0);
   if (!e.length || i <= 0) throw new Error("Random table has no selectable entries.");
   const s = Math.min(Math.max(t(), 0), 0.999999999) * i;
@@ -1072,7 +1072,7 @@ function et(r, t) {
   return { entry: e[e.length - 1], index: e.length - 1, roll: s };
 }
 function yr(r, t) {
-  return { status: "resolved", draw: et(r, t) };
+  return { status: "resolved", draw: tt(r, t) };
 }
 function Jt(r) {
   if (!r || typeof r != "object") return !1;
@@ -1080,12 +1080,12 @@ function Jt(r) {
   if (t.tables !== void 0 && !Array.isArray(t.tables) || t.wheels !== void 0 && !Array.isArray(t.wheels)) return !1;
   const e = t.tables ?? [], i = /* @__PURE__ */ new Set();
   for (const o of e) {
-    if (!Ue(o) || !W(o.id) || i.has(o.id) || !W(o.name) || !W(o.formula) || !It(o.visibility) || !Array.isArray(o.entries) || !o.entries.length || !o.entries.every(Er)) return !1;
+    if (!Ue(o) || !W(o.id) || i.has(o.id) || !W(o.name) || !W(o.formula) || !wt(o.visibility) || !Array.isArray(o.entries) || !o.entries.length || !o.entries.every(Er)) return !1;
     i.add(o.id);
   }
   const s = /* @__PURE__ */ new Set();
   for (const o of t.wheels ?? []) {
-    if (!Ue(o) || !W(o.id) || s.has(o.id) || !W(o.name) || !W(o.tableId) || !i.has(o.tableId) || !It(o.visibility) || !Ge(o.duration) || !Ge(o.minimumSpins)) return !1;
+    if (!Ue(o) || !W(o.id) || s.has(o.id) || !W(o.name) || !W(o.tableId) || !i.has(o.tableId) || !wt(o.visibility) || !Ge(o.duration) || !Ge(o.minimumSpins)) return !1;
     s.add(o.id);
   }
   return !0;
@@ -1152,7 +1152,7 @@ class Qt {
   drawTable(t, e) {
     const i = this.tables.get(t);
     if (!i) throw new Error("Random table was not found.");
-    return et(i.entries, e);
+    return tt(i.entries, e);
   }
   spinWheel(t, e) {
     var s;
@@ -1182,16 +1182,16 @@ function W(r) {
 function Ge(r) {
   return typeof r == "number" && Number.isFinite(r) && r > 0;
 }
-function It(r) {
+function wt(r) {
   return r === "public" || r === "selection" || r === "followers" || r === "owner" || r === "gm" || r === "hidden-until-selected";
 }
 function Er(r) {
   return !Ue(r) || !W(r.id) || !W(r.label) || !Ge(r.weight) || r.description !== void 0 && typeof r.description != "string" ? !1 : r.category === void 0 || r.category === "positive" || r.category === "neutral" || r.category === "negative" || r.category === "catastrophic" || r.category === "jackpot";
 }
-const br = /* @__PURE__ */ JSON.parse(`{"UI":{"TITLE":"Darkis GodForge","TAGLINE":"Custom deities","SUBTITLE":"Create, publish, and connect them directly to characters.","CREATE":"New deity","EDIT":"Edit","EDIT_DEITY":"Edit deity","CODEX":"Divine Codex","HUB":"Follower Hub","ACTIVE_GRANTS":"Active grants","ACTIVATE":"Activate","NO_WONDERS":"This deity grants no activatable wonders.","NO_ASSIGNED_DEITY":"No deity assigned","NO_ASSIGNED_DEITY_HINT":"Choose a deity in the Divine Codex or ask the GM to assign one to this character.","YOUR_DEITY":"Your deity","SELECT_DEITY":"Choose as deity","CHOOSE_AND_SELECT":"Choose options and assign","CHOOSE_GRANTS":"Choose grants","CHOOSE_GRANTS_HINT":"Select the required options for this deity.","PICK_EXACTLY":"Choose exactly {count} option(s).","ASSIGNMENT_FAILED":"The deity could not be assigned.","SELECTION_REQUIRES_GM":"This deity requires grant choices first.","OPEN_CODEX":"Open Divine Codex – available without a selected token","OPEN_HUB":"Open Follower Hub – the character's deity, bonuses, and wonders","SELECT_CHARACTER_FIRST":"The Follower Hub shows a character's deity, bonuses, and wonders. Control a token or choose one of your characters.","MY_DEITIES":"My deities","ENTRIES":"entries","DOMAINS":"Domains","ABILITIES":"Abilities","VISIBILITY":"Visibility","PASSIVE_BONUS":"Passive bonus","PASSIVE_BONUSES":"Passive bonuses","DIVINE_ABILITY":"Divine ability","DIVINE_WONDER":"Divine wonder","DIVINE_WONDERS":"Divine wonders","SEARCH":"Search GodForge …","ALL_DOMAINS":"All domains","NO_RESULTS":"No deities found.","NEW_DEITY":"Create a new deity","NEW_DEITY_HINT":"Define identity, rules, wonders, and visibility.","NAME":"Name","TITLE_FIELD":"Title","DEITY_KIND":"Entry type","HELP_DEITY_KIND":"Lore entries appear in the codex but cannot be worshipped or assigned to characters.","KIND_SELECTABLE":"Selectable deity","KIND_LORE":"Lore only / not worshippable","LORE_BADGE":"Lore · not worshippable","PICKER_TITLE":"GodForge selection","PICKER_EYEBROW":"System selection","PICKER_HINT":"Search, filter, or drop a Foundry document into this window.","PICKER_CATEGORY":"Category","PICKER_GROUP":"Group","PICKER_RANK":"Rank","PICKER_TRAIT":"Traits","PICKER_SOURCE":"Source","PICKER_ALL":"All","PICKER_AVAILABLE":"Available only","PICKER_REMASTER":"Remaster only","PICKER_DETAILS":"Details","PICKER_CHOOSE":"Choose","PICKER_APPLY":"Apply selection","PICKER_CLEAR":"Clear selection","PICKER_DROP_HINT":"Foundry documents can be dropped here.","PICKER_OPEN":"Open selection","PICKER_NONE":"Nothing selected yet","PICKER_MISSING":"The saved document is unavailable in the current system.","DESCRIPTION":"Description","ALIGNMENT":"Alignment","SAVE":"Save deity","CANCEL":"Cancel","OPEN_DASHBOARD":"Open GM dashboard – create and manage deities","NEW_DEITY_PLACEHOLDER":"e.g. Tenebris","TITLE_PLACEHOLDER":"e.g. Goddess of Shadows","DOMAINS_PLACEHOLDER":"Shadows, secrets, deception","QUOTE":"Quote","PORTRAIT":"Portrait","ICON":"Icon","SYMBOL":"Cult symbol","BANNER":"Banner","BROWSE_FILES":"Browse Foundry files","FILE_PATH":"Foundry file path","PANTHEONS":"Pantheons","TAGS":"Tags","FAVORED_WEAPON":"Favored weapon","DIVINE_FONT":"Divine font","TRAINED_SKILL":"Divine skill","SANCTIFICATION":"Sanctification","CHAMPION_CAUSE":"Champion cause","EDICTS":"Edicts","ANATHEMA":"Anathema","COMMA_SEPARATED":"Comma-separated","STATUS":"Publication status","STATUS_DRAFT":"Draft","STATUS_TEST":"Test","STATUS_PUBLISHED":"Published","STATUS_DISABLED":"Disabled","STATUS_ARCHIVED":"Archived","BASIC_DATA":"Basic data","EDITOR_STEPS":"Deity editor steps","REQUIRED_FIELDS":"Required fields","WIZARD_INTRO":"The wizard guides you step by step through creating a game-ready deity.","APPEARANCE":"Appearance","SYSTEM_VALUES":"System values","PREVIEW":"Preview","STEP_BASIC_INTRO":"Give your deity a clear identity. Everything except the name can be added later.","ONLY_NAME_REQUIRED":"Only the name is required","HELP_NAME":"The unique name used for this deity in the codex.","HELP_TITLE":"A short epithet such as “The Faith” or “Lady of Stars”.","HELP_DESCRIPTION":"Summarize the deity's nature, faith, and presence for players.","HELP_QUOTE":"A characteristic saying or guiding phrase.","HELP_PANTHEONS":"Optional pantheons, separated by commas.","HELP_TAGS":"Internal search terms, separated by commas.","STEP_APPEARANCE_INTRO":"Choose how the deity appears on cards, in the codex, and in selection dialogs.","OPTIONAL_STEP_HINT":"All images are optional. Paste Foundry paths, browse for files, or drag files onto the fields.","HELP_PORTRAIT":"Large image for detail views and the Divine Codex.","HELP_ICON":"Small, readable image for lists and buttons.","HELP_SYMBOL":"The cult's sign, seal, or holy symbol.","HELP_BANNER":"Wide background image for presentation areas.","STEP_SYSTEM_INTRO":"Enter the rules Pathfinder 2e or Starfinder 2e needs for this deity.","HELP_DOMAINS":"Thematic domains, separated by commas.","HELP_WEAPON":"The favored weapon of the deity's followers.","HELP_SKILL":"The skill granted by the deity, such as religion.","HELP_FONT":"Divine font such as heal, harm, or both.","HELP_SANCTIFICATION":"Allowed sanctification, such as holy or unholy.","HELP_CAUSE":"Optional champion cause or comparable bond.","HELP_EDICTS":"Actions followers are expected to uphold.","HELP_ANATHEMA":"Actions that violate the faith.","HELP_SPELLS":"Optional granted spells; one rank and UUID per line.","ADVANCED_SYSTEM_VALUES":"Additional system values for advanced users","HELP_ALIGNMENT":"Legacy alignment for older system data.","HELP_ALTERNATE_DOMAINS":"Additional domains outside the primary selection.","HELP_ATTRIBUTES":"Divine attributes, separated by commas.","STEP_BONUSES_INTRO":"Add persistent mechanical benefits. Empty cards are ignored when saving.","STEP_WONDERS_INTRO":"Create activatable abilities with uses, reset events, and effects.","STEP_REPLACEMENT_INTRO":"Choose an official deity as a template or replace it in GodForge selections without changing the system compendium.","HELP_REPLACEMENT_MODE":"None uses the selection only as a template; hide or replace changes GodForge catalogs.","HELP_OFFICIAL_DEITY":"Choose a name from the active system compendium instead of entering a UUID.","EXPERT_OPTIONS":"Expert options","HELP_REPLACEMENT_CONTEXTS":"Limits replacement to specific catalogs. Empty means all contexts.","STEP_VISIBILITY_INTRO":"Control exactly what players see before and after choosing the deity.","HELP_DEITY_VISIBILITY":"Controls who can see the deity at all.","HELP_FIELD_VISIBILITY":"Controls visibility for this individual content field.","HELP_GM_NOTES":"These notes remain visible only to the GM.","PREVIEW_AND_SAVE":"Preview and save","STEP_PREVIEW_INTRO":"Review the key details and choose the publication status.","PREVIEW_EMPTY_DESCRIPTION":"No description entered yet.","HELP_STATUS":"Drafts remain with the GM; published makes the deity normally selectable.","BACK":"Back","NEXT":"Next","SAVE_DRAFT":"Save as draft","HELP_BONUS_NAME":"A clear name for the benefit.","HELP_SELECTOR":"The system value affected by the bonus, such as religion.","HELP_BONUS_VALUE":"A number or supported formula.","HELP_WONDER_NAME":"The visible name of the ability.","HELP_WONDER_DESCRIPTION":"Describe exactly what happens on activation.","HELP_USAGES":"How often the wonder can be used before its next reset.","HELP_RESET":"The event that restores spent uses.","BONUS_EDITOR_HINT":"Create multiple system-native bonuses with conditions and individual visibility.","ABILITY_EDITOR_HINT":"Configure activation, uses, reset, and effect.","GRANT_GROUPS":"Grant groups","GRANT_GROUPS_HINT":"Nest AND/OR groups and override inherited names, descriptions, or values.","ADD_GRANT_GROUP":"Add group","GRANT_GROUP":"Grant group","ADD_GRANT":"Add grant","ADD_SUBGROUP":"Add subgroup","GROUP_MODE":"Relationship","ALL_REQUIRED":"All (AND)","CHOOSE_FROM":"Choice (OR)","PICK_COUNT":"Pick count","GRANT":"Grant","REFERENCE":"Reference ID","OVERRIDE_NAME":"Override name","OVERRIDE_VALUE":"Override value","OVERRIDE_DESCRIPTION":"Override description","ADD_BONUS":"Add bonus","ADD_ABILITY":"Add wonder","REMOVE":"Remove","MOVE_UP":"Move up","MOVE_DOWN":"Move down","DUPLICATE":"Duplicate","STACKING_WARNING":"In PF2e, this status bonus does not stack with another status bonus on the same selector; only the highest value applies.","SELECTOR":"Selector","VALUE":"Value or formula","MODIFIER_TYPE":"Modifier type","MOD_STATUS":"Status bonus","MOD_CIRCUMSTANCE":"Circumstance bonus","MOD_ITEM":"Item bonus","MOD_UNTYPED":"Untyped","APPLIES_TO":"Applies to","CHECKS":"Checks","DCS":"DCs","BOTH":"Checks and DCs","CONDITION":"Condition","OPTIONAL_CONDITION":"Optional, e.g. while in darkness","ACTION_COST":"Action cost","ACTION_AUTOMATIC":"Automatic / no action","ACTION_FREE":"Free action","ACTION_REACTION":"Reaction","ACTIONS":"Actions","ACTION_EXPLORATION":"Exploration activity","ACTION_DOWNTIME":"Downtime activity","ACTION_COUNT":"Number of actions","USAGES":"Uses","RESET":"Reset","RESET_DAILY":"At daily preparations","RESET_TEN_MINUTES":"After a 10-minute rest","RESET_REFOCUS":"After refocusing","RESET_ENCOUNTER":"At encounter end","RESET_SCENE":"On scene change","RESET_CALENDAR_DAY":"Per calendar day","RESET_MANUAL":"GM only","COOLDOWN":"Cooldown","COOLDOWN_UNIT":"Cooldown unit","DURATION":"Duration","DURATION_UNIT":"Duration unit","ROUNDS":"Rounds","MINUTES":"Minutes","HOURS":"Hours","DAYS":"Days","INSTANT":"Instant","ENCOUNTER":"Encounter","SCENE":"Scene","UNTIL_RESET":"Until next reset","EFFECT_TEMPLATE":"Effect template","EFFECT_NARRATIVE":"Narrative effect","EFFECT_HEAL":"Heal","EFFECT_DAMAGE":"Deal damage","EFFECT_BONUS":"Grant bonus","FORMULA_OR_VALUE":"Formula or value","VISIBILITY_HINT":"Hidden fields are never sent to players.","DEITY_VISIBILITY":"Deity visibility","PLAYER_PREVIEW":"Preview as player","GM_NOTES":"Internal GM notes","VIS_PUBLIC":"Public","VIS_SELECTION":"Visible before selection","VIS_FOLLOWERS":"Followers only","VIS_OWNER":"Owner only","VIS_TRUSTED":"Trusted players","VIS_GM":"GM only","VIS_HIDDEN_UNTIL_SELECTED":"Hidden until selected","VIS_FIELD_PORTRAIT":"Portrait","VIS_FIELD_DESCRIPTION":"Description","VIS_FIELD_QUOTE":"Quote","VIS_FIELD_PANTHEON":"Pantheon","VIS_FIELD_BONUSES":"Passive bonuses","VIS_FIELD_ABILITIES":"Divine wonders","VIS_FIELD_NUMERIC_VALUES":"Exact numeric values","VIS_FIELD_DOMAINS":"Domains","VIS_FIELD_SPELLS":"Granted spells","VIS_FIELD_FAVORED_WEAPON":"Favored weapon","VIS_FIELD_EDICTS":"Edicts","VIS_FIELD_ANATHEMA":"Anathema","VIS_FIELD_GM_NOTES":"Internal GM notes","REPLACEMENT":"Official template and replacement","REPLACEMENT_MODE":"Replacement mode","REPLACE_NONE":"No replacement","REPLACE_HIDE":"Hide official deity","REPLACE_SOURCE":"Replace with this deity","SOURCE_UUID":"Source UUID","REPLACEMENT_CONTEXTS":"Affected selection contexts","OVERVIEW":"Overview","DEITIES":"Deities","RANDOM_TABLES":"Random tables","FORTUNE_WHEELS":"Fortune wheels","RANDOM_AND_WHEELS":"Random tables and fortune wheels","RANDOM_MANAGER_HINT":"The result is fixed before the wheel starts spinning.","TEST_LAB_HINT":"Test existing tables and fortune wheels without creating new content.","NEW_RANDOM_TABLE":"New random table","DICE_FORMULA":"Dice formula","RESULT_ENTRIES":"Results","ADD_RESULT":"Add result","SAVE_TABLE":"Save table","NEW_FORTUNE_WHEEL":"New fortune wheel","LINKED_TABLE":"Linked table","ANIMATION_DURATION":"Animation duration in seconds","MINIMUM_SPINS":"Minimum spins","SAVE_WHEEL":"Save wheel","TEST_DRAW":"Test draw","TEST_SPIN":"Test spin","NO_RANDOM_TABLES":"No random tables have been created yet.","NO_FORTUNE_WHEELS":"No fortune wheels have been created yet.","RESULT_TITLE":"Result title","CATEGORY_JACKPOT":"Jackpot","CATEGORY_POSITIVE":"Positive","CATEGORY_NEUTRAL":"Neutral","CATEGORY_NEGATIVE":"Negative","CATEGORY_CATASTROPHIC":"Catastrophic","INTEGRATION":"Integration","REPLACEMENTS":"Replacements","REPLACEMENT_MANAGER_HINT":"Official compendiums are never modified.","OFFICIAL_DEITY":"Official deity","HOMEBREW_REPLACEMENT":"Homebrew replacement","INHERITANCE":"Inheritance","SELECTIVE_INHERITANCE":"Selective via deity definition","INHERITED_VALUES":"inherited values","SPELLS":"Spells","ALTERNATE_DOMAINS":"Alternate domains","DIVINE_ATTRIBUTES":"Divine attributes","CLERIC_SPELLS":"Granted cleric spells","SPELLS_HINT":"One per line: rank=Compendium.package.pack.Item.id","KEEP_EXISTING_ACTORS":"Keep for existing characters","NO_OFFICIAL_DEITIES":"No official deities found","NO_OFFICIAL_DEITIES_HINT":"The active system adapter did not detect a matching deity pack.","CHARACTERS":"Characters","CHARACTER":"Character","CHARACTER_MANAGER_HINT":"Assign a deity and its grants to a character.","ASSIGN_DEITY":"Assign deity","PLAYER_VIEW":"Player view","TOOLS":"Tools","TEST_LAB":"Test lab","IMPORT_EXPORT":"Import / Export","IMPORT_EXPORT_HINT":"Back up or transfer your GodForge data.","DATA_MANAGER_HINT":"Inspect GodForge packages before import and export a portable backup of your definitions.","EXPORT_PACKAGE":"Export GodForge package","EXPORT_HINT":"Exports all deities including visibility, bonuses, wonders, grants, and replacements.","EXPORT":"Export","IMPORT_PACKAGE":"Import GodForge package","IMPORT_HINT":"The file is validated and summarized before any changes are made.","CHOOSE_FILE":"Choose JSON file","IMPORT_INVALID":"The selected import file is invalid.","IMPORT_PREVIEW":"Import preview","NEW_CONTENT":"New content","UPDATED_CONTENT":"Updated content","IMPORT_APPLY_HINT":"Existing IDs are updated and new IDs are added.","APPLY_IMPORT":"Apply validated import","IMPORTED":"GodForge entries imported.","MIGRATIONS":"Migrations","MIGRATION_MANAGER_HINT":"GodForge updates older definitions automatically when they are loaded.","MIGRATION_STATUS":"Migration status","CURRENT_SCHEMA":"Current schema","PENDING_MIGRATIONS":"Pending migrations","MIGRATION_RELOAD_HINT":"Reload the world to update pending definitions.","MIGRATION_COMPLETE":"All deities use the current schema.","AUDIT_LOG":"Audit log","PLANNED":"Planned for a later alpha release","SETTINGS":"Settings","MODULE_OPTIONS":"Module options","ADAPTER":"System adapter","HELP":"Help","QUICK_ACCESS":"Quick access","SYSTEM_STATUS":"System status","RECENTLY_EDITED":"Recently edited","PUBLISHED":"Published","INVALID":"Invalid definitions","ASSIGNED_CHARACTERS":"Assigned characters","RESET_DAILY_USAGES":"Reset daily uses","RESET_DAILY_COMPLETE":"Daily-preparation uses were reset.","MANUAL_RESET_HINT":"If the system event did not fire, the GM can reset daily uses here manually.","EMPTY_TITLE":"No custom deities yet","EMPTY_HINT":"Create a new deity or import a pantheon.","IMPORT":"Import","LARGER_WINDOW":"A larger window is recommended for the full editor.","TYPE":"Type","LAST_CHANGED":"Last changed","SYSTEM":"System","SCHEMA":"Schema","VERSION":"Version","DIAGNOSTICS_OK":"Ready","LOADING":"Loading …","EXPERT_MODE":"Expert mode","DISCOVERY":"Discovery","DISCOVERY_ENABLE":"Hide this deity until it is discovered","DISCOVERY_DEFAULT":"Before discovery","DISCOVERY_REVEALED":"Fully revealed","DISCOVERY_RUMOR":"Show as an unknown rumor","DISCOVERY_HIDDEN":"Hide completely","RUMOR":"Rumor","RUMOR_NAME":"Rumor name","RUMOR_TEXT":"Clue for players","REVEALED_USERS":"Revealed user IDs","REVEALED_ACTORS":"Revealed actor IDs","UNKNOWN_DEITY":"Unknown deity","UNREVEALED":"Not yet discovered","UNKNOWN_DEITY_HINT":"A forgotten presence leaves traces, but its name and nature remain hidden.","REVEAL_TO_ALL":"Reveal to all players","CLEAR_ALL_DATA":"Delete all GodForge data","CLEAR_ALL_DATA_HINT":"Downloads one final backup, then deletes deities, assignments, generated effects, random tables and fortune wheels. Module settings remain.","CLEAR_CONFIRM_FIRST":"Download one final backup and permanently delete all GodForge content?","CLEAR_CONFIRM_TYPE":"Final confirmation: type LÖSCHUNG exactly.","CLEAR_CANCELLED":"Deletion cancelled.","CLEAR_COMPLETE":"GodForge records deleted.","CLEAR_FAILED":"Deletion stopped after an error. Use the downloaded backup to restore any affected data.","BUILDER_TITLE":"Divine blueprint","BUILDER_HINT":"Connect triggers, checks, actions and results. Every execution is previewed for the GM.","NODE_LIBRARY":"Node library","SEARCH_NODES":"Search nodes …","TRIGGERS":"Triggers","LOGIC":"Checks and logic","RESULTS":"Results","AUTO_LAYOUT":"Auto layout","ZOOM_IN":"Zoom in","ZOOM_OUT":"Zoom out","CENTER_GRAPH":"Center blueprint","COPY_SUFFIX":"Copy","DISCARD_UNSAVED":"Discard unsaved changes?","DIFFICULTY_CLASS":"Difficulty class","TRAINED_SKILL_PF2E":"Divine skill – PF2e training","SKILL_NO_BONUS":"Does not add a numeric modifier.","ADDITIONAL_FOLLOWER_BONUSES":"Additional follower bonuses","BONUS_SECTION_HINT":"These bonuses may be granted in addition to divine training.","INHERITANCE_HINT":"Recommended technical values are selected automatically","SKILL_OVERLAP_WARNING":"This skill is trained and also receives the bonus. That is allowed, but may be stronger than intended.","ABILITY_TYPE":"Ability type","ABILITY_STANDARD":"Standard","ABILITY_FORTUNE_WHEEL":"Fortune wheel / random table","VARIANT_SELECT_PORTRAIT":"Select a portrait first.","VARIANT_UPLOAD_UNAVAILABLE":"Foundry file upload is unavailable.","VARIANT_CREATING":"Creating variants …","VARIANT_NONE_SELECTED":"No variant selected.","VARIANT_FAILED":"Image variants could not be created. Check file permissions and the browser console.","IMPORT_FAILED":"The import failed. Details are available in the browser console.","INVALID_RANDOM_CONTENT":"The backup contains invalid random content.","INVALID_ACTOR_BACKUP":"The backup contains invalid actor data.","BACKUP_ITEM_FAILED":"GodForge item {id} cannot be backed up.","RESTORE_ACTOR_FAILED":"Actor {id} cannot restore embedded GodForge items.","CATEGORY_TRIGGER":"Trigger","CATEGORY_LOGIC":"Logic","CATEGORY_ACTION":"Action","CATEGORY_RESULT":"Result","PORT_NEXT":"Next","PORT_IN":"Input","PORT_ACTOR":"Actor","PORT_EVENT":"Event","PORT_VALUE":"Value","PORT_LEFT":"Left","PORT_RIGHT":"Right","PORT_TRUE":"True","PORT_FALSE":"False","PORT_TARGET":"Target","PORT_SELECTOR":"Selector","PORT_CRITICAL_SUCCESS":"Critical success","PORT_SUCCESS":"Success","PORT_FAILURE":"Failure","PORT_CRITICAL_FAILURE":"Critical failure","PORT_TOTAL":"Total","PORT_DEGREE":"Degree of success","PORT_RESULT":"Result","TEMPLATES":"Templates","TEMPLATE_HEAL":"Manual healing blessing","TEMPLATE_DAMAGE_REACTION":"Reaction after damage","TEMPLATE_DAILY_RESOURCE":"Daily resource","SIMULATE":"Test run","SIMULATION":"Test result","SAVE_GRAPH":"Save blueprint","UNDO":"Undo","REDO":"Redo","CONNECT_TARGET":"Now select the input port of the next node.","CONNECT_INPUT":"Connect here","CONNECT_OUTPUT":"Start connection","BRANCH_TRUE":"True branch","BRANCH_FALSE":"False branch","GRAPH_CANVAS":"Ability blueprint canvas","GRAPH_VALID":"Blueprint is executable","GRAPH_INVALID":"Blueprint needs attention","GRAPH_ISSUE_GENERIC":"Invalid blueprint element ({code}).","EMPTY_GRAPH":"The forge is empty","EMPTY_GRAPH_HINT":"Start with a trigger from the library.","SELECT_NODE":"Select a node","SELECT_NODE_HINT":"Its settings will appear here.","LINEAR_OUTLINE":"Readable outline","APPROVAL_EYEBROW":"GM approval","APPROVAL_HINT":"Review the expected changes before they are applied.","APPROVE":"Approve and execute","DENY":"Deny","GM_REQUIRED":"Only a GM can confirm this action.","NO_CHANGES":"No actor changes","NO_CHANGES_HINT":"The ability only produces informational output.","OPERATIONS":"Planned operations","SOURCE_ACTOR":"Source character","NODE_MANUAL":"Manual button","NODE_SKILL_CHECK":"Skill check","NODE_ATTACK_ROLL":"Attack roll","NODE_SAVING_THROW":"Saving throw","NODE_DAMAGE_ROLL":"Damage roll","NODE_DAMAGE_TAKEN":"Damage taken","NODE_HEALING_RECEIVED":"Healing received","NODE_COMBAT_START":"Combat start","NODE_TURN_START":"Turn start","NODE_TURN_END":"Turn end","NODE_ROUND_START":"Round start","NODE_DAILY_PREPARATIONS":"Daily preparations","NODE_TOKEN_MOVE":"Token movement","NODE_REGION_ENTER":"Enter region","NODE_DEITY_ASSIGNED":"Deity assigned","NODE_CUSTOM":"Custom event","NODE_CONDITION":"Condition","NODE_CHANCE":"Chance","NODE_COMPARE":"Compare values","NODE_BRANCH":"Branch","NODE_CHOICE":"Choice","NODE_HEAL":"Heal","NODE_DAMAGE":"Damage","NODE_MODIFIER":"Bonus or penalty","NODE_ROLL":"Request roll","NODE_RESOURCE":"Resource","NODE_MOVEMENT":"Movement","NODE_RANDOM_WHEEL":"Random table","NODE_MESSAGE":"Chat message","NODE_SUCCESS":"Success","NODE_FAILURE":"Failure","NODE_SUMMARY":"Summary","NODE_END":"End","NODES":"nodes","CONNECTIONS":"connections","EXECUTABLE_EFFECTS":"executable effects","NODE_LABEL":"Label","EVENT_FILTER":"Selector or event filter","CHANCE_PERCENT":"Chance in percent","FACT_PATH":"Fact or result path","COMPARISON":"Comparison","EXPECTED_VALUE":"Expected value","FORMULA_VALUE":"Formula or value","SYSTEM_SELECTOR":"System selector","TARGET":"Target","TARGET_SELF":"Self","TARGET_TARGET":"Selected target","TARGET_ALLIES":"Allies","TARGET_ENEMIES":"Enemies","TARGET_GROUP":"Group","COMPARE_EQ":"equals","COMPARE_NEQ":"does not equal","COMPARE_GT":"greater than","COMPARE_GTE":"greater than or equal","COMPARE_LT":"less than","COMPARE_LTE":"less than or equal","HUB_EXPLANATION":"The Follower Hub shows a character's deity, bonuses, and wonders.","HUB_NO_CHARACTER":"Set an owned character or control a token first.","UNDERSTOOD":"Understood","CHOOSE_CHARACTER":"Choose character","OPEN_HUB_ACTION":"Open Follower Hub"},"SETTINGS":{"MENU_NAME":"GodForge management","MENU_LABEL":"Open GodForge","MENU_HINT":"Opens the dashboard for creating and managing custom deities.","LANGUAGE":"GodForge language","LANGUAGE_HINT":"Language used by GodForge surfaces.","AUTO":"Automatic"},"ERROR":{"NO_USES":"No uses remaining.","GM_ONLY":"Only the GM may use this GodForge feature.","NO_PERMISSION":"You are not allowed to use this GodForge feature.","DASHBOARD_OPEN":"The dashboard did not open. Details are available in the browser console.","CODEX_OPEN":"The Divine Codex did not open. Reload Foundry and try again.","HUB_OPEN":"The character hub could not be loaded. Check that the character is still available.","UNSUPPORTED_SYSTEM":"Darkis GodForge does not support the active {system} system.","ACTION_FAILED":"That did not work."}}`), tt = {
+const br = /* @__PURE__ */ JSON.parse(`{"UI":{"TITLE":"Darkis GodForge","TAGLINE":"Custom deities","SUBTITLE":"Create, publish, and connect them directly to characters.","CREATE":"New deity","EDIT":"Edit","EDIT_DEITY":"Edit deity","CODEX":"Divine Codex","HUB":"Follower Hub","ACTIVE_GRANTS":"Active grants","ACTIVATE":"Activate","NO_WONDERS":"This deity grants no activatable wonders.","NO_ASSIGNED_DEITY":"No deity assigned","NO_ASSIGNED_DEITY_HINT":"Choose a deity in the Divine Codex or ask the GM to assign one to this character.","YOUR_DEITY":"Your deity","SELECT_DEITY":"Choose as deity","CHOOSE_AND_SELECT":"Choose options and assign","CHOOSE_GRANTS":"Choose grants","CHOOSE_GRANTS_HINT":"Select the required options for this deity.","PICK_EXACTLY":"Choose exactly {count} option(s).","ASSIGNMENT_FAILED":"The deity could not be assigned.","SELECTION_REQUIRES_GM":"This deity requires grant choices first.","OPEN_CODEX":"Open Divine Codex – available without a selected token","OPEN_HUB":"Open Follower Hub – the character's deity, bonuses, and wonders","SELECT_CHARACTER_FIRST":"The Follower Hub shows a character's deity, bonuses, and wonders. Control a token or choose one of your characters.","MY_DEITIES":"My deities","ENTRIES":"entries","DOMAINS":"Domains","ABILITIES":"Abilities","VISIBILITY":"Visibility","PASSIVE_BONUS":"Passive bonus","PASSIVE_BONUSES":"Passive bonuses","DIVINE_ABILITY":"Divine ability","DIVINE_WONDER":"Divine wonder","DIVINE_WONDERS":"Divine wonders","SEARCH":"Search GodForge …","ALL_DOMAINS":"All domains","NO_RESULTS":"No deities found.","NEW_DEITY":"Create a new deity","NEW_DEITY_HINT":"Define identity, rules, wonders, and visibility.","NAME":"Name","TITLE_FIELD":"Title","DEITY_KIND":"Entry type","HELP_DEITY_KIND":"Lore entries appear in the codex but cannot be worshipped or assigned to characters.","KIND_SELECTABLE":"Selectable deity","KIND_LORE":"Lore only / not worshippable","LORE_BADGE":"Lore · not worshippable","PICKER_TITLE":"GodForge selection","PICKER_EYEBROW":"System selection","PICKER_HINT":"Search, filter, or drop a Foundry document into this window.","PICKER_CATEGORY":"Category","PICKER_GROUP":"Group","PICKER_RANK":"Rank","PICKER_TRAIT":"Traits","PICKER_SOURCE":"Source","PICKER_ALL":"All","PICKER_AVAILABLE":"Available only","PICKER_REMASTER":"Remaster only","PICKER_DETAILS":"Details","PICKER_CHOOSE":"Choose","PICKER_APPLY":"Apply selection","PICKER_CLEAR":"Clear selection","PICKER_DROP_HINT":"Foundry documents can be dropped here.","PICKER_OPEN":"Open selection","PICKER_NONE":"Nothing selected yet","PICKER_MISSING":"The saved document is unavailable in the current system.","DESCRIPTION":"Description","ALIGNMENT":"Alignment","SAVE":"Save deity","CANCEL":"Cancel","OPEN_DASHBOARD":"Open GM dashboard – create and manage deities","NEW_DEITY_PLACEHOLDER":"e.g. Tenebris","TITLE_PLACEHOLDER":"e.g. Goddess of Shadows","DOMAINS_PLACEHOLDER":"Shadows, secrets, deception","QUOTE":"Quote","PORTRAIT":"Portrait","ICON":"Icon","SYMBOL":"Cult symbol","BANNER":"Banner","BROWSE_FILES":"Browse Foundry files","FILE_PATH":"Foundry file path","PANTHEONS":"Pantheons","TAGS":"Tags","FAVORED_WEAPON":"Favored weapon","DIVINE_FONT":"Divine font","TRAINED_SKILL":"Divine skill","SANCTIFICATION":"Sanctification","CHAMPION_CAUSE":"Champion cause","EDICTS":"Edicts","ANATHEMA":"Anathema","COMMA_SEPARATED":"Comma-separated","STATUS":"Publication status","STATUS_DRAFT":"Draft","STATUS_TEST":"Test","STATUS_PUBLISHED":"Published","STATUS_DISABLED":"Disabled","STATUS_ARCHIVED":"Archived","BASIC_DATA":"Basic data","EDITOR_STEPS":"Deity editor steps","REQUIRED_FIELDS":"Required fields","WIZARD_INTRO":"The wizard guides you step by step through creating a game-ready deity.","APPEARANCE":"Appearance","SYSTEM_VALUES":"System values","PREVIEW":"Preview","STEP_BASIC_INTRO":"Give your deity a clear identity. Everything except the name can be added later.","ONLY_NAME_REQUIRED":"Only the name is required","HELP_NAME":"The unique name used for this deity in the codex.","HELP_TITLE":"A short epithet such as “The Faith” or “Lady of Stars”.","HELP_DESCRIPTION":"Summarize the deity's nature, faith, and presence for players.","HELP_QUOTE":"A characteristic saying or guiding phrase.","HELP_PANTHEONS":"Optional pantheons, separated by commas.","HELP_TAGS":"Internal search terms, separated by commas.","STEP_APPEARANCE_INTRO":"Choose how the deity appears on cards, in the codex, and in selection dialogs.","OPTIONAL_STEP_HINT":"All images are optional. Paste Foundry paths, browse for files, or drag files onto the fields.","HELP_PORTRAIT":"Large image for detail views and the Divine Codex.","HELP_ICON":"Small, readable image for lists and buttons.","HELP_SYMBOL":"The cult's sign, seal, or holy symbol.","HELP_BANNER":"Wide background image for presentation areas.","STEP_SYSTEM_INTRO":"Enter the rules Pathfinder 2e or Starfinder 2e needs for this deity.","HELP_DOMAINS":"Thematic domains, separated by commas.","HELP_WEAPON":"The favored weapon of the deity's followers.","HELP_SKILL":"The skill granted by the deity, such as religion.","HELP_FONT":"Divine font such as heal, harm, or both.","HELP_SANCTIFICATION":"Allowed sanctification, such as holy or unholy.","HELP_CAUSE":"Optional champion cause or comparable bond.","HELP_EDICTS":"Actions followers are expected to uphold.","HELP_ANATHEMA":"Actions that violate the faith.","HELP_SPELLS":"Optional granted spells; one rank and UUID per line.","ADVANCED_SYSTEM_VALUES":"Additional system values for advanced users","HELP_ALIGNMENT":"Legacy alignment for older system data.","HELP_ALTERNATE_DOMAINS":"Additional domains outside the primary selection.","HELP_ATTRIBUTES":"Divine attributes, separated by commas.","STEP_BONUSES_INTRO":"Add persistent mechanical benefits. Empty cards are ignored when saving.","STEP_WONDERS_INTRO":"Create activatable abilities with uses, reset events, and effects.","STEP_REPLACEMENT_INTRO":"Choose an official deity as a template or replace it in GodForge selections without changing the system compendium.","HELP_REPLACEMENT_MODE":"None uses the selection only as a template; hide or replace changes GodForge catalogs.","HELP_OFFICIAL_DEITY":"Choose a name from the active system compendium instead of entering a UUID.","EXPERT_OPTIONS":"Expert options","HELP_REPLACEMENT_CONTEXTS":"Limits replacement to specific catalogs. Empty means all contexts.","STEP_VISIBILITY_INTRO":"Control exactly what players see before and after choosing the deity.","HELP_DEITY_VISIBILITY":"Controls who can see the deity at all.","HELP_FIELD_VISIBILITY":"Controls visibility for this individual content field.","HELP_GM_NOTES":"These notes remain visible only to the GM.","PREVIEW_AND_SAVE":"Preview and save","STEP_PREVIEW_INTRO":"Review the key details and choose the publication status.","PREVIEW_EMPTY_DESCRIPTION":"No description entered yet.","HELP_STATUS":"Drafts remain with the GM; published makes the deity normally selectable.","BACK":"Back","NEXT":"Next","SAVE_DRAFT":"Save as draft","HELP_BONUS_NAME":"A clear name for the benefit.","HELP_SELECTOR":"The system value affected by the bonus, such as religion.","HELP_BONUS_VALUE":"A number or supported formula.","HELP_WONDER_NAME":"The visible name of the ability.","HELP_WONDER_DESCRIPTION":"Describe exactly what happens on activation.","HELP_USAGES":"How often the wonder can be used before its next reset.","HELP_RESET":"The event that restores spent uses.","BONUS_EDITOR_HINT":"Create multiple system-native bonuses with conditions and individual visibility.","ABILITY_EDITOR_HINT":"Configure activation, uses, reset, and effect.","GRANT_GROUPS":"Grant groups","GRANT_GROUPS_HINT":"Nest AND/OR groups and override inherited names, descriptions, or values.","ADD_GRANT_GROUP":"Add group","GRANT_GROUP":"Grant group","ADD_GRANT":"Add grant","ADD_SUBGROUP":"Add subgroup","GROUP_MODE":"Relationship","ALL_REQUIRED":"All (AND)","CHOOSE_FROM":"Choice (OR)","PICK_COUNT":"Pick count","GRANT":"Grant","REFERENCE":"Reference ID","OVERRIDE_NAME":"Override name","OVERRIDE_VALUE":"Override value","OVERRIDE_DESCRIPTION":"Override description","ADD_BONUS":"Add bonus","ADD_ABILITY":"Add wonder","REMOVE":"Remove","MOVE_UP":"Move up","MOVE_DOWN":"Move down","DUPLICATE":"Duplicate","STACKING_WARNING":"In PF2e, this status bonus does not stack with another status bonus on the same selector; only the highest value applies.","SELECTOR":"Selector","VALUE":"Value or formula","MODIFIER_TYPE":"Modifier type","MOD_STATUS":"Status bonus","MOD_CIRCUMSTANCE":"Circumstance bonus","MOD_ITEM":"Item bonus","MOD_UNTYPED":"Untyped","APPLIES_TO":"Applies to","CHECKS":"Checks","DCS":"DCs","BOTH":"Checks and DCs","CONDITION":"Condition","OPTIONAL_CONDITION":"Optional, e.g. while in darkness","ACTION_COST":"Action cost","ACTION_AUTOMATIC":"Automatic / no action","ACTION_FREE":"Free action","ACTION_REACTION":"Reaction","ACTIONS":"Actions","ACTION_EXPLORATION":"Exploration activity","ACTION_DOWNTIME":"Downtime activity","ACTION_COUNT":"Number of actions","USAGES":"Uses","RESET":"Reset","RESET_DAILY":"At daily preparations","RESET_TEN_MINUTES":"After a 10-minute rest","RESET_REFOCUS":"After refocusing","RESET_ENCOUNTER":"At encounter end","RESET_SCENE":"On scene change","RESET_CALENDAR_DAY":"Per calendar day","RESET_MANUAL":"GM only","COOLDOWN":"Cooldown","COOLDOWN_UNIT":"Cooldown unit","DURATION":"Duration","DURATION_UNIT":"Duration unit","ROUNDS":"Rounds","MINUTES":"Minutes","HOURS":"Hours","DAYS":"Days","INSTANT":"Instant","ENCOUNTER":"Encounter","SCENE":"Scene","UNTIL_RESET":"Until next reset","EFFECT_TEMPLATE":"Effect template","EFFECT_NARRATIVE":"Narrative effect","EFFECT_HEAL":"Heal","EFFECT_DAMAGE":"Deal damage","EFFECT_BONUS":"Grant bonus","FORMULA_OR_VALUE":"Formula or value","VISIBILITY_HINT":"Hidden fields are never sent to players.","DEITY_VISIBILITY":"Deity visibility","PLAYER_PREVIEW":"Preview as player","GM_NOTES":"Internal GM notes","VIS_PUBLIC":"Public","VIS_SELECTION":"Visible before selection","VIS_FOLLOWERS":"Followers only","VIS_OWNER":"Owner only","VIS_TRUSTED":"Trusted players","VIS_GM":"GM only","VIS_HIDDEN_UNTIL_SELECTED":"Hidden until selected","VIS_FIELD_PORTRAIT":"Portrait","VIS_FIELD_DESCRIPTION":"Description","VIS_FIELD_QUOTE":"Quote","VIS_FIELD_PANTHEON":"Pantheon","VIS_FIELD_BONUSES":"Passive bonuses","VIS_FIELD_ABILITIES":"Divine wonders","VIS_FIELD_NUMERIC_VALUES":"Exact numeric values","VIS_FIELD_DOMAINS":"Domains","VIS_FIELD_SPELLS":"Granted spells","VIS_FIELD_FAVORED_WEAPON":"Favored weapon","VIS_FIELD_EDICTS":"Edicts","VIS_FIELD_ANATHEMA":"Anathema","VIS_FIELD_GM_NOTES":"Internal GM notes","REPLACEMENT":"Official template and replacement","REPLACEMENT_MODE":"Replacement mode","REPLACE_NONE":"No replacement","REPLACE_HIDE":"Hide official deity","REPLACE_SOURCE":"Replace with this deity","SOURCE_UUID":"Source UUID","REPLACEMENT_CONTEXTS":"Affected selection contexts","OVERVIEW":"Overview","DEITIES":"Deities","RANDOM_TABLES":"Random tables","FORTUNE_WHEELS":"Fortune wheels","RANDOM_AND_WHEELS":"Random tables and fortune wheels","RANDOM_MANAGER_HINT":"The result is fixed before the wheel starts spinning.","TEST_LAB_HINT":"Test existing tables and fortune wheels without creating new content.","NEW_RANDOM_TABLE":"New random table","DICE_FORMULA":"Dice formula","RESULT_ENTRIES":"Results","ADD_RESULT":"Add result","SAVE_TABLE":"Save table","NEW_FORTUNE_WHEEL":"New fortune wheel","LINKED_TABLE":"Linked table","ANIMATION_DURATION":"Animation duration in seconds","MINIMUM_SPINS":"Minimum spins","SAVE_WHEEL":"Save wheel","TEST_DRAW":"Test draw","TEST_SPIN":"Test spin","NO_RANDOM_TABLES":"No random tables have been created yet.","NO_FORTUNE_WHEELS":"No fortune wheels have been created yet.","RESULT_TITLE":"Result title","CATEGORY_JACKPOT":"Jackpot","CATEGORY_POSITIVE":"Positive","CATEGORY_NEUTRAL":"Neutral","CATEGORY_NEGATIVE":"Negative","CATEGORY_CATASTROPHIC":"Catastrophic","INTEGRATION":"Integration","REPLACEMENTS":"Replacements","REPLACEMENT_MANAGER_HINT":"Official compendiums are never modified.","OFFICIAL_DEITY":"Official deity","HOMEBREW_REPLACEMENT":"Homebrew replacement","INHERITANCE":"Inheritance","SELECTIVE_INHERITANCE":"Selective via deity definition","INHERITED_VALUES":"inherited values","SPELLS":"Spells","ALTERNATE_DOMAINS":"Alternate domains","DIVINE_ATTRIBUTES":"Divine attributes","CLERIC_SPELLS":"Granted cleric spells","SPELLS_HINT":"One per line: rank=Compendium.package.pack.Item.id","KEEP_EXISTING_ACTORS":"Keep for existing characters","NO_OFFICIAL_DEITIES":"No official deities found","NO_OFFICIAL_DEITIES_HINT":"The active system adapter did not detect a matching deity pack.","CHARACTERS":"Characters","CHARACTER":"Character","CHARACTER_MANAGER_HINT":"Assign a deity and its grants to a character.","ASSIGN_DEITY":"Assign deity","PLAYER_VIEW":"Player view","TOOLS":"Tools","TEST_LAB":"Test lab","IMPORT_EXPORT":"Import / Export","IMPORT_EXPORT_HINT":"Back up or transfer your GodForge data.","DATA_MANAGER_HINT":"Inspect GodForge packages before import and export a portable backup of your definitions.","EXPORT_PACKAGE":"Export GodForge package","EXPORT_HINT":"Exports all deities including visibility, bonuses, wonders, grants, and replacements.","EXPORT":"Export","IMPORT_PACKAGE":"Import GodForge package","IMPORT_HINT":"The file is validated and summarized before any changes are made.","CHOOSE_FILE":"Choose JSON file","IMPORT_INVALID":"The selected import file is invalid.","IMPORT_PREVIEW":"Import preview","NEW_CONTENT":"New content","UPDATED_CONTENT":"Updated content","IMPORT_APPLY_HINT":"Existing IDs are updated and new IDs are added.","APPLY_IMPORT":"Apply validated import","IMPORTED":"GodForge entries imported.","MIGRATIONS":"Migrations","MIGRATION_MANAGER_HINT":"GodForge updates older definitions automatically when they are loaded.","MIGRATION_STATUS":"Migration status","CURRENT_SCHEMA":"Current schema","PENDING_MIGRATIONS":"Pending migrations","MIGRATION_RELOAD_HINT":"Reload the world to update pending definitions.","MIGRATION_COMPLETE":"All deities use the current schema.","AUDIT_LOG":"Audit log","PLANNED":"Planned for a later alpha release","SETTINGS":"Settings","MODULE_OPTIONS":"Module options","ADAPTER":"System adapter","HELP":"Help","QUICK_ACCESS":"Quick access","SYSTEM_STATUS":"System status","RECENTLY_EDITED":"Recently edited","PUBLISHED":"Published","INVALID":"Invalid definitions","ASSIGNED_CHARACTERS":"Assigned characters","RESET_DAILY_USAGES":"Reset daily uses","RESET_DAILY_COMPLETE":"Daily-preparation uses were reset.","MANUAL_RESET_HINT":"If the system event did not fire, the GM can reset daily uses here manually.","EMPTY_TITLE":"No custom deities yet","EMPTY_HINT":"Create a new deity or import a pantheon.","IMPORT":"Import","LARGER_WINDOW":"A larger window is recommended for the full editor.","TYPE":"Type","LAST_CHANGED":"Last changed","SYSTEM":"System","SCHEMA":"Schema","VERSION":"Version","DIAGNOSTICS_OK":"Ready","LOADING":"Loading …","EXPERT_MODE":"Expert mode","DISCOVERY":"Discovery","DISCOVERY_ENABLE":"Hide this deity until it is discovered","DISCOVERY_DEFAULT":"Before discovery","DISCOVERY_REVEALED":"Fully revealed","DISCOVERY_RUMOR":"Show as an unknown rumor","DISCOVERY_HIDDEN":"Hide completely","RUMOR":"Rumor","RUMOR_NAME":"Rumor name","RUMOR_TEXT":"Clue for players","REVEALED_USERS":"Revealed user IDs","REVEALED_ACTORS":"Revealed actor IDs","UNKNOWN_DEITY":"Unknown deity","UNREVEALED":"Not yet discovered","UNKNOWN_DEITY_HINT":"A forgotten presence leaves traces, but its name and nature remain hidden.","REVEAL_TO_ALL":"Reveal to all players","CLEAR_ALL_DATA":"Delete all GodForge data","CLEAR_ALL_DATA_HINT":"Downloads one final backup, then deletes deities, assignments, generated effects, random tables and fortune wheels. Module settings remain.","CLEAR_CONFIRM_FIRST":"Download one final backup and permanently delete all GodForge content?","CLEAR_CONFIRM_TYPE":"Final confirmation: type LÖSCHUNG exactly.","CLEAR_CANCELLED":"Deletion cancelled.","CLEAR_COMPLETE":"GodForge records deleted.","CLEAR_FAILED":"Deletion stopped after an error. Use the downloaded backup to restore any affected data.","BUILDER_TITLE":"Divine blueprint","BUILDER_HINT":"Connect triggers, checks, actions and results. Every execution is previewed for the GM.","NODE_LIBRARY":"Node library","SEARCH_NODES":"Search nodes …","TRIGGERS":"Triggers","LOGIC":"Checks and logic","RESULTS":"Results","AUTO_LAYOUT":"Auto layout","ZOOM_IN":"Zoom in","ZOOM_OUT":"Zoom out","CENTER_GRAPH":"Center blueprint","COPY_SUFFIX":"Copy","DISCARD_UNSAVED":"Discard unsaved changes?","DIFFICULTY_CLASS":"Difficulty class","TRAINED_SKILL_PF2E":"Divine skill – PF2e training","SKILL_NO_BONUS":"Does not add a numeric modifier.","ADDITIONAL_FOLLOWER_BONUSES":"Additional follower bonuses","BONUS_SECTION_HINT":"These bonuses may be granted in addition to divine training.","INHERITANCE_HINT":"Recommended technical values are selected automatically","SKILL_OVERLAP_WARNING":"This skill is trained and also receives the bonus. That is allowed, but may be stronger than intended.","ABILITY_TYPE":"Ability type","ABILITY_STANDARD":"Standard","ABILITY_FORTUNE_WHEEL":"Fortune wheel / random table","VARIANT_SELECT_PORTRAIT":"Select a portrait first.","VARIANT_UPLOAD_UNAVAILABLE":"Foundry file upload is unavailable.","VARIANT_CREATING":"Creating variants …","VARIANT_NONE_SELECTED":"No variant selected.","VARIANT_FAILED":"Image variants could not be created. Check file permissions and the browser console.","IMPORT_FAILED":"The import failed. Details are available in the browser console.","INVALID_RANDOM_CONTENT":"The backup contains invalid random content.","INVALID_ACTOR_BACKUP":"The backup contains invalid actor data.","BACKUP_ITEM_FAILED":"GodForge item {id} cannot be backed up.","RESTORE_ACTOR_FAILED":"Actor {id} cannot restore embedded GodForge items.","CATEGORY_TRIGGER":"Trigger","CATEGORY_LOGIC":"Logic","CATEGORY_ACTION":"Action","CATEGORY_RESULT":"Result","PORT_NEXT":"Next","PORT_IN":"Input","PORT_ACTOR":"Actor","PORT_EVENT":"Event","PORT_VALUE":"Value","PORT_LEFT":"Left","PORT_RIGHT":"Right","PORT_TRUE":"True","PORT_FALSE":"False","PORT_TARGET":"Target","PORT_SELECTOR":"Selector","PORT_CRITICAL_SUCCESS":"Critical success","PORT_SUCCESS":"Success","PORT_FAILURE":"Failure","PORT_CRITICAL_FAILURE":"Critical failure","PORT_TOTAL":"Total","PORT_DEGREE":"Degree of success","PORT_RESULT":"Result","TEMPLATES":"Templates","TEMPLATE_HEAL":"Manual healing blessing","TEMPLATE_DAMAGE_REACTION":"Reaction after damage","TEMPLATE_DAILY_RESOURCE":"Daily resource","SIMULATE":"Test run","SIMULATION":"Test result","SIMULATION_RANDOM_TABLE":"Simulated random-table result","HEALING":"Healing","DAMAGE":"Damage","BLUEPRINT":"Ability blueprint","BLUEPRINT_EMPTY":"No blueprint connected yet","OPEN_BUILDER":"Open blueprint","LEGACY_EFFECTS":"Classic effect blocks","EFFECT_CHAIN":"Effect chain","ADD_EFFECT":"Add effect","SAVE_GRAPH":"Save blueprint","UNDO":"Undo","REDO":"Redo","CONNECT_TARGET":"Now select the input port of the next node.","CONNECT_INPUT":"Connect here","CONNECT_OUTPUT":"Start connection","BRANCH_TRUE":"True branch","BRANCH_FALSE":"False branch","GRAPH_CANVAS":"Ability blueprint canvas","GRAPH_VALID":"Blueprint is executable","GRAPH_INVALID":"Blueprint needs attention","GRAPH_ISSUE_GENERIC":"Invalid blueprint element ({code}).","EMPTY_GRAPH":"The forge is empty","EMPTY_GRAPH_HINT":"Start with a trigger from the library.","SELECT_NODE":"Select a node","SELECT_NODE_HINT":"Its settings will appear here.","LINEAR_OUTLINE":"Readable outline","APPROVAL_EYEBROW":"GM approval","APPROVAL_HINT":"Review the expected changes before they are applied.","APPROVE":"Approve and execute","DENY":"Deny","GM_REQUIRED":"Only a GM can confirm this action.","NO_CHANGES":"No actor changes","NO_CHANGES_HINT":"The ability only produces informational output.","OPERATIONS":"Planned operations","SOURCE_ACTOR":"Source character","NODE_MANUAL":"Manual button","NODE_SKILL_CHECK":"Skill check","NODE_ATTACK_ROLL":"Attack roll","NODE_SAVING_THROW":"Saving throw","NODE_DAMAGE_ROLL":"Damage roll","NODE_DAMAGE_TAKEN":"Damage taken","NODE_HEALING_RECEIVED":"Healing received","NODE_COMBAT_START":"Combat start","NODE_TURN_START":"Turn start","NODE_TURN_END":"Turn end","NODE_ROUND_START":"Round start","NODE_DAILY_PREPARATIONS":"Daily preparations","NODE_TOKEN_MOVE":"Token movement","NODE_REGION_ENTER":"Enter region","NODE_DEITY_ASSIGNED":"Deity assigned","NODE_CUSTOM":"Custom event","NODE_CONDITION":"Condition","NODE_CHANCE":"Chance","NODE_COMPARE":"Compare values","NODE_BRANCH":"Branch","NODE_CHOICE":"Choice","NODE_HEAL":"Heal","NODE_DAMAGE":"Damage","NODE_MODIFIER":"Bonus or penalty","NODE_ROLL":"Request roll","NODE_RESOURCE":"Resource","NODE_MOVEMENT":"Movement","NODE_RANDOM_WHEEL":"Random table","NODE_MESSAGE":"Chat message","NODE_SUCCESS":"Success","NODE_FAILURE":"Failure","NODE_SUMMARY":"Summary","NODE_END":"End","NODES":"nodes","CONNECTIONS":"connections","EXECUTABLE_EFFECTS":"executable effects","NODE_LABEL":"Label","EVENT_FILTER":"Selector or event filter","CHANCE_PERCENT":"Chance in percent","FACT_PATH":"Fact or result path","COMPARISON":"Comparison","EXPECTED_VALUE":"Expected value","FORMULA_VALUE":"Formula or value","SYSTEM_SELECTOR":"System selector","TARGET":"Target","TARGET_SELF":"Self","TARGET_TARGET":"Selected target","TARGET_ALLIES":"Allies","TARGET_ENEMIES":"Enemies","TARGET_GROUP":"Group","COMPARE_EQ":"equals","COMPARE_NEQ":"does not equal","COMPARE_GT":"greater than","COMPARE_GTE":"greater than or equal","COMPARE_LT":"less than","COMPARE_LTE":"less than or equal","HUB_EXPLANATION":"The Follower Hub shows a character's deity, bonuses, and wonders.","HUB_NO_CHARACTER":"Set an owned character or control a token first.","UNDERSTOOD":"Understood","CHOOSE_CHARACTER":"Choose character","OPEN_HUB_ACTION":"Open Follower Hub"},"SETTINGS":{"MENU_NAME":"GodForge management","MENU_LABEL":"Open GodForge","MENU_HINT":"Opens the dashboard for creating and managing custom deities.","LANGUAGE":"GodForge language","LANGUAGE_HINT":"Language used by GodForge surfaces.","AUTO":"Automatic"},"ERROR":{"NO_USES":"No uses remaining.","GM_ONLY":"Only the GM may use this GodForge feature.","NO_PERMISSION":"You are not allowed to use this GodForge feature.","DASHBOARD_OPEN":"The dashboard did not open. Details are available in the browser console.","CODEX_OPEN":"The Divine Codex did not open. Reload Foundry and try again.","HUB_OPEN":"The character hub could not be loaded. Check that the character is still available.","UNSUPPORTED_SYSTEM":"Darkis GodForge does not support the active {system} system.","ACTION_FAILED":"That did not work."}}`), it = {
   DARKIS_GODFORGE: br
-}, Fe = /* @__PURE__ */ new Map([["en", tt]]);
-async function wt(r, t) {
+}, Fe = /* @__PURE__ */ new Map([["en", it]]);
+async function At(r, t) {
   if (r === "auto" || Fe.has(r)) return;
   const e = await fetch(t);
   if (!e.ok) throw new Error(`Unable to load GodForge language ${r}.`);
@@ -1201,29 +1201,29 @@ function q(r) {
   var o, n, a, l;
   const t = S(), e = (n = (o = t == null ? void 0 : t.settings) == null ? void 0 : o.get) == null ? void 0 : n.call(o, "darkis-godforge", "language");
   if (typeof e == "string" && e !== "auto") {
-    const c = At(Fe.get(e), r);
+    const c = St(Fe.get(e), r);
     if (typeof c == "string") return c;
   }
   const i = (l = (a = t == null ? void 0 : t.i18n) == null ? void 0 : a.localize) == null ? void 0 : l.call(a, r);
   if (i && i !== r) return i;
-  const s = At(tt, r);
+  const s = St(it, r);
   return typeof s == "string" ? s : r;
 }
 function T() {
-  return Object.fromEntries(Object.keys(tt.DARKIS_GODFORGE.UI).map((r) => [r, q(`DARKIS_GODFORGE.UI.${r}`)]));
+  return Object.fromEntries(Object.keys(it.DARKIS_GODFORGE.UI).map((r) => [r, q(`DARKIS_GODFORGE.UI.${r}`)]));
 }
-function At(r, t) {
+function St(r, t) {
   return t.split(".").reduce((e, i) => e && typeof e == "object" ? e[i] : void 0, r);
 }
 function D() {
-  if (!it())
-    throw rt(), new Error("GodForge: GM only.");
+  if (!rt())
+    throw st(), new Error("GodForge: GM only.");
 }
-function it() {
+function rt() {
   var r, t;
   return ((t = (r = S()) == null ? void 0 : r.user) == null ? void 0 : t.isGM) === !0;
 }
-function rt() {
+function st() {
   var r, t, e;
   (e = (t = (r = U()) == null ? void 0 : r.notifications) == null ? void 0 : t.warn) == null || e.call(t, q("DARKIS_GODFORGE.ERROR.GM_ONLY"));
 }
@@ -1240,18 +1240,18 @@ function B(r = !1) {
     ownsActor: !!(t && ((n = e == null ? void 0 : e.testUserPermission) == null ? void 0 : n.call(e, t, "OWNER")) === !0)
   };
 }
-const Re = /* @__PURE__ */ new Map();
+const ke = /* @__PURE__ */ new Map();
 async function vr(r, t) {
   var o, n;
   if ((((n = (o = S()) == null ? void 0 : o.system) == null ? void 0 : n.id) ?? "") === "sfrpg" && r.operations.some((a) => ["create-modifier", "condition", "roll"].includes(a.kind))) throw new Error("This advanced ability requires the PF2e or SF2e runtime adapter.");
   const i = await Ir(r.operations, t), s = [];
   try {
-    for (const a of r.operations.filter((l) => l.kind === "roll")) await ke(a, t, r, i);
+    for (const a of r.operations.filter((l) => l.kind === "roll")) await Le(a, t, r, i);
     for (const a of r.operations.filter((l) => l.kind !== "roll" && l.kind !== "chat" && l.kind !== "roll-result")) {
-      const l = await ke(a, t, r, i);
+      const l = await Le(a, t, r, i);
       l && s.push(l);
     }
-    for (const a of r.operations.filter((l) => l.kind === "chat" || l.kind === "roll-result")) await ke(a, t, r, i);
+    for (const a of r.operations.filter((l) => l.kind === "chat" || l.kind === "roll-result")) await Le(a, t, r, i);
   } catch (a) {
     for (const l of s.reverse())
       try {
@@ -1307,7 +1307,7 @@ async function Ir(r, t) {
   }
   return { conditions: e, items: i };
 }
-async function ke(r, t, e, i) {
+async function Le(r, t, e, i) {
   var o, n, a, l, c, u;
   const s = t.get(r.targetId);
   if (r.kind === "actor-update") {
@@ -1361,7 +1361,7 @@ async function ke(r, t, e, i) {
     return;
   }
   if (r.kind === "roll-result") {
-    await St(`<strong>${ue(e.abilityName)}</strong><p>${ue(r.selector)}: ${r.total}${r.degree ? ` (${ue(r.degree)})` : ""}</p>`);
+    await Tt(`<strong>${ue(e.abilityName)}</strong><p>${ue(r.selector)}: ${r.total}${r.degree ? ` (${ue(r.degree)})` : ""}</p>`);
     return;
   }
   if (r.kind === "movement") {
@@ -1401,7 +1401,7 @@ async function ke(r, t, e, i) {
     }
     return;
   }
-  await St(`<strong>${ue(e.abilityName)}</strong><p>${ue(r.text)}</p>`);
+  await Tt(`<strong>${ue(e.abilityName)}</strong><p>${ue(r.text)}</p>`);
 }
 async function wr(r, t, e, i) {
   var n;
@@ -1435,8 +1435,8 @@ async function wr(r, t, e, i) {
 async function Ar(r) {
   var s;
   const t = (s = S()) == null ? void 0 : s.system, e = `${(t == null ? void 0 : t.id) ?? "unknown"}:${(t == null ? void 0 : t.version) ?? "unknown"}:${r.toLocaleLowerCase()}`;
-  let i = Re.get(e);
-  return i || (i = Sr(r), Re.set(e, i), i.catch(() => Re.delete(e))), structuredClone(await i);
+  let i = ke.get(e);
+  return i || (i = Sr(r), ke.set(e, i), i.catch(() => ke.delete(e))), structuredClone(await i);
 }
 async function Sr(r) {
   var i, s, o;
@@ -1464,7 +1464,7 @@ function ei(r) {
     return ((n = o.actor) == null ? void 0 : n.id) === r;
   })) == null ? void 0 : s.document;
 }
-async function St(r) {
+async function Tt(r) {
   const t = globalThis.ChatMessage;
   t && await t.create({ content: r, speaker: { alias: "Darkis GodForge" } }, { darkisGodForge: !0 });
 }
@@ -1595,7 +1595,7 @@ class ii {
   }
   drawRandomDeity(t) {
     const e = B(!0);
-    return et(this.deities.list().filter((i) => i.kind !== "lore" && X(i, e) && Z(i, e) === "revealed").map((i) => ({ id: i.id, label: i.name, weight: 1 })), t);
+    return tt(this.deities.list().filter((i) => i.kind !== "lore" && X(i, e) && Z(i, e) === "revealed").map((i) => ({ id: i.id, label: i.name, weight: 1 })), t);
   }
   getAdapterCapabilities(t) {
     return this.adapters.get(t).capabilities;
@@ -1672,7 +1672,7 @@ class ii {
     this.requireActorOwner(t);
     const s = this.deities.get(e);
     if (!s || s.kind === "lore" || !X(s, B(!0))) throw new Error("Deity is not available for assignment.");
-    const o = Object.entries(i).map(([c, u]) => ({ groupId: c, refs: u })), n = s.grantGroups.flatMap((c) => ye(c, o)), a = Object.fromEntries(s.abilities.filter((c) => c.uses).map((c) => [c.id, { used: 0, max: c.uses.max, lastResetAt: Date.now(), reset: c.uses.reset }]));
+    const o = Object.entries(i).map(([c, u]) => ({ groupId: c, refs: u })), n = s.grantGroups.flatMap((c) => Ee(c, o)), a = Object.fromEntries(s.abilities.filter((c) => c.uses).map((c) => [c.id, { used: 0, max: c.uses.max, lastResetAt: Date.now(), reset: c.uses.reset }]));
     await t.update({ flags: { "darkis-godforge": { deityId: e, grants: n, usages: a } } }), await this.synchronizeActorDeityItem(t, s), (l = re()) == null || l.Hooks.callAll("godforge.trigger", "deity-assigned", t);
   }
   async removeDeity(t) {
@@ -1796,8 +1796,8 @@ class ii {
   formulaFacts(t, e) {
     const i = t.system ?? {}, s = (e == null ? void 0 : e.system) ?? {};
     return {
-      actor: { level: V($(i.details).level) ?? V(i.level) ?? 0, hpPercent: Tt(i) },
-      target: { hpPercent: Tt(s) }
+      actor: { level: V($(i.details).level) ?? V(i.level) ?? 0, hpPercent: Dt(i) },
+      target: { hpPercent: Dt(s) }
     };
   }
   async rollStatistic(t, e, i) {
@@ -1829,7 +1829,7 @@ function V(r) {
   const t = Number(r);
   return Number.isFinite(t) ? t : void 0;
 }
-function Tt(r) {
+function Dt(r) {
   const t = $($(r.attributes).hp), e = V(t.value), i = V(t.max);
   return e === void 0 || !i ? void 0 : e / i * 100;
 }
@@ -1848,7 +1848,7 @@ function Ur(r) {
   const t = [];
   r.name.trim() || t.push({ level: "error", field: "name", message: "Name is required." }), r.title.trim() || t.push({ level: "warning", field: "title", message: "Title is empty." }), r.description.trim() || t.push({ level: "warning", field: "description", message: "Description is empty." });
   for (const e of r.passiveBonuses)
-    (!e.name.trim() || !e.selector.trim()) && t.push({ level: "error", field: `bonus.${e.id}`, message: "Bonus name and selector are required." }), typeof e.value == "string" && !Qe(e.value) && t.push({ level: "error", field: `bonus.${e.id}.value`, message: "Bonus formula is invalid." });
+    (!e.name.trim() || !e.selector.trim()) && t.push({ level: "error", field: `bonus.${e.id}`, message: "Bonus name and selector are required." }), typeof e.value == "string" && !Ze(e.value) && t.push({ level: "error", field: `bonus.${e.id}.value`, message: "Bonus formula is invalid." });
   for (const e of r.abilities)
     e.name.trim() || t.push({ level: "error", field: `ability.${e.id}`, message: "Ability name is required." }), !e.timing && e.actionCost === void 0 && t.push({ level: "warning", field: `ability.${e.id}.timing`, message: "Ability timing is incomplete." });
   return t;
@@ -1875,7 +1875,7 @@ function Y() {
   const r = ne();
   return class extends r {
     render(t) {
-      return it() ? super.render(t) : (rt(), Promise.resolve(this));
+      return rt() ? super.render(t) : (st(), Promise.resolve(this));
     }
   };
 }
@@ -1954,7 +1954,7 @@ class xe extends ne() {
   }
 }
 v(xe, "DEFAULT_OPTIONS", { id: "darkis-godforge-grant-choices", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.CHOOSE_GRANTS", resizable: !0 }, position: { width: 620, height: 680 } }), v(xe, "PARTS", { main: { template: "modules/darkis-godforge/templates/grant-choice-dialog.hbs" } });
-function ve(r) {
+function Ie(r) {
   const t = me(r == null ? void 0 : r.focusX, 50, 0, 100), e = me(r == null ? void 0 : r.focusY, 25, 0, 100), i = me(r == null ? void 0 : r.zoom, 1, 1, 3), s = me(r == null ? void 0 : r.rotation, 0, -180, 180);
   return {
     imageFit: (r == null ? void 0 : r.fit) === "contain" ? "contain" : "cover",
@@ -1966,7 +1966,7 @@ function ve(r) {
 function me(r, t, e, i) {
   return Math.max(e, Math.min(i, Number.isFinite(r) ? r : t));
 }
-const Dt = "modules/darkis-godforge/assets/unknown-deity.svg";
+const _t = "modules/darkis-godforge/assets/unknown-deity.svg";
 class se extends ne() {
   constructor(e, i, s, o, n, a) {
     super();
@@ -1983,9 +1983,9 @@ class se extends ne() {
     this.remoteChoices.clear();
     for (const I of i ?? []) this.remoteChoices.set(I.id, I);
     const s = this.preview ? [{ ...this.preview.deity, status: "published" }] : i ?? this.deityService.list(), o = (E = (b = (m = this.actor) == null ? void 0 : m.flags) == null ? void 0 : b["darkis-godforge"]) == null ? void 0 : E.deityId, n = (g = S()) == null ? void 0 : g.user, a = !!(this.actor && n && ((w = (y = this.actor).testUserPermission) == null ? void 0 : w.call(y, n, "OWNER")) === !0), l = s.flatMap((I) => {
-      var F, ae, ce, R, fe, ot, nt, at, ct;
+      var F, ae, ce, R, fe, nt, at, ct, lt;
       if ("discovery" in I && typeof I.discovery == "string")
-        return I.discovery === "rumor" ? [{ id: I.id, name: ((F = I.rumorName) == null ? void 0 : F.trim()) || T().UNKNOWN_DEITY || "Unknown deity", title: T().UNREVEALED || "Not yet discovered", image: Dt, imageFit: "cover", imagePosition: "50% 35%", rumor: !0, rumorText: ((ae = I.rumorText) == null ? void 0 : ae.trim()) || T().UNKNOWN_DEITY_HINT }] : [{ ...I, image: j(I.image), ...ve((ce = I.imagePresentation) == null ? void 0 : ce.image), lore: I.lore, selected: I.id === o, canSelect: !I.lore && !!(this.actor && this.socketRouter), requiresChoices: I.choiceGroups.length > 0 }];
+        return I.discovery === "rumor" ? [{ id: I.id, name: ((F = I.rumorName) == null ? void 0 : F.trim()) || T().UNKNOWN_DEITY || "Unknown deity", title: T().UNREVEALED || "Not yet discovered", image: _t, imageFit: "cover", imagePosition: "50% 35%", rumor: !0, rumorText: ((ae = I.rumorText) == null ? void 0 : ae.trim()) || T().UNKNOWN_DEITY_HINT }] : [{ ...I, image: j(I.image), ...Ie((ce = I.imagePresentation) == null ? void 0 : ce.image), lore: I.lore, selected: I.id === o, canSelect: !I.lore && !!(this.actor && this.socketRouter), requiresChoices: I.choiceGroups.length > 0 }];
       if (!X(I, e)) return [];
       const A = Z(I, e);
       if (A === "hidden") return [];
@@ -1994,21 +1994,21 @@ class se extends ne() {
           id: I.id,
           name: ((fe = (R = I.discovery) == null ? void 0 : R.rumorName) == null ? void 0 : fe.trim()) || T().UNKNOWN_DEITY || "Unknown deity",
           title: T().UNREVEALED || "Not yet discovered",
-          image: Dt,
+          image: _t,
           imageFit: "cover",
           imagePosition: "50% 35%",
           rumor: !0,
-          rumorText: ((nt = (ot = I.discovery) == null ? void 0 : ot.rumorText) == null ? void 0 : nt.trim()) || T().UNKNOWN_DEITY_HINT
+          rumorText: ((at = (nt = I.discovery) == null ? void 0 : nt.rumorText) == null ? void 0 : at.trim()) || T().UNKNOWN_DEITY_HINT
         }];
       const C = Pr(I.grantGroups), N = I.kind === "lore", _ = e.isGM ? I : K(I, e);
       return _ ? [{
         ..._,
         image: j(_.image),
-        ...ve((at = _.imagePresentation) == null ? void 0 : at.image),
+        ...Ie((ct = _.imagePresentation) == null ? void 0 : ct.image),
         lore: N,
         selected: I.id === o,
         canSelect: !N && !!(this.api && this.socketRouter && this.actor && !this.preview && !this.viewerOverride && (e.ownsActor || a)),
-        canReveal: e.isGM && ((ct = I.discovery) == null ? void 0 : ct.enabled) === !0,
+        canReveal: e.isGM && ((lt = I.discovery) == null ? void 0 : lt.enabled) === !0,
         requiresChoices: C
       }] : [];
     }).sort((I, A) => Number(A.lore) - Number(I.lore) || I.name.localeCompare(A.name)), c = l.filter(
@@ -2078,14 +2078,14 @@ class $e extends ne() {
   constructor(e, i, s, o, n) {
     super();
     v(this, "selected", /* @__PURE__ */ new Set());
-    this.title = e, this.choices = i, this.multiple = o, this.onChoose = n, s.forEach((a) => this.selected.add(a));
+    this.dialogTitle = e, this.choices = i, this.multiple = o, this.onChoose = n, s.forEach((a) => this.selected.add(a));
   }
   async _prepareContext() {
     const e = this.choices.map((s, o) => {
       var n;
       return { ...s, token: String(o), selected: this.selected.has(s.value), traitText: ((n = s.traits) == null ? void 0 : n.join(", ")) ?? "", rankText: s.rank === void 0 ? "" : String(s.rank), available: s.available !== !1 };
     }), i = (s) => [...new Set(s.filter((o) => !!o))].sort((o, n) => o.localeCompare(n));
-    return { ui: T(), title: this.title, items: e, multiple: this.multiple, categories: i(e.map((s) => s.category)), groups: i(e.map((s) => s.group)), sources: i(e.map((s) => s.source)), ranks: [...new Set(e.flatMap((s) => s.rank === void 0 ? [] : [s.rank]))].sort((s, o) => s - o), traits: i(e.flatMap((s) => s.traits ?? [])) };
+    return { ui: T(), title: this.dialogTitle, items: e, multiple: this.multiple, categories: i(e.map((s) => s.category)), groups: i(e.map((s) => s.group)), sources: i(e.map((s) => s.source)), ranks: [...new Set(e.flatMap((s) => s.rank === void 0 ? [] : [s.rank]))].sort((s, o) => s - o), traits: i(e.flatMap((s) => s.traits ?? [])) };
   }
   _onRender() {
     var l, c, u;
@@ -2153,7 +2153,7 @@ class $e extends ne() {
   }
 }
 v($e, "DEFAULT_OPTIONS", { id: "darkis-godforge-picker", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.PICKER_TITLE", resizable: !0 }, position: { width: 980, height: 720 } }), v($e, "PARTS", { main: { template: "modules/darkis-godforge/templates/picker-dialog.hbs" } });
-const Le = [
+const ye = [
   { category: "trigger", type: "manual", label: "Manual button", icon: "fa-hand-pointer" },
   { category: "trigger", type: "skill-check", label: "Skill check", icon: "fa-dice-d20" },
   { category: "trigger", type: "attack-roll", label: "Attack roll", icon: "fa-crosshairs" },
@@ -2206,14 +2206,14 @@ class Ve extends Y() {
   async _prepareContext() {
     D();
     const e = T(), i = G(this.graph), s = this.graph.nodes.find((c) => c.id === this.selectedId), o = this.graph.nodes.map((c) => {
-      var d;
-      const u = Ee(c);
+      const u = be(c), d = ye.find((h) => h.category === c.category && h.type === c.type);
       return {
         ...c,
+        label: Vr(c, e),
         selected: c.id === this.selectedId,
         connecting: c.id === this.connectFrom,
         style: `left:${c.x}px;top:${c.y}px;height:${Math.max(88, 58 + Math.max(u.filter((h) => h.direction === "input").length, u.filter((h) => h.direction === "output").length) * 24)}px`,
-        icon: ((d = Le.find((h) => h.category === c.category && h.type === c.type)) == null ? void 0 : d.icon) ?? "fa-circle-nodes",
+        icon: (d == null ? void 0 : d.icon) ?? "fa-circle-nodes",
         hasError: i.issues.some((h) => h.nodeId === c.id),
         miniStyle: `left:${c.x / 20}px;top:${c.y / 20}px`,
         categoryLabel: e[`CATEGORY_${c.category.toUpperCase()}`] ?? c.category,
@@ -2225,7 +2225,7 @@ class Ve extends Y() {
       if (!u || !d) return [];
       const h = Ot(u, c.from.port, "output"), p = Ot(d, c.to.port, "input");
       return [{ ...c, x1: h.x, y1: h.y, x2: p.x, y2: p.y, path: Fr(h.x, h.y, p.x, p.y), portType: c.from.type }];
-    }), l = Le.map((c) => ({ ...c, label: e[_t(c.type)] ?? c.label, categoryLabel: e[`CATEGORY_${c.category.toUpperCase()}`] ?? c.category })).filter((c) => (this.category === "all" || c.category === this.category) && (!this.search || `${c.label} ${c.type}`.toLocaleLowerCase().includes(this.search)));
+    }), l = ye.map((c) => ({ ...c, label: e[He(c.type)] ?? c.label, categoryLabel: e[`CATEGORY_${c.category.toUpperCase()}`] ?? c.category })).filter((c) => (this.category === "all" || c.category === this.category) && (!this.search || `${c.label} ${c.type}`.toLocaleLowerCase().includes(this.search)));
     return {
       ui: e,
       graph: this.graph,
@@ -2265,7 +2265,7 @@ class Ve extends Y() {
         this.connectFrom = m.dataset.graphNode ?? "", this.connectFromPort = E.dataset.nodeOutput || "next", this.connectFromType = Ct(E.dataset.portType), this.render(!0);
       })), m.querySelectorAll("[data-node-input]").forEach((E) => E.addEventListener("click", () => this.finishConnection(m.dataset.graphNode ?? "", E.dataset.nodeInput ?? "in", Ct(E.dataset.portType))));
     }), (o = e.querySelector("[data-action='delete-node']")) == null || o.addEventListener("click", () => this.deleteSelected()), (n = e.querySelector("[data-action='duplicate-node']")) == null || n.addEventListener("click", () => this.duplicateSelected()), (a = e.querySelector("[data-action='auto-layout']")) == null || a.addEventListener("click", () => this.mutate(() => {
-      this.graph = ft(this.graph);
+      this.graph = mt(this.graph);
     })), (l = e.querySelector("[data-action='zoom-in']")) == null || l.addEventListener("click", () => this.setZoom(this.zoom + 0.1)), (c = e.querySelector("[data-action='zoom-out']")) == null || c.addEventListener("click", () => this.setZoom(this.zoom - 0.1)), (u = e.querySelector("[data-action='center-graph']")) == null || u.addEventListener("click", () => this.centerGraph()), e.querySelectorAll("[data-graph-template]").forEach((m) => m.addEventListener("click", () => this.applyTemplate(m.dataset.graphTemplate ?? ""))), (d = e.querySelector("[data-action='undo']")) == null || d.addEventListener("click", () => this.undo()), (h = e.querySelector("[data-action='redo']")) == null || h.addEventListener("click", () => this.redo()), (p = e.querySelector("[data-action='simulate']")) == null || p.addEventListener("click", () => void this.simulate()), (f = e.querySelector("[data-action='save-graph']")) == null || f.addEventListener("click", () => {
       var b;
       G(this.graph).valid && (this.onSave(structuredClone(this.graph)), (b = this.close) == null || b.call(this));
@@ -2275,9 +2275,9 @@ class Ve extends Y() {
     this.searchTimer && clearTimeout(this.searchTimer), this.searchTimer = null;
   }
   addNode(e, i) {
-    const s = Le.find((o) => o.category === e && o.type === i);
+    const s = ye.find((o) => o.category === e && o.type === i);
     s && this.mutate(() => {
-      const o = this.graph.nodes.length % 4, n = Math.floor(this.graph.nodes.length / 4), a = { id: crypto.randomUUID(), category: e, type: i, label: T()[_t(i)] ?? s.label, x: 80 + o * 280, y: 80 + n * 170, config: Gr(e, i) };
+      const o = this.graph.nodes.length % 4, n = Math.floor(this.graph.nodes.length / 4), a = { id: crypto.randomUUID(), category: e, type: i, label: T()[He(i)] ?? s.label, x: 80 + o * 280, y: 80 + n * 170, config: Gr(e, i) };
       this.graph.nodes.push(a), this.selectedId = a.id;
     });
   }
@@ -2293,7 +2293,7 @@ class Ve extends Y() {
   }
   applyTemplate(e) {
     this.mutate(() => {
-      e === "heal" ? this.graph = te({ trigger: "manual", effects: [{ type: "heal", formula: "1d8", target: "target" }, { type: "message", text: "The blessing takes effect." }] }) : e === "damage-reaction" ? this.graph = te({ trigger: "damage-taken", effects: [{ type: "modifier", selector: "ac", value: 1, modifierType: "status", target: "self", duration: 1 }] }) : e === "daily-resource" && (this.graph = te({ trigger: "daily-preparations", effects: [{ type: "resource", resource: "item", operation: "add", formula: "1", target: "self", itemUuid: "" }] })), this.graph = ft(this.graph), this.selectedId = "";
+      e === "heal" ? this.graph = te({ trigger: "manual", effects: [{ type: "heal", formula: "1d8", target: "target" }, { type: "message", text: "The blessing takes effect." }] }) : e === "damage-reaction" ? this.graph = te({ trigger: "damage-taken", effects: [{ type: "modifier", selector: "ac", value: 1, modifierType: "status", target: "self", duration: 1 }] }) : e === "daily-resource" && (this.graph = te({ trigger: "daily-preparations", effects: [{ type: "resource", resource: "item", operation: "add", formula: "1", target: "self", itemUuid: "" }] })), this.graph = mt(this.graph), this.selectedId = "";
     });
   }
   deleteSelected() {
@@ -2363,7 +2363,14 @@ class Ve extends Y() {
         conditionFacts: { always: !0, "actor.level": 5, "actor.hpPercent": 66, "target.hpPercent": 60 },
         triggerEvent: ((n = this.graph.nodes.find((l) => l.category === "trigger")) == null ? void 0 : n.type) ?? "manual",
         rollDice: async () => 5,
-        rollStatistic: async () => ({ total: 15, degree: "success" })
+        rollStatistic: async () => ({ total: 15, degree: "success" }),
+        choose: async (l, c) => {
+          var u;
+          return ((u = c[0]) == null ? void 0 : u.id) ?? "";
+        },
+        runMacro: async () => {
+        },
+        rollTable: async () => i.SIMULATION_RANDOM_TABLE ?? "Simulated random-table result"
       });
       this.simulation = [
         `${this.graph.nodes.length} ${i.NODES ?? "nodes"} · ${this.graph.edges.length} ${i.CONNECTIONS ?? "connections"}`,
@@ -2402,7 +2409,7 @@ function Fr(r, t, e, i) {
   const s = Math.max(70, Math.abs(e - r) / 2);
   return `M ${r} ${t} C ${r + s} ${t}, ${e - s} ${i}, ${e} ${i}`;
 }
-function _t(r) {
+function He(r) {
   return `NODE_${r.replaceAll("-", "_").toUpperCase()}`;
 }
 function xr(r) {
@@ -2418,7 +2425,7 @@ function Nt(r, t) {
   return r.map((e, i) => ({ ...e, label: t[`PORT_${e.port.replaceAll("-", "_").toUpperCase()}`] ?? e.label, style: `top:${42 + i * 24}px` }));
 }
 function Ot(r, t, e) {
-  const i = Ee(r).filter((o) => o.direction === e), s = Math.max(0, i.findIndex((o) => o.port === t));
+  const i = be(r).filter((o) => o.direction === e), s = Math.max(0, i.findIndex((o) => o.port === t));
   return { x: r.x + (e === "output" ? 220 : 0), y: r.y + 42 + s * 24 };
 }
 function Rt(r, t) {
@@ -2427,9 +2434,19 @@ function Rt(r, t) {
 function $r(r, t) {
   return r.replace(/^Trigger:/, `${t.CATEGORY_TRIGGER ?? "Trigger"}:`).replace(/^Logic:/, `${t.CATEGORY_LOGIC ?? "Logic"}:`).replace(/^Action:/, `${t.CATEGORY_ACTION ?? "Action"}:`).replace(/^Result:/, `${t.CATEGORY_RESULT ?? "Result"}:`);
 }
+function Vr(r, t) {
+  var o;
+  const e = t[He(r.type)];
+  if (!e) return r.label;
+  const i = (o = ye.find((n) => n.category === r.category && n.type === r.type)) == null ? void 0 : o.label, s = new Set([i, r.type, Hr(r.type), r.type === "manual" ? "Manual" : "", r.type === "random-wheel" ? "Random Wheel" : ""].filter(Boolean));
+  return !r.label || s.has(r.label) ? e : r.label;
+}
+function Hr(r) {
+  return r.split("-").map((t) => t && t[0].toUpperCase() + t.slice(1)).join(" ");
+}
 const kt = Object.keys(ee.fields);
-class Ie extends Y() {
-  constructor(e, i, s = new Je(), o) {
+class we extends Y() {
+  constructor(e, i, s = new Qe(), o) {
     super();
     v(this, "systemCatalog", { skills: [], domains: [], weapons: [], spells: [], fonts: [], sanctifications: [], attributes: [] });
     v(this, "officialChoices", []);
@@ -2836,28 +2853,27 @@ class Ie extends Y() {
     l.disabled = !0, l.classList.add("loading"), n && (n.textContent = T().LOADING ?? "Loading …");
     try {
       await this.loadPickerData(s);
-    } catch (f) {
-      H("Darkis GodForge | Could not load picker data.", f), n && (n.textContent = a);
-      return;
-    } finally {
-      l.disabled = !1, l.classList.remove("loading");
-    }
-    const c = this.pickerChoices(s), u = this.pickerValues(e, s), d = s === "domains" || s === "alternateDomains" || s === "spells" || s === "attributes", h = T(), p = { domains: h.DOMAINS, alternateDomains: h.ALTERNATE_DOMAINS, weapons: h.FAVORED_WEAPON, spells: h.CLERIC_SPELLS, skills: h.TRAINED_SKILL, fonts: h.DIVINE_FONT, sanctifications: h.SANCTIFICATION, attributes: h.DIVINE_ATTRIBUTES, official: h.OFFICIAL_DEITY };
-    new $e(p[s] ?? h.PICKER_TITLE ?? "Selection", c, u, d, ({ items: f }) => {
-      var b, E;
-      const m = f.map((g) => g.value);
-      if (s === "weapons")
-        this.setValue(e, "favoredWeaponUuid", m[0] ?? ""), this.setValue(e, "favoredWeapon", ((b = f[0]) == null ? void 0 : b.slug) ?? "");
-      else if (s === "spells") {
-        const g = /* @__PURE__ */ new Map();
-        f.forEach((y) => g.set(y.rank ?? 1, y)), this.setValue(e, "spells", [...g.entries()].sort(([y], [w]) => y - w).map(([y, w]) => `${y}=${w.value}`).join(`
+      const c = this.pickerChoices(s), u = this.pickerValues(e, s), d = s === "domains" || s === "alternateDomains" || s === "spells" || s === "attributes", h = T(), p = { domains: h.DOMAINS, alternateDomains: h.ALTERNATE_DOMAINS, weapons: h.FAVORED_WEAPON, spells: h.CLERIC_SPELLS, skills: h.TRAINED_SKILL, fonts: h.DIVINE_FONT, sanctifications: h.SANCTIFICATION, attributes: h.DIVINE_ATTRIBUTES, official: h.OFFICIAL_DEITY };
+      await new $e(p[s] ?? h.PICKER_TITLE ?? "Selection", c, u, d, ({ items: m }) => {
+        var E, g;
+        const b = m.map((y) => y.value);
+        if (s === "weapons")
+          this.setValue(e, "favoredWeaponUuid", b[0] ?? ""), this.setValue(e, "favoredWeapon", ((E = m[0]) == null ? void 0 : E.slug) ?? "");
+        else if (s === "spells") {
+          const y = /* @__PURE__ */ new Map();
+          m.forEach((w) => y.set(w.rank ?? 1, w)), this.setValue(e, "spells", [...y.entries()].sort(([w], [I]) => w - I).map(([w, I]) => `${w}=${I.value}`).join(`
 `));
-      } else {
-        const g = { domains: "domains", alternateDomains: "alternateDomains", skills: "skill", fonts: "font", sanctifications: "sanctification", attributes: "divineAttributes", official: "replacement.sourceUuid" }[s];
-        g && this.setValue(e, g, d ? m.join(", ") : m[0] ?? "");
-      }
-      s === "official" && ((E = e.elements.namedItem("replacement.sourceUuid")) == null || E.dispatchEvent(new Event("change", { bubbles: !0 }))), this.refreshPickerControls(e), this.updateWizardPreview(this.element, e);
-    }).render(!0);
+        } else {
+          const y = { domains: "domains", alternateDomains: "alternateDomains", skills: "skill", fonts: "font", sanctifications: "sanctification", attributes: "divineAttributes", official: "replacement.sourceUuid" }[s];
+          y && this.setValue(e, y, d ? b.join(", ") : b[0] ?? "");
+        }
+        s === "official" && ((g = e.elements.namedItem("replacement.sourceUuid")) == null || g.dispatchEvent(new Event("change", { bubbles: !0 }))), this.refreshPickerControls(e), this.updateWizardPreview(this.element, e);
+      }).render(!0);
+    } catch (c) {
+      H("Darkis GodForge | Could not load picker data.", c);
+    } finally {
+      n && (n.textContent = a), l.disabled = !1, l.classList.remove("loading");
+    }
   }
   async loadPickerData(e) {
     var o, n;
@@ -2965,7 +2981,7 @@ class Ie extends Y() {
     const i = (s = e.parentElement) == null ? void 0 : s.querySelector("[data-formula-status]");
     if (i)
       try {
-        Se(e.value.replace(/\b\d+d\d+\b/gi, "1"), { actor: { level: 1 }, target: {} }), i.textContent = "✓", i.dataset.valid = "true";
+        Te(e.value.replace(/\b\d+d\d+\b/gi, "1"), { actor: { level: 1 }, target: {} }), i.textContent = "✓", i.dataset.valid = "true";
       } catch {
         i.textContent = "!", i.dataset.valid = "false";
       }
@@ -3091,26 +3107,26 @@ class Ie extends Y() {
     return e === "rounds" || e === "minutes" || e === "hours" || e === "encounter" || e === "scene" || e === "until-reset" ? e : "instant";
   }
 }
-v(Ie, "DEFAULT_OPTIONS", { id: "darkis-godforge-deity-editor", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.NEW_DEITY", resizable: !0 }, position: { width: 980, height: 760 } }), v(Ie, "PARTS", { main: { template: "modules/darkis-godforge/templates/deity-editor.hbs" } });
-class He extends Y() {
+v(we, "DEFAULT_OPTIONS", { id: "darkis-godforge-deity-editor", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.NEW_DEITY", resizable: !0 }, position: { width: 980, height: 760 } }), v(we, "PARTS", { main: { template: "modules/darkis-godforge/templates/deity-editor.hbs" } });
+class qe extends Y() {
   constructor(t, e, i) {
     super(), this.deity = t, this.deityService = e, this.adapters = i;
   }
   async _prepareContext() {
     var t;
-    return D(), { ui: T(), deity: { ...this.deity, image: j(this.deity.image), ...ve((t = this.deity.imagePresentation) == null ? void 0 : t.image) } };
+    return D(), { ui: T(), deity: { ...this.deity, image: j(this.deity.image), ...Ie((t = this.deity.imagePresentation) == null ? void 0 : t.image) } };
   }
   _onRender() {
     var t, e;
     (e = (t = this.element) == null ? void 0 : t.querySelector("[data-action='edit']")) == null || e.addEventListener("click", () => {
-      this.deityService && new Ie(this.deityService, (i) => {
+      this.deityService && new we(this.deityService, (i) => {
         this.deity = i, this.render(!0);
       }, this.adapters, this.deity).render(!0);
     });
   }
 }
-v(He, "DEFAULT_OPTIONS", { id: "darkis-godforge-deity-detail", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: !0 }, position: { width: 1200, height: 820 } }), v(He, "PARTS", { main: { template: "modules/darkis-godforge/templates/deity-detail.hbs" } });
-class qe extends Y() {
+v(qe, "DEFAULT_OPTIONS", { id: "darkis-godforge-deity-detail", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: !0 }, position: { width: 1200, height: 820 } }), v(qe, "PARTS", { main: { template: "modules/darkis-godforge/templates/deity-detail.hbs" } });
+class Be extends Y() {
   constructor(t, e) {
     super(), this.deities = t, this.adapters = e;
   }
@@ -3145,8 +3161,8 @@ class qe extends Y() {
     });
   }
 }
-v(qe, "DEFAULT_OPTIONS", { id: "darkis-godforge-replacements", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.REPLACEMENTS", resizable: !0 }, position: { width: 1100, height: 760 } }), v(qe, "PARTS", { main: { template: "modules/darkis-godforge/templates/replacement-manager.hbs" } });
-class Be extends Y() {
+v(Be, "DEFAULT_OPTIONS", { id: "darkis-godforge-replacements", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.REPLACEMENTS", resizable: !0 }, position: { width: 1100, height: 760 } }), v(Be, "PARTS", { main: { template: "modules/darkis-godforge/templates/replacement-manager.hbs" } });
+class We extends Y() {
   constructor(e, i, s, o = "transfer") {
     super();
     v(this, "pendingImport");
@@ -3270,8 +3286,8 @@ class Be extends Y() {
     }
   }
 }
-v(Be, "DEFAULT_OPTIONS", { id: "darkis-godforge-data-manager", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.IMPORT_EXPORT", resizable: !0 }, position: { width: 900, height: 700 } }), v(Be, "PARTS", { main: { template: "modules/darkis-godforge/templates/data-manager.hbs" } });
-class We extends Y() {
+v(We, "DEFAULT_OPTIONS", { id: "darkis-godforge-data-manager", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.IMPORT_EXPORT", resizable: !0 }, position: { width: 900, height: 700 } }), v(We, "PARTS", { main: { template: "modules/darkis-godforge/templates/data-manager.hbs" } });
+class je extends Y() {
   constructor(e, i = "tables") {
     super();
     v(this, "result", null);
@@ -3357,8 +3373,8 @@ class We extends Y() {
     }
   }
 }
-v(We, "DEFAULT_OPTIONS", { id: "darkis-godforge-random-manager", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.RANDOM_TABLES", resizable: !0 }, position: { width: 1100, height: 800 } }), v(We, "PARTS", { main: { template: "modules/darkis-godforge/templates/random-manager.hbs" } });
-class je extends Y() {
+v(je, "DEFAULT_OPTIONS", { id: "darkis-godforge-random-manager", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.RANDOM_TABLES", resizable: !0 }, position: { width: 1100, height: 800 } }), v(je, "PARTS", { main: { template: "modules/darkis-godforge/templates/random-manager.hbs" } });
+class Ye extends Y() {
   constructor(t, e) {
     super(), this.deities = t, this.api = e;
   }
@@ -3386,7 +3402,7 @@ class je extends Y() {
       const n = o.currentTarget, a = new FormData(n), l = (h = (d = S()) == null ? void 0 : d.actors) == null ? void 0 : h.get(String(a.get("actorId") ?? "")), c = String(a.get("deityId") ?? "");
       if (!l || !c) return;
       const u = {};
-      t.querySelectorAll(`[data-deity-choices='${Vr(c)}'] input[data-group]:checked`).forEach((p) => {
+      t.querySelectorAll(`[data-deity-choices='${qr(c)}'] input[data-group]:checked`).forEach((p) => {
         var f;
         (u[f = p.dataset.group ?? ""] ?? (u[f] = [])).push(p.value);
       }), this.api.assignDeity(l, c, u).then(() => this.render(!0)).catch((p) => H("Character assignment failed.", p));
@@ -3402,12 +3418,12 @@ class je extends Y() {
     }));
   }
 }
-v(je, "DEFAULT_OPTIONS", { id: "darkis-godforge-character-manager", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.CHARACTERS", resizable: !0 }, position: { width: 900, height: 700 } }), v(je, "PARTS", { main: { template: "modules/darkis-godforge/templates/character-manager.hbs" } });
-function Vr(r) {
+v(Ye, "DEFAULT_OPTIONS", { id: "darkis-godforge-character-manager", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.CHARACTERS", resizable: !0 }, position: { width: 900, height: 700 } }), v(Ye, "PARTS", { main: { template: "modules/darkis-godforge/templates/character-manager.hbs" } });
+function qr(r) {
   return typeof CSS < "u" ? CSS.escape(r) : r.replace(/["'\\]/g, "\\$&");
 }
-class we extends Y() {
-  constructor(e, i = new Je(), s = new ii(e, i), o = new Qt()) {
+class Ae extends Y() {
+  constructor(e, i = new Qe(), s = new ii(e, i), o = new Qt()) {
     super();
     v(this, "searchTerm", "");
     v(this, "sectionFilter", "overview");
@@ -3432,12 +3448,12 @@ class we extends Y() {
       return {
         ...g,
         image: j(g.image),
-        ...ve((w = g.imagePresentation) == null ? void 0 : w.image),
+        ...Ie((w = g.imagePresentation) == null ? void 0 : w.image),
         errors: y,
         statusLabel: e[`STATUS_${g.status.toUpperCase()}`] ?? g.status,
-        updatedLabel: qr(g.updatedAt)
+        updatedLabel: Wr(g.updatedAt)
       };
-    }), s = this.searchTerm.toLocaleLowerCase(), o = i.filter((g) => this.matchesSection(g) && (!s || `${g.name} ${g.title} ${g.domains.join(" ")}`.toLocaleLowerCase().includes(s))), n = ((h = (d = (u = S()) == null ? void 0 : u.actors) == null ? void 0 : d.contents) == null ? void 0 : h.filter(Hr).length) ?? 0, a = S(), l = ((f = (p = a == null ? void 0 : a.modules) == null ? void 0 : p.get("darkis-godforge")) == null ? void 0 : f.version) ?? "—", c = ((m = a == null ? void 0 : a.system) == null ? void 0 : m.id) ?? "—";
+    }), s = this.searchTerm.toLocaleLowerCase(), o = i.filter((g) => this.matchesSection(g) && (!s || `${g.name} ${g.title} ${g.domains.join(" ")}`.toLocaleLowerCase().includes(s))), n = ((h = (d = (u = S()) == null ? void 0 : u.actors) == null ? void 0 : d.contents) == null ? void 0 : h.filter(Br).length) ?? 0, a = S(), l = ((f = (p = a == null ? void 0 : a.modules) == null ? void 0 : p.get("darkis-godforge")) == null ? void 0 : f.version) ?? "—", c = ((m = a == null ? void 0 : a.system) == null ? void 0 : m.id) ?? "—";
     return {
       ui: e,
       deities: o,
@@ -3469,16 +3485,16 @@ class we extends Y() {
     D();
     const e = this.element;
     if (!e) return;
-    e.querySelectorAll("[data-action='create']").forEach((c) => c.addEventListener("click", () => new Ie(this.deityService, () => void this.render(!0), this.adapters).render(!0))), e.querySelectorAll("[data-action='codex']").forEach((c) => c.addEventListener("click", () => new se(this.deityService).render(!0))), e.querySelectorAll("[data-action='player-preview']").forEach((c) => c.addEventListener("click", () => new se(this.deityService, void 0, void 0, void 0, void 0, { isGM: !1, selection: !0 }).render(!0))), e.querySelectorAll("[data-section]").forEach((c) => c.addEventListener("click", () => {
+    e.querySelectorAll("[data-action='create']").forEach((c) => c.addEventListener("click", () => new we(this.deityService, () => void this.render(!0), this.adapters).render(!0))), e.querySelectorAll("[data-action='codex']").forEach((c) => c.addEventListener("click", () => new se(this.deityService).render(!0))), e.querySelectorAll("[data-action='player-preview']").forEach((c) => c.addEventListener("click", () => new se(this.deityService, void 0, void 0, void 0, void 0, { isGM: !1, selection: !0 }).render(!0))), e.querySelectorAll("[data-section]").forEach((c) => c.addEventListener("click", () => {
       const u = c.dataset.section;
       (u === "overview" || u === "deities" || u === "pantheons" || u === "abilities" || u === "bonuses") && (this.sectionFilter = u, this.render(!0));
-    })), (s = e.querySelector("[data-manager='replacements']")) == null || s.addEventListener("click", () => void new qe(this.deityService, this.adapters).render(!0)), e.querySelectorAll("[data-manager='data']").forEach((c) => c.addEventListener("click", () => {
+    })), (s = e.querySelector("[data-manager='replacements']")) == null || s.addEventListener("click", () => void new Be(this.deityService, this.adapters).render(!0)), e.querySelectorAll("[data-manager='data']").forEach((c) => c.addEventListener("click", () => {
       const u = c.dataset.managerMode === "migration" ? "migration" : "transfer";
-      new Be(this.deityService, this.api, this.randomContent, u).render(!0);
+      new We(this.deityService, this.api, this.randomContent, u).render(!0);
     })), e.querySelectorAll("[data-manager='random']").forEach((c) => c.addEventListener("click", () => {
       const u = c.dataset.managerMode, d = u === "wheels" || u === "test" ? u : "tables";
-      new We(this.randomContent, d).render(!0);
-    })), (o = e.querySelector("[data-manager='characters']")) == null || o.addEventListener("click", () => void new je(this.deityService, this.api).render(!0)), (n = e.querySelector("[data-action='toggle-context']")) == null || n.addEventListener("click", () => {
+      new je(this.randomContent, d).render(!0);
+    })), (o = e.querySelector("[data-manager='characters']")) == null || o.addEventListener("click", () => void new Ye(this.deityService, this.api).render(!0)), (n = e.querySelector("[data-action='toggle-context']")) == null || n.addEventListener("click", () => {
       var c;
       return (c = e.querySelector(".dg-app-shell")) == null ? void 0 : c.classList.toggle("context-open");
     }), (a = e.querySelector("[data-action='settings']")) == null || a.addEventListener("click", () => this.openSettings()), e.querySelectorAll("[data-scroll]").forEach((c) => c.addEventListener("click", () => {
@@ -3486,7 +3502,7 @@ class we extends Y() {
       return (u = e.querySelector(`[data-section-target='${c.dataset.scroll ?? ""}']`)) == null ? void 0 : u.scrollIntoView({ behavior: "smooth", block: "start" });
     })), e.querySelectorAll("[data-deity]").forEach((c) => c.addEventListener("click", () => {
       const u = this.deityService.get(c.dataset.deity ?? "");
-      u && new He(u, this.deityService, this.adapters).render(!0);
+      u && new qe(u, this.deityService, this.adapters).render(!0);
     }));
     const i = e.querySelector("[data-search]");
     i && (i.value = this.searchTerm), i == null || i.addEventListener("input", () => {
@@ -3512,17 +3528,17 @@ class we extends Y() {
     return this.sectionFilter === "pantheons" ? !!((i = e.pantheonIds) != null && i.length) : this.sectionFilter === "abilities" ? e.abilities.length > 0 : this.sectionFilter === "bonuses" ? e.passiveBonuses.length > 0 : !0;
   }
 }
-v(we, "DEFAULT_OPTIONS", { id: "darkis-godforge-dashboard", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: !0 }, position: { width: 1440, height: 900 } }), v(we, "PARTS", { main: { template: "modules/darkis-godforge/templates/dashboard.hbs" } });
-function Hr(r) {
+v(Ae, "DEFAULT_OPTIONS", { id: "darkis-godforge-dashboard", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: !0 }, position: { width: 1440, height: 900 } }), v(Ae, "PARTS", { main: { template: "modules/darkis-godforge/templates/dashboard.hbs" } });
+function Br(r) {
   var e;
   const t = (e = r.flags) == null ? void 0 : e["darkis-godforge"];
   return !!(t && typeof t == "object" && "deityId" in t);
 }
-function qr(r) {
+function Wr(r) {
   const t = new Date(r);
   return Number.isNaN(t.getTime()) ? "—" : new Intl.DateTimeFormat(void 0, { dateStyle: "medium", timeStyle: "short" }).format(t);
 }
-class Ye extends ne() {
+class ze extends ne() {
   constructor(t, e, i, s) {
     super(), this.actor = t, this.api = e, this.socketRouter = i, this.openCodex = s;
   }
@@ -3535,13 +3551,13 @@ class Ye extends ne() {
     var e;
     const t = this.element;
     (e = t == null ? void 0 : t.querySelector("[data-action='codex']")) == null || e.addEventListener("click", this.openCodex), t == null || t.querySelectorAll("[data-ability]").forEach((i) => i.addEventListener("click", () => {
-      const s = Br();
+      const s = jr();
       this.socketRouter.activate({ actorId: this.actor.id, abilityId: i.dataset.ability ?? "", options: { targetActorId: s[0], enemyActorIds: s, triggerEvent: "manual" } }).then(() => this.render(!0)).catch((o) => H("Ability activation failed.", o));
     }));
   }
 }
-v(Ye, "DEFAULT_OPTIONS", { id: "darkis-godforge-hub", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.HUB", resizable: !0 }, position: { width: 520, height: 650 } }), v(Ye, "PARTS", { main: { template: "modules/darkis-godforge/templates/hub.hbs" } });
-function Br() {
+v(ze, "DEFAULT_OPTIONS", { id: "darkis-godforge-hub", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.HUB", resizable: !0 }, position: { width: 520, height: 650 } }), v(ze, "PARTS", { main: { template: "modules/darkis-godforge/templates/hub.hbs" } });
+function jr() {
   var e, i;
   const r = globalThis.canvas, t = ((i = (e = r == null ? void 0 : r.tokens) == null ? void 0 : e.placeables) == null ? void 0 : i.filter((s) => s.isTargeted).map((s) => {
     var o;
@@ -3549,7 +3565,7 @@ function Br() {
   }).filter((s) => !!s)) ?? [];
   return [...new Set(t)];
 }
-class Wr {
+class Yr {
   constructor() {
     v(this, "definitions", /* @__PURE__ */ new Map());
     v(this, "persistDefinition");
@@ -3633,7 +3649,7 @@ class Wr {
   }
 }
 const Q = "darkis-godforge";
-class jr {
+class zr {
   constructor(t) {
     this.collection = t;
   }
@@ -3641,14 +3657,14 @@ class jr {
     return this.collection.contents.flatMap((t) => {
       var i;
       const e = (i = t.flags) == null ? void 0 : i[Q];
-      return e && typeof e == "object" && "deity" in e && De(e.deity) ? [e.deity] : [];
+      return e && typeof e == "object" && "deity" in e && _e(e.deity) ? [e.deity] : [];
     });
   }
   async save(t) {
     const e = this.collection.contents.find((n) => {
       var l;
       const a = (l = n.flags) == null ? void 0 : l[Q];
-      return a && typeof a == "object" && "deity" in a && De(a.deity) && a.deity.id === t.id;
+      return a && typeof a == "object" && "deity" in a && _e(a.deity) && a.deity.id === t.id;
     }), i = { [Q]: { schemaVersion: t.schemaVersion, deity: t } };
     if (e) {
       const n = Object.fromEntries(Object.keys(e.ownership ?? {}).map((a) => [a, 0]));
@@ -3664,7 +3680,7 @@ class jr {
     const e = this.collection.contents.find((i) => {
       var o;
       const s = (o = i.flags) == null ? void 0 : o[Q];
-      return s && typeof s == "object" && "deity" in s && De(s.deity) && s.deity.id === t;
+      return s && typeof s == "object" && "deity" in s && _e(s.deity) && s.deity.id === t;
     });
     if (!e) return !1;
     if (!e.delete) throw new Error("Foundry JournalEntry deletion is unavailable.");
@@ -3692,7 +3708,7 @@ class jr {
     }
   }
 }
-function Yr(r) {
+function Kr(r) {
   if (!r || typeof r != "object" || !("registerModule" in r)) return null;
   const e = r.registerModule("darkis-godforge");
   if (!e || typeof e != "object" || !("register" in e) || !("executeAsGM" in e)) return null;
@@ -3710,8 +3726,8 @@ function Yr(r) {
 function Lt(r, t, e) {
   var u;
   const i = r.actor;
-  if (!i || !Kr(i) || !Xr(i)) return;
-  const s = zr(t), o = (s == null ? void 0 : s.closest(".application, .window-app, .app")) ?? s, n = o == null ? void 0 : o.querySelector(".window-header");
+  if (!i || !Jr(i) || !Qr(i)) return;
+  const s = Xr(t), o = (s == null ? void 0 : s.closest(".application, .window-app, .app")) ?? s, n = o == null ? void 0 : o.querySelector(".window-header");
   if (!n) return;
   (u = n.querySelector(".darkis-godforge-sheet-button")) == null || u.remove();
   const a = q("DARKIS_GODFORGE.UI.OPEN_HUB"), l = document.createElement("a");
@@ -3721,23 +3737,23 @@ function Lt(r, t, e) {
   const c = n.querySelector("button.close, a.close, .header-button.close, [data-action='close']");
   c ? c.before(l) : n.append(l);
 }
-function zr(r) {
+function Xr(r) {
   var i;
   if (r instanceof HTMLElement) return r;
   const t = r, e = (t == null ? void 0 : t[0]) ?? ((i = t == null ? void 0 : t.get) == null ? void 0 : i.call(t, 0));
   return e instanceof HTMLElement ? e : null;
 }
-function Kr(r) {
+function Jr(r) {
   var e;
   const t = (e = r.flags) == null ? void 0 : e["darkis-godforge"];
   return !!(t && typeof t == "object" && "deityId" in t);
 }
-function Xr(r) {
+function Qr(r) {
   var e, i;
   const t = (e = S()) == null ? void 0 : e.user;
   return (t == null ? void 0 : t.isGM) === !0 || ((i = r.testUserPermission) == null ? void 0 : i.call(r, t, "OWNER")) === !0;
 }
-class Jr {
+class Zr {
   constructor() {
     v(this, "byEvent", /* @__PURE__ */ new Map());
   }
@@ -3767,9 +3783,9 @@ class Jr {
     return (t ? [this.byEvent.get(t)].filter((i) => !!i) : [...this.byEvent.values()]).reduce((i, s) => i + [...s.values()].reduce((o, n) => o + n.length, 0), 0);
   }
 }
-class Qr {
+class es {
   constructor(t, e, i) {
-    v(this, "registry", new Jr());
+    v(this, "registry", new Zr());
     v(this, "recent", /* @__PURE__ */ new Map());
     v(this, "previousHp", /* @__PURE__ */ new Map());
     this.hooks = t, this.deities = e, this.socketRouter = i;
@@ -3806,7 +3822,7 @@ class Qr {
     const i = M(t), s = M(M(i.flags).pf2e), o = M(s.context), n = i.actor ?? M(i.token).actor;
     if (!n) return;
     const a = String(o.type ?? o.rollType ?? "").toLocaleLowerCase(), l = Array.isArray(o.domains) ? o.domains.map(String) : [], c = Array.isArray(o.options) ? o.options.map(String) : [], u = String(o.statistic ?? o.slug ?? l.find((d) => !d.includes(":")) ?? "");
-    !i.rolls && !i.roll || (this.dispatch("roll-complete", n, { selector: u }), a.includes("damage") ? this.dispatch("damage-roll", n, { selector: u }) : a.includes("attack") || l.some((d) => d.includes("attack")) ? this.dispatch("attack-roll", n, { selector: u }) : a.includes("saving") || l.some((d) => d.includes("saving-throw")) ? this.dispatch("saving-throw", n, { selector: u }) : (a.includes("skill") || l.some((d) => es.has(d))) && this.dispatch("skill-check", n, { selector: u }), (a.includes("spell") || l.some((d) => d.includes("spell")) || c.some((d) => d.includes("spell"))) && this.dispatch("spell-cast", n), (o.item || s.origin || a.includes("action")) && this.dispatch("item-used", n));
+    !i.rolls && !i.roll || (this.dispatch("roll-complete", n, { selector: u }), a.includes("damage") ? this.dispatch("damage-roll", n, { selector: u }) : a.includes("attack") || l.some((d) => d.includes("attack")) ? this.dispatch("attack-roll", n, { selector: u }) : a.includes("saving") || l.some((d) => d.includes("saving-throw")) ? this.dispatch("saving-throw", n, { selector: u }) : (a.includes("skill") || l.some((d) => is.has(d))) && this.dispatch("skill-check", n, { selector: u }), (a.includes("spell") || l.some((d) => d.includes("spell")) || c.some((d) => d.includes("spell"))) && this.dispatch("spell-cast", n), (o.item || s.origin || a.includes("action")) && this.dispatch("item-used", n));
   }
   dispatchCombat(t, e) {
     const i = M(e).turns;
@@ -3824,7 +3840,7 @@ class Qr {
     if (!(o != null && o.deityId)) return;
     const n = Date.now();
     for (const u of this.registry.forActor(t, o.deityId)) {
-      if (Zr.has(t)) {
+      if (ts.has(t)) {
         const h = String(u.config.selector ?? "").trim().toLocaleLowerCase(), p = String(i.selector ?? "").trim().toLocaleLowerCase();
         if (h && h !== p) continue;
       }
@@ -3848,15 +3864,15 @@ function ge(r, t) {
   const i = Number(e);
   return Number.isFinite(i) ? i : void 0;
 }
-const Zr = /* @__PURE__ */ new Set(["roll-complete", "skill-check", "attack-roll", "damage-roll", "saving-throw"]), es = /* @__PURE__ */ new Set(["acrobatics", "arcana", "athletics", "crafting", "deception", "diplomacy", "intimidation", "medicine", "nature", "occultism", "performance", "religion", "society", "stealth", "survival", "thievery"]), k = "darkis-godforge";
-function ts(r, t, e) {
-  return class extends we {
+const ts = /* @__PURE__ */ new Set(["roll-complete", "skill-check", "attack-roll", "damage-roll", "saving-throw"]), is = /* @__PURE__ */ new Set(["acrobatics", "arcana", "athletics", "crafting", "deception", "diplomacy", "intimidation", "medicine", "nature", "occultism", "performance", "religion", "society", "stealth", "survival", "thievery"]), k = "darkis-godforge";
+function rs(r, t, e) {
+  return class extends Ae {
     constructor() {
       super(r, void 0, t, e);
     }
   };
 }
-function is(r, t, e, i, s = () => {
+function ss(r, t, e, i, s = () => {
 }) {
   if (!r || typeof r != "object" || Array.isArray(r)) return;
   const o = r, n = Math.max(-1, ...Object.values(o).map((a) => a.order ?? -1)) + 1;
@@ -3873,7 +3889,7 @@ function is(r, t, e, i, s = () => {
     }
   };
 }
-function rs(r, t, e, i, s, o, n, a) {
+function os(r, t, e, i, s, o, n, a) {
   const l = re();
   l && (l.Hooks.once("init", () => {
     var h, p;
@@ -3885,7 +3901,7 @@ function rs(r, t, e, i, s, o, n, a) {
     else {
       if (!c.settings.registerMenu) console.error("Darkis GodForge | game.settings.registerMenu is unavailable during init.");
       else try {
-        c.settings.registerMenu(k, "dashboard", { name: "DARKIS_GODFORGE.SETTINGS.MENU_NAME", label: "DARKIS_GODFORGE.SETTINGS.MENU_LABEL", hint: "DARKIS_GODFORGE.SETTINGS.MENU_HINT", icon: "fas fa-hammer", type: ts(t, r, o), restricted: !0 });
+        c.settings.registerMenu(k, "dashboard", { name: "DARKIS_GODFORGE.SETTINGS.MENU_NAME", label: "DARKIS_GODFORGE.SETTINGS.MENU_LABEL", hint: "DARKIS_GODFORGE.SETTINGS.MENU_HINT", icon: "fas fa-hammer", type: rs(t, r, o), restricted: !0 });
       } catch (f) {
         console.error("Darkis GodForge | Could not register dashboard settings menu.", f);
       }
@@ -3893,7 +3909,7 @@ function rs(r, t, e, i, s, o, n, a) {
         c.settings.register(k, "language", { name: "DARKIS_GODFORGE.SETTINGS.LANGUAGE", hint: "DARKIS_GODFORGE.SETTINGS.LANGUAGE_HINT", scope: "client", config: !0, type: String, default: "auto", choices: d, onChange: (f) => {
           if (typeof f != "string" || f === "auto") return;
           const m = u.find((b) => b.lang === f);
-          m != null && m.path && wt(f, `modules/${k}/${m.path}`);
+          m != null && m.path && At(f, `modules/${k}/${m.path}`);
         } });
       } catch (f) {
         console.error("Darkis GodForge | Could not register language setting.", f);
@@ -3920,7 +3936,7 @@ function rs(r, t, e, i, s, o, n, a) {
     }
   }), l.Hooks.on("getSceneControlButtons", (...c) => {
     var u, d;
-    is(c[0], e, i, ((d = (u = S()) == null ? void 0 : u.user) == null ? void 0 : d.isGM) === !0, () => n == null ? void 0 : n());
+    ss(c[0], e, i, ((d = (u = S()) == null ? void 0 : u.user) == null ? void 0 : d.isGM) === !0, () => n == null ? void 0 : n());
   }), l.Hooks.on("renderCharacterSheetPF2e", (c, u) => {
     n && Lt(c, u, n);
   }), l.Hooks.on("renderActorSheet", (c, u) => {
@@ -3937,13 +3953,13 @@ function rs(r, t, e, i, s, o, n, a) {
       Mt(c, r, e, i, n);
       try {
         const A = (d = (u = c.settings) == null ? void 0 : u.get) == null ? void 0 : d.call(u, k, "language"), C = (f = (p = (h = c.modules) == null ? void 0 : h.get(k)) == null ? void 0 : p.languages) == null ? void 0 : f.find((N) => N.lang === A);
-        typeof A == "string" && (C != null && C.path) && await wt(A, `modules/${k}/${C.path}`);
+        typeof A == "string" && (C != null && C.path) && await At(A, `modules/${k}/${C.path}`);
       } catch (A) {
         console.error("Darkis GodForge | Could not load the selected language.", A);
       }
       try {
         if (((m = c.user) == null ? void 0 : m.isGM) === !0 && c.journal) {
-          const A = new jr(c.journal), C = A.load();
+          const A = new zr(c.journal), C = A.load();
           await A.secureAll(), C.some((N) => N.schemaVersion < P) && ((b = c.settings) != null && b.set) && await c.settings.set(k, "migration-backup", { createdAt: (/* @__PURE__ */ new Date()).toISOString(), targetSchema: P, definitions: C });
           for (const N of C) t.save(N);
           t.setPersistence((N) => A.save(N)), t.setDeletePersistence((N) => A.delete(N), () => A.deleteAll()), C.some((N) => N.schemaVersion < P) && await Promise.all(t.list().map((N) => A.save(N)));
@@ -3960,13 +3976,13 @@ function rs(r, t, e, i, s, o, n, a) {
         console.error("Darkis GodForge | Could not load random content.", A);
       }
       try {
-        const A = Yr((I = (w = c.modules) == null ? void 0 : w.get("socketlib")) == null ? void 0 : I.api);
+        const A = Kr((I = (w = c.modules) == null ? void 0 : w.get("socketlib")) == null ? void 0 : I.api);
         A && s && (s.setTransport(A), s.register());
       } catch (A) {
         console.error("Darkis GodForge | Could not initialize socketlib integration.", A);
       }
       try {
-        a && l.Hooks.callAll("godforge.registerSystemAdapter", (A) => a.register(A)), s && new Qr(l.Hooks, t, s).register();
+        a && l.Hooks.callAll("godforge.registerSystemAdapter", (A) => a.register(A)), s && new es(l.Hooks, t, s).register();
       } catch (A) {
         console.error("Darkis GodForge | Could not initialize trigger and adapter bridges.", A);
       }
@@ -3987,7 +4003,7 @@ function Mt(r, t, e, i, s) {
   const n = t;
   n.openDashboard = e, n.openCodex = i, s && (n.openHub = s), o.api = n;
 }
-class ss {
+class ns {
   constructor(t, e, i, s = async () => !0) {
     v(this, "activations", /* @__PURE__ */ new Map());
     this.api = t, this.authority = e, this.transport = i, this.requestApproval = s;
@@ -4188,7 +4204,7 @@ class ss {
     this.activations.set(t, e);
   }
 }
-class ze extends ne() {
+class Ke extends ne() {
   constructor(e) {
     super();
     v(this, "resolve");
@@ -4219,42 +4235,42 @@ class ze extends ne() {
     this.settled || (this.settled = !0, (s = this.resolve) == null || s.call(this, e), this.resolve = void 0, i && ((o = this.close) == null || o.call(this)));
   }
 }
-v(ze, "DEFAULT_OPTIONS", { id: "darkis-godforge-ability-approval", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.APPROVAL_TITLE", resizable: !0 }, position: { width: 680, height: 650 } }), v(ze, "PARTS", { main: { template: "modules/darkis-godforge/templates/ability-approval.hbs" } });
-const Te = new Wr(), Ae = new Je(), pe = new ii(Te, Ae), ri = new Qt();
+v(Ke, "DEFAULT_OPTIONS", { id: "darkis-godforge-ability-approval", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.APPROVAL_TITLE", resizable: !0 }, position: { width: 680, height: 650 } }), v(Ke, "PARTS", { main: { template: "modules/darkis-godforge/templates/ability-approval.hbs" } });
+const De = new Yr(), Se = new Qe(), pe = new ii(De, Se), ri = new Qt();
 let Ut = Promise.resolve(), Gt = null;
 function Ft() {
-  if (!it()) {
-    rt();
+  if (!rt()) {
+    st();
     return;
   }
-  Gt ?? (Gt = new we(Te, Ae, pe, ri)), Gt.render(!0).catch((r) => {
+  Gt ?? (Gt = new Ae(De, Se, pe, ri)), Gt.render(!0).catch((r) => {
     var t, e, i;
     console.error("Darkis GodForge | Could not open dashboard.", r), (i = (e = (t = U()) == null ? void 0 : t.notifications) == null ? void 0 : e.error) == null || i.call(e, q("DARKIS_GODFORGE.ERROR.DASHBOARD_OPEN"));
   });
 }
 function si() {
-  new se(Te, void 0, pe, st, as()).render(!0).catch((t) => {
+  new se(De, void 0, pe, ot, ls()).render(!0).catch((t) => {
     var e, i, s;
     console.error("Darkis GodForge | Could not open codex.", t), (s = (i = (e = U()) == null ? void 0 : e.notifications) == null ? void 0 : i.error) == null || s.call(i, q("DARKIS_GODFORGE.ERROR.CODEX_OPEN"));
   });
 }
 const xt = /* @__PURE__ */ new Map();
-function os(r) {
-  cs(r).then((t) => {
-    t && ns(t);
+function as(r) {
+  ds(r).then((t) => {
+    t && cs(t);
   }).catch((t) => {
     var e, i, s;
     console.error("Darkis GodForge | Could not select a character for the follower hub.", t), (s = (i = (e = U()) == null ? void 0 : e.notifications) == null ? void 0 : i.error) == null || s.call(i, q("DARKIS_GODFORGE.ERROR.HUB_OPEN"));
   });
 }
-function ns(r) {
+function cs(r) {
   let t = xt.get(r.id);
-  t || (t = new Ye(r, pe, st, si), xt.set(r.id, t)), t.render(!0).catch((e) => {
+  t || (t = new ze(r, pe, ot, si), xt.set(r.id, t)), t.render(!0).catch((e) => {
     var i, s, o;
     console.error("Darkis GodForge | Could not open hub.", e), (o = (s = (i = U()) == null ? void 0 : i.notifications) == null ? void 0 : s.error) == null || o.call(s, q("DARKIS_GODFORGE.ERROR.HUB_OPEN"));
   });
 }
-const $t = re(), st = new ss(pe, { get currentUserId() {
+const $t = re(), ot = new ns(pe, { get currentUserId() {
   var r, t;
   return ((t = (r = S()) == null ? void 0 : r.user) == null ? void 0 : t.id) ?? "unknown";
 }, get isGM() {
@@ -4271,22 +4287,22 @@ const $t = re(), st = new ss(pe, { get currentUserId() {
   var t, e;
   return ((e = (t = S()) == null ? void 0 : t.actors) == null ? void 0 : e.get(r)) ?? null;
 } }, void 0, (r) => {
-  const t = Ut.then(() => new ze(r).wait());
+  const t = Ut.then(() => new Ke(r).wait());
   return Ut = t.then(() => {
   }, () => {
   }), t;
 });
-$t ? (rs(pe, Te, Ft, si, st, ri, os, Ae), $t.Hooks.once("ready", () => {
+$t ? (os(pe, De, Ft, si, ot, ri, as, Se), $t.Hooks.once("ready", () => {
   var t, e, i, s, o;
   const r = (e = (t = S()) == null ? void 0 : t.system) == null ? void 0 : e.id;
-  r && !Ae.supports(r) && ((o = (s = (i = U()) == null ? void 0 : i.notifications) == null ? void 0 : s.warn) == null || o.call(s, q("DARKIS_GODFORGE.ERROR.UNSUPPORTED_SYSTEM").replace("{system}", r)));
+  r && !Se.supports(r) && ((o = (s = (i = U()) == null ? void 0 : i.notifications) == null ? void 0 : s.warn) == null || o.call(s, q("DARKIS_GODFORGE.ERROR.UNSUPPORTED_SYSTEM").replace("{system}", r)));
 })) : typeof document < "u" && Ft();
-function as() {
+function ls() {
   var e, i, s, o;
   const r = globalThis.canvas, t = ((i = (e = r == null ? void 0 : r.tokens) == null ? void 0 : e.controlled) == null ? void 0 : i.map((n) => n.actor).filter((n) => !!n)) ?? [];
   return t.length === 1 ? t[0] : (o = (s = S()) == null ? void 0 : s.user) == null ? void 0 : o.character;
 }
-async function cs(r) {
+async function ds(r) {
   var h, p, f, m, b, E, g, y, w, I, A, C, N;
   if (r) return r;
   const t = (((p = (h = globalThis.canvas) == null ? void 0 : h.tokens) == null ? void 0 : p.controlled) ?? []).map((_) => _.actor).filter((_) => !!_);
@@ -4311,10 +4327,10 @@ async function cs(r) {
   return s.find((_) => _.id === d);
 }
 export {
-  we as GodForgeDashboard,
+  Ae as GodForgeDashboard,
   pe as api,
-  Te as deityService,
+  De as deityService,
   ri as randomContentService,
-  Ae as registry,
-  st as socketRouter
+  Se as registry,
+  ot as socketRouter
 };
