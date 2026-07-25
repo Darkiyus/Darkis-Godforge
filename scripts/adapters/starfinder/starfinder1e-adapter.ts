@@ -7,7 +7,7 @@ import { loadSystemEditorCatalog } from "../system-catalog";
 // ref: https://github.com/foundryvtt-starfinder/foundryvtt-starfinder
 export class Starfinder1eAdapter implements GodForgeSystemAdapter {
   readonly id = "sfrpg";
-  readonly capabilities = { lore: true, deity: true, passiveBonuses: true, abilities: true, classCoupling: false, selectors: ["perception", "stealth", "bluff", "ac", "attack-roll", "piloting"] };
+  readonly capabilities = { lore: true, deity: true, passiveBonuses: false, abilities: false, classCoupling: false, selectors: ["perception", "stealth", "bluff", "ac", "attack-roll", "piloting"] };
   async materialize(_deity: DeityDefinition, _context?: MaterializationContext): Promise<string | null> { return null; }
   async listOfficialDeities() { return listOfficialDeitiesFromPacks(this.id); }
   listSkills(): string[] { const skills = (globalThis as unknown as { CONFIG?: { SFRPG?: { skills?: Record<string, unknown> } } }).CONFIG?.SFRPG?.skills; return skills ? Object.keys(skills).sort() : [...this.capabilities.selectors]; }

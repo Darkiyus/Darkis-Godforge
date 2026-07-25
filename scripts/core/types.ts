@@ -104,6 +104,44 @@ export interface AbilityDefinition {
   targetMode?: EffectTargetMode;
   animation?: { audience: "all" | "user" | "gm"; sound?: string; skippable?: boolean };
   effects: EffectNode[];
+  graph?: AbilityGraph;
+}
+
+export type GraphNodeCategory = "trigger" | "logic" | "action" | "result";
+export type GraphPortType = "flow" | "actor" | "number" | "boolean" | "text" | "roll" | "degree" | "item" | "event";
+export type GraphApprovalMode = "gm";
+
+export interface AbilityGraphNode {
+  id: string;
+  category: GraphNodeCategory;
+  type: string;
+  label: string;
+  x: number;
+  y: number;
+  config: Record<string, unknown>;
+}
+
+export interface AbilityGraphEdge {
+  id: string;
+  from: { nodeId: string; port: string; type: GraphPortType };
+  to: { nodeId: string; port: string; type: GraphPortType };
+}
+
+export interface AbilityGraph {
+  schemaVersion: 1;
+  approval: GraphApprovalMode;
+  nodes: AbilityGraphNode[];
+  edges: AbilityGraphEdge[];
+}
+
+export type DiscoveryState = "hidden" | "rumor" | "revealed";
+export interface DiscoveryConfiguration {
+  enabled: boolean;
+  defaultState: DiscoveryState;
+  rumorName?: string;
+  rumorText?: string;
+  revealedToUsers?: string[];
+  revealedToActors?: string[];
 }
 
 export type EffectTargetMode = "self" | "target" | "allies" | "enemies" | "group";
@@ -178,6 +216,7 @@ export interface DeityDefinition {
   edicts?: string[];
   anathema?: string[];
   gmNotes?: string;
+  discovery?: DiscoveryConfiguration;
   passiveBonuses: PassiveBonusDefinition[];
   abilities: AbilityDefinition[];
   grantGroups: GrantGroup[];

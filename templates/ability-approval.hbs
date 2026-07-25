@@ -1,0 +1,22 @@
+<section class="dg-approval">
+  <header>
+    <div><p class="eyebrow">{{ui.APPROVAL_EYEBROW}}</p><h2>{{prepared.abilityName}}</h2></div>
+    <span class="dg-approval-lock"><i class="fas fa-shield-halved" aria-hidden="true"></i> {{ui.GM_REQUIRED}}</span>
+  </header>
+  <p>{{ui.APPROVAL_HINT}}</p>
+  <dl class="dg-approval-meta">
+    <div><dt>{{ui.SOURCE_ACTOR}}</dt><dd>{{prepared.actorId}}</dd></div>
+    <div><dt>{{ui.OPERATIONS}}</dt><dd>{{operations.length}}</dd></div>
+  </dl>
+  {{#if operations.length}}
+    <ol class="dg-approval-operations">
+      {{#each operations}}<li class="{{#if dangerous}}dangerous{{/if}}"><i class="fas {{#if dangerous}}fa-triangle-exclamation{{else}}fa-arrow-right{{/if}}" aria-hidden="true"></i><span>{{summary}}</span><small>{{kind}}</small></li>{{/each}}
+    </ol>
+  {{else}}
+    <div class="dg-empty-state"><i class="fas fa-circle-info" aria-hidden="true"></i><h3>{{ui.NO_CHANGES}}</h3><p>{{ui.NO_CHANGES_HINT}}</p></div>
+  {{/if}}
+  <footer>
+    <button type="button" data-action="deny"><i class="fas fa-xmark" aria-hidden="true"></i> {{ui.DENY}}</button>
+    <button type="button" class="dg-primary" data-action="approve" {{#unless operations.length}}disabled{{/unless}}><i class="fas fa-check" aria-hidden="true"></i> {{ui.APPROVE}}</button>
+  </footer>
+</section>

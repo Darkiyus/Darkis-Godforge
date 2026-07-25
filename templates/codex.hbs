@@ -1,28 +1,57 @@
-<section class="dg-codex">
-  <header class="dg-codex-title">
-    <img src="modules/darkis-godforge/assets/logo.png" alt="{{ui.TITLE}}">
-    <div><p class="eyebrow">{{ui.TITLE}}</p><h2>{{ui.CODEX}}</h2>{{#if isPreview}}<span class="dg-preview-badge"><i class="fas fa-eye" aria-hidden="true"></i> {{ui.PLAYER_PREVIEW}}</span>{{/if}}</div>
+<section class="dg-codex" tabindex="0">
+  {{!-- Design contract: a tactile two-page discovery book, not a dashboard card list. --}}
+  <header class="dg-codex-toolbar">
+    <div class="dg-search"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input data-search placeholder="{{ui.SEARCH}}" aria-label="{{ui.SEARCH}}"></div>
+    <select data-filter aria-label="{{ui.DOMAINS}}"><option value="">{{ui.ALL_DOMAINS}}</option>{{#each domains}}<option value="{{this}}">{{this}}</option>{{/each}}</select>
+    {{#if isPreview}}<span class="dg-preview-badge"><i class="fas fa-eye" aria-hidden="true"></i> {{ui.PLAYER_PREVIEW}}</span>{{/if}}
   </header>
-  <div class="dg-codex-toolbar"><div class="dg-search"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input data-search placeholder="{{ui.SEARCH}}" aria-label="{{ui.SEARCH}}"></div><select data-filter aria-label="{{ui.DOMAINS}}"><option value="">{{ui.ALL_DOMAINS}}</option>{{#each domains}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div>
-  {{#if deities.length}}
-    <div class="dg-codex-list">
-      {{#each deities}}
-        <article class="dg-codex-entry">
-          {{#if image}}<img src="{{image}}" alt="" style="object-fit:{{imageFit}};object-position:{{imagePosition}}">{{/if}}
-          <div class="dg-codex-copy">
-            <p class="eyebrow">{{#if pantheonIds}}{{pantheonIds}}{{else}}{{../ui.CODEX}}{{/if}}</p>
-            <h3>{{name}} {{#if lore}}<span class="dg-lore-badge"><i class="fas fa-book-open" aria-hidden="true"></i> {{../ui.LORE_BADGE}}</span>{{/if}}</h3><h4>{{title}}</h4>
-            {{#if quote}}<blockquote>{{quote}}</blockquote>{{/if}}
-            {{#if description}}<p>{{description}}</p>{{/if}}
-            {{#if domains}}<div class="dg-tags">{{#each domains}}<i>{{this}}</i>{{/each}}</div>{{/if}}
-            {{#if favoredWeapon}}<dl><dt>{{../ui.FAVORED_WEAPON}}</dt><dd>{{favoredWeapon}}</dd></dl>{{/if}}
-            {{#if passiveBonuses}}<section><h5>{{../ui.PASSIVE_BONUSES}}</h5>{{#each passiveBonuses}}<div class="dg-codex-rule"><strong>{{name}}</strong>{{#if value}}<span>{{value}}</span>{{/if}}</div>{{/each}}</section>{{/if}}
-            {{#if abilities}}<section><h5>{{../ui.DIVINE_WONDERS}}</h5>{{#each abilities}}<div class="dg-codex-rule"><strong>{{name}}</strong><p>{{description}}</p></div>{{/each}}</section>{{/if}}
-            {{#if selected}}<span class="dg-selected-deity"><i class="fas fa-circle-check" aria-hidden="true"></i> {{../ui.YOUR_DEITY}}</span>{{else}}{{#if canSelect}}<button type="button" class="dg-primary" data-select-deity="{{id}}">{{#if requiresChoices}}{{../ui.CHOOSE_AND_SELECT}}{{else}}{{../ui.SELECT_DEITY}}{{/if}}</button>{{/if}}{{/if}}
+  {{#if hasEntries}}
+    <div class="dg-codex-book">
+      <div class="dg-book-binding" aria-hidden="true"></div>
+      <article class="dg-book-page dg-book-page-left">
+        {{#if left}}
+          {{#if left.image}}<img class="dg-book-portrait" src="{{left.image}}" alt="" style="object-fit:{{left.imageFit}};object-position:{{left.imagePosition}};transform:{{left.imageTransform}};transform-origin:{{left.imageTransformOrigin}}">{{/if}}
+          <div class="dg-book-copy">
+            <p class="eyebrow">{{#if left.rumor}}{{ui.RUMOR}}{{else}}{{ui.CODEX}}{{/if}}</p>
+            <h2>{{left.name}}</h2><h3>{{left.title}}</h3>
+            {{#if left.rumor}}<p class="dg-rumor-text">{{left.rumorText}}</p>{{else}}
+              {{#if left.quote}}<blockquote>{{left.quote}}</blockquote>{{/if}}
+              {{#if left.description}}<p>{{left.description}}</p>{{/if}}
+              {{#if left.domains}}<div class="dg-tags">{{#each left.domains}}<i>{{this}}</i>{{/each}}</div>{{/if}}
+              {{#if left.favoredWeapon}}<dl><dt>{{ui.FAVORED_WEAPON}}</dt><dd>{{left.favoredWeapon}}</dd></dl>{{/if}}
+              {{#if left.passiveBonuses}}<section><h4>{{ui.PASSIVE_BONUSES}}</h4>{{#each left.passiveBonuses}}<div class="dg-codex-rule"><strong>{{name}}</strong>{{#if value}}<span>{{value}}</span>{{/if}}</div>{{/each}}</section>{{/if}}
+              {{#if left.abilities}}<section><h4>{{ui.DIVINE_WONDERS}}</h4>{{#each left.abilities}}<div class="dg-codex-rule"><strong>{{name}}</strong><p>{{description}}</p></div>{{/each}}</section>{{/if}}
+              {{#if left.selected}}<span class="dg-selected-deity"><i class="fas fa-circle-check"></i> {{ui.YOUR_DEITY}}</span>{{else}}{{#if left.canSelect}}<button type="button" class="dg-primary" data-select-deity="{{left.id}}">{{#if left.requiresChoices}}{{ui.CHOOSE_AND_SELECT}}{{else}}{{ui.SELECT_DEITY}}{{/if}}</button>{{/if}}{{/if}}
+              {{#if left.canReveal}}<button type="button" class="dg-secondary dg-reveal-button" data-reveal-deity="{{left.id}}"><i class="fas fa-eye"></i> {{ui.REVEAL_TO_ALL}}</button>{{/if}}
+            {{/if}}
           </div>
-        </article>
-      {{/each}}
+        {{/if}}
+      </article>
+      <article class="dg-book-page dg-book-page-right">
+        {{#if right}}
+          {{#if right.image}}<img class="dg-book-portrait" src="{{right.image}}" alt="" style="object-fit:{{right.imageFit}};object-position:{{right.imagePosition}};transform:{{right.imageTransform}};transform-origin:{{right.imageTransformOrigin}}">{{/if}}
+          <div class="dg-book-copy">
+            <p class="eyebrow">{{#if right.rumor}}{{ui.RUMOR}}{{else}}{{ui.CODEX}}{{/if}}</p>
+            <h2>{{right.name}}</h2><h3>{{right.title}}</h3>
+            {{#if right.rumor}}<p class="dg-rumor-text">{{right.rumorText}}</p>{{else}}
+              {{#if right.quote}}<blockquote>{{right.quote}}</blockquote>{{/if}}
+              {{#if right.description}}<p>{{right.description}}</p>{{/if}}
+              {{#if right.domains}}<div class="dg-tags">{{#each right.domains}}<i>{{this}}</i>{{/each}}</div>{{/if}}
+              {{#if right.favoredWeapon}}<dl><dt>{{ui.FAVORED_WEAPON}}</dt><dd>{{right.favoredWeapon}}</dd></dl>{{/if}}
+              {{#if right.passiveBonuses}}<section><h4>{{ui.PASSIVE_BONUSES}}</h4>{{#each right.passiveBonuses}}<div class="dg-codex-rule"><strong>{{name}}</strong>{{#if value}}<span>{{value}}</span>{{/if}}</div>{{/each}}</section>{{/if}}
+              {{#if right.abilities}}<section><h4>{{ui.DIVINE_WONDERS}}</h4>{{#each right.abilities}}<div class="dg-codex-rule"><strong>{{name}}</strong><p>{{description}}</p></div>{{/each}}</section>{{/if}}
+              {{#if right.selected}}<span class="dg-selected-deity"><i class="fas fa-circle-check"></i> {{ui.YOUR_DEITY}}</span>{{else}}{{#if right.canSelect}}<button type="button" class="dg-primary" data-select-deity="{{right.id}}">{{#if right.requiresChoices}}{{ui.CHOOSE_AND_SELECT}}{{else}}{{ui.SELECT_DEITY}}{{/if}}</button>{{/if}}{{/if}}
+              {{#if right.canReveal}}<button type="button" class="dg-secondary dg-reveal-button" data-reveal-deity="{{right.id}}"><i class="fas fa-eye"></i> {{ui.REVEAL_TO_ALL}}</button>{{/if}}
+            {{/if}}
+          </div>
+        {{else}}<div class="dg-book-watermark"><i class="fas fa-feather-pointed"></i></div>{{/if}}
+      </article>
     </div>
+    <footer class="dg-book-navigation">
+      <button type="button" data-page="previous" {{#unless canPrevious}}disabled{{/unless}}><i class="fas fa-chevron-left"></i> {{ui.BACK}}</button>
+      <span>{{spreadNumber}} / {{spreadCount}}</span>
+      <button type="button" data-page="next" {{#unless canNext}}disabled{{/unless}}>{{ui.NEXT}} <i class="fas fa-chevron-right"></i></button>
+    </footer>
   {{else}}
     <div class="dg-empty-state"><i class="fas fa-book" aria-hidden="true"></i><h3>{{ui.NO_RESULTS}}</h3></div>
   {{/if}}

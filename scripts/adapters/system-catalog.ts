@@ -21,8 +21,11 @@ async function buildCatalog(systemId: string, fallbackSkills: string[]): Promise
   const itemPacks = packs.filter((pack) => pack.documentName === "Item" && (!pack.metadata?.system || pack.metadata.system === systemId));
   const weapons: SystemChoice[] = [];
   const spells: SystemChoice[] = [];
-  for (const pack of itemPacks) {
-    const index = await pack.getIndex({ fields: ["type", "img", "system.slug", "system.category", "system.group", "system.traits", "system.level", "system.rank", "system.publication.remaster"] });
+  const indexes = await mapWithConcurrency(itemPacks, 4, async (pack) => ({
+    pack,
+    index: await pack.getIndex({ fields: ["type", "img", "system.slug", "system.category", "system.group", "system.traits", "system.level", "system.rank", "system.publication.remaster"] })
+  }));
+  for (const { pack, index } of indexes) {
     for (const entry of index) {
       if (!entry._id || !entry.name || !pack.collection || (entry.type !== "weapon" && entry.type !== "spell")) continue;
       const system = entry.system ?? {};
@@ -74,3 +77,15 @@ function title(value: string): string { return value.replaceAll("-", " ").replac
 function stringValue(value: unknown): string | undefined { if (typeof value === "string") return value; if (value && typeof value === "object" && typeof (value as Record<string, unknown>).value === "string") return String((value as Record<string, unknown>).value); return undefined; }
 function stringArray(value: unknown): string[] | undefined { return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : undefined; }
 function numberValue(value: unknown): number | undefined { const result = Number(value); return Number.isFinite(result) ? result : undefined; }
+async function mapWithConcurrency<T, R>(values: T[], limit: number, mapper: (value: T) => Promise<R>): Promise<R[]> {
+  const output = new Array<R>(values.length);
+  let next = 0;
+  const worker = async (): Promise<void> => {
+    while (next < values.length) {
+      const index = next++;
+      output[index] = await mapper(values[index]!);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(limit, values.length) }, () => worker()));
+  return output;
+}

@@ -1,5 +1,5 @@
 import type { GodForgeActor } from "../api";
-import { collectGrantChoiceGroups } from "../core/grant-choice-service";
+import { collectGrantChoiceGroups, type GrantChoiceGroupView } from "../core/grant-choice-service";
 import type { DeityDefinition, GrantChoiceMap } from "../core/types";
 import { handlebarsApplicationBase } from "../foundry/application-base";
 import { reportActionError } from "../foundry/error-reporting";
@@ -22,11 +22,11 @@ export class GodForgeGrantChoiceDialog extends handlebarsApplicationBase() {
   private readonly tokens = new Map<string, string>();
   private error = "";
 
-  constructor(private readonly deity: DeityDefinition, private readonly actor: GodForgeActor, private readonly socketRouter: SocketRouter, private readonly onAssigned: () => void) { super(); }
+  constructor(private readonly deity: DeityDefinition | { id: string; name: string; choiceGroups: GrantChoiceGroupView[] }, private readonly actor: GodForgeActor, private readonly socketRouter: SocketRouter, private readonly onAssigned: () => void) { super(); }
 
   async _prepareContext(): Promise<Record<string, unknown>> {
     this.tokens.clear();
-    const sourceGroups = this.deity.grantGroups.flatMap((group) => collectGrantChoiceGroups(group));
+    const sourceGroups = "choiceGroups" in this.deity ? this.deity.choiceGroups : this.deity.grantGroups.flatMap((group) => collectGrantChoiceGroups(group));
     const optionTokens = new Map<string, string>();
     const options = sourceGroups.map((group, groupIndex) => group.options.map((option, optionIndex) => {
         const token = `${groupIndex}-${optionIndex}-${crypto.randomUUID()}`;

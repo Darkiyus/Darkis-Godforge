@@ -16,6 +16,7 @@ import { RandomContentService } from "../core/random-service";
 import { CURRENT_SCHEMA_VERSION } from "../core/migration-service";
 import { GodForgeRandomManager } from "./random-manager";
 import { GodForgeCharacterManager } from "./character-manager";
+import { imagePresentationStyle } from "../core/image-presentation";
 
 export class GodForgeDashboard extends gmApplicationBase() {
   static DEFAULT_OPTIONS = { id: "darkis-godforge-dashboard", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.TITLE", resizable: true }, position: { width: 1440, height: 900 } };
@@ -42,8 +43,7 @@ export class GodForgeDashboard extends gmApplicationBase() {
       return {
         ...deity,
         image: safeImageUrl(deity.image),
-        imagePosition: `${deity.imagePresentation?.image?.focusX ?? 50}% ${deity.imagePresentation?.image?.focusY ?? 25}%`,
-        imageFit: deity.imagePresentation?.image?.fit === "contain" ? "contain" : "cover",
+        ...imagePresentationStyle(deity.imagePresentation?.image),
         errors,
         statusLabel: ui[`STATUS_${deity.status.toUpperCase()}`] ?? deity.status,
         updatedLabel: formatDate(deity.updatedAt)

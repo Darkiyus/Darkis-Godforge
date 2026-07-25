@@ -34,9 +34,13 @@ export class RandomContentService {
   private readonly tables = new Map<string, RandomTableDefinition>();
   private readonly wheels = new Map<string, FortuneWheelDefinition>();
   private persistContent?: (snapshot: RandomContentSnapshot) => Promise<unknown>;
+  private persistenceQueue: Promise<void> = Promise.resolve();
+  private persistenceError: unknown = null;
   setPersistence(handler: (snapshot: RandomContentSnapshot) => Promise<unknown>): void { this.persistContent = handler; }
   load(snapshot: Partial<RandomContentSnapshot> | null | undefined): void { const input = snapshot ?? {}; if (!validateRandomContentSnapshot(input)) throw new Error("Invalid GodForge random content."); this.tables.clear(); this.wheels.clear(); for (const table of input.tables ?? []) this.tables.set(table.id, structuredClone(table)); for (const wheel of input.wheels ?? []) this.wheels.set(wheel.id, structuredClone(wheel)); }
   replace(snapshot: Partial<RandomContentSnapshot>): void { this.load(snapshot); this.persist(); }
+  async replacePersistent(snapshot: Partial<RandomContentSnapshot>): Promise<void> { const previous = this.snapshot(); this.load(snapshot); this.persist(); try { await this.flushPersistence(); } catch (error) { this.load(previous); throw error; } }
+  async flushPersistence(): Promise<void> { await this.persistenceQueue; if (this.persistenceError) { const error = this.persistenceError; this.persistenceError = null; throw error; } }
   snapshot(): RandomContentSnapshot { return { tables: this.listTables(), wheels: this.listWheels() }; }
   listTables(): RandomTableDefinition[] { return [...this.tables.values()].map((item) => structuredClone(item)); }
   listWheels(): FortuneWheelDefinition[] { return [...this.wheels.values()].map((item) => structuredClone(item)); }
@@ -45,7 +49,7 @@ export class RandomContentService {
   createWheel(input: Omit<FortuneWheelDefinition, "id" | "updatedAt">): FortuneWheelDefinition { if (!this.tables.has(input.tableId)) throw new Error("Fortune wheel table was not found."); const wheel = { ...structuredClone(input), id: crypto.randomUUID(), updatedAt: new Date().toISOString() }; this.wheels.set(wheel.id, wheel); this.persist(); return structuredClone(wheel); }
   drawTable(id: string, random: () => number): RandomDraw { const table = this.tables.get(id); if (!table) throw new Error("Random table was not found."); return drawWeighted(table.entries, random); }
   spinWheel(id: string, random: () => number): WheelState { const wheel = this.wheels.get(id); if (!wheel) throw new Error("Fortune wheel was not found."); return resolveWheel(this.tables.get(wheel.tableId)?.entries ?? [], random); }
-  private persist(): void { if (this.persistContent) void this.persistContent(this.snapshot()).catch((error: unknown) => console.error("Darkis GodForge | Could not persist random content.", error)); }
+  private persist(): void { if (!this.persistContent) return; const snapshot = this.snapshot(); this.persistenceQueue = this.persistenceQueue.then(async () => { try { await this.persistContent?.(snapshot); } catch (error) { this.persistenceError ??= error; console.error("Darkis GodForge | Could not persist random content.", error); } }); }
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> { return Boolean(value) && typeof value === "object"; }

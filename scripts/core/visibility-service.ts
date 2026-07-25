@@ -5,7 +5,19 @@ export interface ViewerContext {
   isTrusted?: boolean;
   selection?: boolean;
   actorDeityId?: string;
+  userId?: string;
+  actorId?: string;
   ownsActor?: boolean;
+}
+
+export type DiscoveryView = "hidden" | "rumor" | "revealed";
+
+export function discoveryForViewer(deity: DeityDefinition, context: ViewerContext): DiscoveryView {
+  if (context.isGM || !deity.discovery?.enabled) return "revealed";
+  if (context.actorDeityId === deity.id) return "revealed";
+  if (context.userId && deity.discovery.revealedToUsers?.includes(context.userId)) return "revealed";
+  if (context.actorId && deity.discovery.revealedToActors?.includes(context.actorId)) return "revealed";
+  return deity.discovery.defaultState;
 }
 
 export interface PlayerDeityView {
@@ -84,13 +96,16 @@ function redactNumericBonus(bonus: PassiveBonusDefinition, revealNumbers: boolea
 
 function redactAbility(ability: AbilityDefinition, revealNumbers: boolean): AbilityDefinition {
   const copy = structuredClone(ability);
+  const manuallyAvailable = ability.graph ? ability.graph.nodes.some((node) => node.category === "trigger" && node.type === "manual") : !ability.trigger || ability.trigger === "manual";
+  delete copy.graph;
+  delete copy.condition;
+  copy.trigger = manuallyAvailable ? "manual" : "automatic";
+  copy.effects = [];
   if (!revealNumbers) {
-    copy.effects = copy.effects.filter((effect) => effect.type === "message");
     delete copy.timing;
     delete copy.uses;
     delete copy.duration;
     delete copy.actionCost;
   }
-  delete copy.condition;
   return copy;
 }

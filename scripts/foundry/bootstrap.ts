@@ -9,6 +9,10 @@ import { GodForgeDashboard } from "../applications/dashboard";
 import type { RandomContentService, RandomContentSnapshot } from "../core/random-service";
 import type { GodForgeActor } from "../api";
 import { addGodForgeSheetButton } from "./sheet-integration";
+import type { AdapterRegistry } from "../adapters/adapter-registry";
+import type { GodForgeSystemAdapter } from "../adapters/adapter.interface";
+import { FoundryTriggerBridge } from "./trigger-bridge";
+import { CURRENT_SCHEMA_VERSION } from "../core/migration-service";
 
 const namespace = "darkis-godforge";
 
@@ -39,7 +43,7 @@ export function addDashboardSceneControl(controls: unknown, openDashboard: () =>
   };
 }
 
-export function registerFoundryBootstrap(api: GodForgeApi, deityService: DeityService, openDashboard: () => void, openCodex: () => void, socketRouter?: SocketRouter, randomContent?: RandomContentService, openHub?: (actor?: GodForgeActor) => void): void {
+export function registerFoundryBootstrap(api: GodForgeApi, deityService: DeityService, openDashboard: () => void, openCodex: () => void, socketRouter?: SocketRouter, randomContent?: RandomContentService, openHub?: (actor?: GodForgeActor) => void, adapters?: AdapterRegistry): void {
   const runtime = getFoundryRuntime(); if (!runtime) return;
   runtime.Hooks.once("init", () => {
     const game = requireGame("init"); if (!game) return;
@@ -52,6 +56,7 @@ export function registerFoundryBootstrap(api: GodForgeApi, deityService: DeitySe
       else try { game.settings.registerMenu(namespace, "dashboard", { name: "DARKIS_GODFORGE.SETTINGS.MENU_NAME", label: "DARKIS_GODFORGE.SETTINGS.MENU_LABEL", hint: "DARKIS_GODFORGE.SETTINGS.MENU_HINT", icon: "fas fa-hammer", type: createDashboardSettingsMenu(deityService, api, randomContent), restricted: true }); } catch (error) { console.error("Darkis GodForge | Could not register dashboard settings menu.", error); }
       try { game.settings.register(namespace, "language", { name: "DARKIS_GODFORGE.SETTINGS.LANGUAGE", hint: "DARKIS_GODFORGE.SETTINGS.LANGUAGE_HINT", scope: "client", config: true, type: String, default: "auto", choices, onChange: (language: unknown) => { if (typeof language !== "string" || language === "auto") return; const entry = languages.find((item) => item.lang === language); if (entry?.path) void loadLanguage(language, `modules/${namespace}/${entry.path}`); } }); } catch (error) { console.error("Darkis GodForge | Could not register language setting.", error); }
       try { game.settings.register(namespace, "random-content", { scope: "world", config: false, type: Object, default: { tables: [], wheels: [] } }); } catch (error) { console.error("Darkis GodForge | Could not register random content storage.", error); }
+      try { game.settings.register(namespace, "migration-backup", { scope: "world", config: false, type: Object, default: {} }); } catch (error) { console.error("Darkis GodForge | Could not register migration backup storage.", error); }
     }
     if (!game.keybindings) console.error("Darkis GodForge | game.keybindings is unavailable during init.");
     else try { game.keybindings.register(namespace, "open-dashboard", { name: "DARKIS_GODFORGE.UI.OPEN_DASHBOARD", editable: [], onDown: () => { if (getFoundryGame()?.user?.isGM !== true) return false; openDashboard(); return true; } }); game.keybindings.register(namespace, "open-hub", { name: "DARKIS_GODFORGE.UI.OPEN_HUB", editable: [{ key: "KeyG" }], restricted: false, onDown: () => { openHub?.(); return true; } }); game.keybindings.register(namespace, "open-codex", { name: "DARKIS_GODFORGE.UI.OPEN_CODEX", editable: [{ key: "KeyG", modifiers: ["Shift"] }], restricted: false, onDown: () => { openCodex(); return true; } }); } catch (error) { console.error("Darkis GodForge | Could not register keybindings.", error); }
@@ -71,9 +76,28 @@ export function registerFoundryBootstrap(api: GodForgeApi, deityService: DeitySe
     const game = requireGame("ready"); if (!game) return;
     exposeModuleApi(game, api, openDashboard, openCodex, openHub);
     try { const selectedLanguage = game.settings?.get?.(namespace, "language"); const languageEntry = game.modules?.get(namespace)?.languages?.find((entry) => entry.lang === selectedLanguage); if (typeof selectedLanguage === "string" && languageEntry?.path) await loadLanguage(selectedLanguage, `modules/${namespace}/${languageEntry.path}`); } catch (error) { console.error("Darkis GodForge | Could not load the selected language.", error); }
-    try { if (game.journal) { const repository = new JournalDeityRepository(game.journal); for (const deity of repository.load()) deityService.save(deity); deityService.setPersistence((deity) => repository.save(deity)); } } catch (error) { console.error("Darkis GodForge | Could not load deity journals.", error); }
+    try {
+      if (game.user?.isGM === true && game.journal) {
+        const repository = new JournalDeityRepository(game.journal);
+        const loaded = repository.load();
+        await repository.secureAll();
+        if (loaded.some((deity) => deity.schemaVersion < CURRENT_SCHEMA_VERSION) && game.settings?.set) {
+          await game.settings.set(namespace, "migration-backup", { createdAt: new Date().toISOString(), targetSchema: CURRENT_SCHEMA_VERSION, definitions: loaded });
+        }
+        for (const deity of loaded) deityService.save(deity);
+        deityService.setPersistence((deity) => repository.save(deity));
+        deityService.setDeletePersistence((id) => repository.delete(id), () => repository.deleteAll());
+        if (loaded.some((deity) => deity.schemaVersion < CURRENT_SCHEMA_VERSION)) {
+          await Promise.all(deityService.list().map((deity) => repository.save(deity)));
+        }
+      }
+    } catch (error) { console.error("Darkis GodForge | Could not load deity journals.", error); }
     try { if (randomContent) { const stored = game.settings?.get?.(namespace, "random-content"); randomContent.load(stored && typeof stored === "object" ? stored as Partial<RandomContentSnapshot> : null); if (game.settings?.set) randomContent.setPersistence((snapshot) => game.settings!.set!(namespace, "random-content", snapshot)); } } catch (error) { console.error("Darkis GodForge | Could not load random content.", error); }
     try { const transport = createSocketlibTransport(game.modules?.get("socketlib")?.api); if (transport && socketRouter) { socketRouter.setTransport(transport); socketRouter.register(); } } catch (error) { console.error("Darkis GodForge | Could not initialize socketlib integration.", error); }
+    try {
+      if (adapters) runtime.Hooks.callAll("godforge.registerSystemAdapter", (adapter: GodForgeSystemAdapter) => adapters.register(adapter));
+      if (socketRouter) new FoundryTriggerBridge(runtime.Hooks, deityService, socketRouter).register();
+    } catch (error) { console.error("Darkis GodForge | Could not initialize trigger and adapter bridges.", error); }
   });
 }
 

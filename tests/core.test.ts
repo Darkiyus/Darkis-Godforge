@@ -24,12 +24,15 @@ import { createSocketlibTransport } from "../scripts/foundry/socketlib-transport
 import { DEFAULT_VISIBILITY, type DeityDefinition } from "../scripts/core/types";
 import { addDashboardSceneControl, createDashboardSettingsMenu, registerFoundryBootstrap } from "../scripts/foundry/bootstrap";
 import { migrateDefinition } from "../scripts/core/migration-service";
-import { redactForViewer } from "../scripts/core/visibility-service";
+import { discoveryForViewer, redactForViewer } from "../scripts/core/visibility-service";
 import { currentViewerContext, requireGM } from "../scripts/foundry/permissions";
 import { buildPf2eDeityData } from "../scripts/adapters/pf2e/deity-materializer";
 import { Starfinder1eAdapter } from "../scripts/adapters/starfinder/starfinder1e-adapter";
 import { Starfinder2eAdapter } from "../scripts/adapters/starfinder/starfinder2e-adapter";
 import { collectGrantChoiceGroups, hasGrantChoices } from "../scripts/core/grant-choice-service";
+import { autoLayoutGraph, compileGraphToEffects, describeAbilityGraph, migrateEffectsToGraph, validateAbilityGraph } from "../scripts/core/ability-graph";
+import { executeAbilityGraph } from "../scripts/core/graph-execution";
+import { applyPreparedAbility } from "../scripts/foundry/effect-applier";
 
 const deity: DeityDefinition = { id: "a", schemaVersion: 2, revision: 1, createdAt: "", updatedAt: "", checksum: "", status: "published", kind: "selectable", name: "A", title: "T", description: "D", domains: ["shadow"], passiveBonuses: [], abilities: [], grantGroups: [], replacement: { sourceUuid: "", mode: "none", contexts: [] }, visibility: structuredClone(DEFAULT_VISIBILITY) };
 
@@ -39,6 +42,95 @@ afterEach(() => vi.unstubAllGlobals());
 function localizationLeafKeys(value: unknown, prefix = ""): string[] { if (!value || typeof value !== "object") return [prefix]; return Object.entries(value).flatMap(([key, child]) => localizationLeafKeys(child, prefix ? `${prefix}.${key}` : key)).sort(); }
 
 describe("formula service", () => { it("evaluates whitelisted facts", () => expect(evaluateFormula("3 + @actor.level", { actor: { level: 4 }, target: {} })).toBe(7)); it("rejects code", () => expect(validateFormula("window.alert(1)")).toBe(false)); });
+describe("ability graph", () => {
+  it("migrates legacy effects into a valid typed graph", () => {
+    const graph = migrateEffectsToGraph({ trigger: "manual", effects: [{ type: "heal", formula: "1d8+2", target: "self" }, { type: "message", text: "Blessed" }] });
+    expect(validateAbilityGraph(graph)).toMatchObject({ valid: true });
+    expect(compileGraphToEffects(graph)).toEqual([{ type: "heal", formula: "1d8+2", target: "self" }, { type: "message", text: "Blessed" }]);
+    expect(describeAbilityGraph(graph)).toEqual(expect.arrayContaining(["Trigger: manual", "Action: Heal", "Action: Message"]));
+  });
+  it("rejects cycles, incompatible ports and unbounded graph payloads", () => {
+    const graph = migrateEffectsToGraph({ effects: [{ type: "message", text: "A" }] });
+    graph.edges.push({ id: "cycle", from: { nodeId: graph.nodes[1]!.id, port: "next", type: "flow" }, to: { nodeId: graph.nodes[0]!.id, port: "in", type: "flow" } });
+    expect(validateAbilityGraph(graph).issues.map((issue) => issue.code)).toContain("graph.cycle");
+  });
+  it("auto-layouts graph columns deterministically", () => {
+    const graph = migrateEffectsToGraph({ effects: [{ type: "heal", formula: "1", target: "self" }] });
+    const laidOut = autoLayoutGraph(graph);
+    expect(laidOut.nodes[1]!.x).toBeGreaterThan(laidOut.nodes[0]!.x);
+  });
+  it("rejects data edges whose producer is not an earlier flow dependency", () => {
+    const graph = migrateEffectsToGraph({ effects: [{ type: "heal", formula: "1", target: "self" }, { type: "damage", formula: "1", target: "self" }] });
+    graph.edges.push({ id: "late-data", from: { nodeId: graph.nodes[2]!.id, port: "result", type: "number" }, to: { nodeId: graph.nodes[1]!.id, port: "value", type: "number" } });
+    expect(validateAbilityGraph(graph).issues.map((issue) => issue.code)).toContain("edge.data-order");
+  });
+  it("rejects a data consumer reachable by a path that bypasses its producer", () => {
+    const graph = migrateEffectsToGraph({ effects: [{ type: "heal", formula: "1", target: "self" }, { type: "damage", formula: "1", target: "self" }] });
+    graph.edges.push({ id: "bypass", from: { nodeId: graph.nodes[0]!.id, port: "next", type: "flow" }, to: { nodeId: graph.nodes[2]!.id, port: "in", type: "flow" } });
+    graph.edges.push({ id: "data", from: { nodeId: graph.nodes[1]!.id, port: "result", type: "number" }, to: { nodeId: graph.nodes[2]!.id, port: "value", type: "number" } });
+    expect(validateAbilityGraph(graph).issues.map((issue) => issue.code)).toContain("edge.data-order");
+  });
+  it("compiles true and false branch ports into nested effects", () => {
+    const graph = {
+      schemaVersion: 1 as const, approval: "gm" as const,
+      nodes: [
+        { id: "trigger", category: "trigger" as const, type: "manual", label: "Manual", x: 0, y: 0, config: {} },
+        { id: "branch", category: "logic" as const, type: "branch", label: "Check", x: 200, y: 0, config: { fact: "roll.total", equals: 20 } },
+        { id: "heal", category: "action" as const, type: "heal", label: "Heal", x: 400, y: 0, config: { formula: "5", target: "self" } },
+        { id: "message", category: "result" as const, type: "message", label: "Miss", x: 400, y: 160, config: { text: "No blessing" } }
+      ],
+      edges: [
+        { id: "a", from: { nodeId: "trigger", port: "next", type: "flow" as const }, to: { nodeId: "branch", port: "in", type: "flow" as const } },
+        { id: "b", from: { nodeId: "branch", port: "true", type: "flow" as const }, to: { nodeId: "heal", port: "in", type: "flow" as const } },
+        { id: "c", from: { nodeId: "branch", port: "false", type: "flow" as const }, to: { nodeId: "message", port: "in", type: "flow" as const } }
+      ]
+    };
+    expect(compileGraphToEffects(graph)).toEqual([{ type: "branch", condition: { type: "fact", key: "roll.total", equals: 20 }, then: [{ type: "heal", formula: "5", target: "self" }], otherwise: [{ type: "message", text: "No blessing" }] }]);
+  });
+  it("uses an actual resolved roll to choose the connected degree branch", async () => {
+    const graph = {
+      schemaVersion: 1 as const, approval: "gm" as const,
+      nodes: [
+        { id: "trigger", category: "trigger" as const, type: "manual", label: "Manual", x: 0, y: 0, config: {} },
+        { id: "roll", category: "action" as const, type: "roll", label: "Religion", x: 200, y: 0, config: { selector: "religion" } },
+        { id: "heal", category: "action" as const, type: "heal", label: "Heal", x: 400, y: 0, config: { formula: "5", target: "self" } },
+        { id: "fail", category: "action" as const, type: "message", label: "Failure", x: 400, y: 160, config: { text: "No blessing" } }
+      ],
+      edges: [
+        { id: "a", from: { nodeId: "trigger", port: "next", type: "flow" as const }, to: { nodeId: "roll", port: "in", type: "flow" as const } },
+        { id: "b", from: { nodeId: "roll", port: "success", type: "flow" as const }, to: { nodeId: "heal", port: "in", type: "flow" as const } },
+        { id: "c", from: { nodeId: "roll", port: "failure", type: "flow" as const }, to: { nodeId: "fail", port: "in", type: "flow" as const } }
+      ]
+    };
+    const actor = { id: "actor", hp: 10, maxHp: 20, modifiers: {}, conditions: [] };
+    const result = await executeAbilityGraph(graph, { actor, facts: { actor: { level: 1 }, target: {} }, triggerEvent: "manual", rollStatistic: async () => ({ total: 17, degree: "success" }) });
+    expect(result.healing).toBe(5);
+    expect(result.messages).toEqual([]);
+    expect(result.rolls[0]).toMatchObject({ total: 17, degree: "success", resolved: true });
+  });
+});
+describe("effect application", () => {
+  it("rolls back earlier actor mutations if a later operation fails", async () => {
+    let hp = 10;
+    const actor = {
+      id: "actor",
+      update: vi.fn(async (data: Record<string, unknown>) => { hp = Number(data["system.attributes.hp.value"]); }),
+      createEmbeddedDocuments: vi.fn(async () => { throw new Error("cannot create effect"); }),
+      deleteEmbeddedDocuments: vi.fn(async () => undefined)
+    } as unknown as GodForgeActor;
+    const prepared = {
+      id: "activation", actorId: "actor", deityId: "deity", abilityId: "ability", abilityName: "Blessing", createdAt: Date.now(),
+      operations: [
+        { kind: "actor-update" as const, targetId: "actor", path: "system.attributes.hp.value", before: 10, after: 15 },
+        { kind: "create-modifier" as const, targetId: "actor", selector: "religion", value: 1, modifierType: "status" }
+      ],
+      result: { messages: [], healing: 5, damage: 0, appliedModifiers: [], modifierOperations: [], appliedConditions: [], rolls: [], movements: [], resources: [], choices: [] },
+      updatedTargets: {}
+    };
+    await expect(applyPreparedAbility(prepared, new Map([["actor", actor]]))).rejects.toThrow("cannot create effect");
+    expect(hp).toBe(10);
+  });
+});
 describe("conditions and grants", () => { it("evaluates nested boolean conditions", () => expect(evaluateCondition({ type: "and", children: [{ type: "fact", key: "level", equals: 5 }, { type: "not", child: { type: "fact", key: "dead", equals: true } }] }, { level: 5, dead: false })).toBe(true)); it("requires an exact pick", () => expect(resolveGrantGroup({ id: "g", mode: "any", pick: 1, label: "", grants: [{ type: "bonus", ref: "a" }] }, { groupId: "g", refs: ["a"] })).toEqual(["a"])); });
 describe("nested grants", () => { it("previews nested AND/OR groups and preserves overrides", () => { const group = { id: "root", mode: "all" as const, label: "", grants: [{ type: "ability" as const, ref: "a", overrides: { name: "Renamed" } }, { id: "choice", mode: "any" as const, pick: 1, label: "", grants: [{ type: "bonus" as const, ref: "b" }, { type: "bonus" as const, ref: "c" }] }] }; expect(previewGrantGroup(group)).toEqual(["a", "b", "c"]); }); });
 describe("nested grant resolution", () => { it("resolves a selected AND subgroup inside an OR group", () => { const group = { id: "root", mode: "any" as const, pick: 1, label: "", grants: [{ id: "combined", mode: "all" as const, label: "", grants: [{ type: "ability" as const, ref: "a" }, { type: "bonus" as const, ref: "b" }] }, { type: "ability" as const, ref: "c" }] }; expect(resolveGrantGroup(group, [{ groupId: "root", refs: ["combined"] }])).toEqual(["a", "b"]); }); });
@@ -54,7 +146,7 @@ describe("visibility model", () => {
     const legacy = { ...deity, schemaVersion: 1, status: undefined, visibility: { library: true, players: true, characterSheet: true } };
     const result = migrateDefinition(legacy);
     expect(result.migrated).toBe(true);
-    expect(result.definition.schemaVersion).toBe(3);
+    expect(result.definition.schemaVersion).toBe(4);
     expect(result.definition.status).toBe("published");
     expect(result.definition.visibility.fields.gmNotes).toBe("gm");
     expect(result.definition.visibility.fields.spells).toBe("followers");
@@ -63,13 +155,15 @@ describe("visibility model", () => {
   it("repairs source replacements and normalizes portrait focus during schema 3 migration", () => { const result = migrateDefinition({ ...deity, schemaVersion: 2, replacement: { sourceUuid: "Compendium.pf2e.deities.Item.test", mode: "none", contexts: [] }, imagePresentation: { image: { fit: "cover", focusX: 200, focusY: -10 } } }); expect(result.definition.replacement.mode).toBe("replace"); expect(result.definition.imagePresentation?.image).toMatchObject({ focusX: 100, focusY: 0, fit: "cover" }); });
 
   it("removes unauthorized fields before player rendering", () => {
-    const hidden = { ...deity, gmNotes: "secret", passiveBonuses: [{ id: "b", name: "Secret bonus", selector: "stealth", value: 2, modifierType: "status" as const, visibility: "gm" as const }], visibility: { ...structuredClone(DEFAULT_VISIBILITY), fields: { ...structuredClone(DEFAULT_VISIBILITY.fields), description: "gm" as const, bonuses: "public" as const } } };
+    const hidden = { ...deity, gmNotes: "secret", passiveBonuses: [{ id: "b", name: "Secret bonus", selector: "stealth", value: 2, modifierType: "status" as const, visibility: "gm" as const }], abilities: [{ id: "ability", name: "Visible name", description: "Visible description", effects: [{ type: "damage" as const, formula: "99", target: "self" as const }], graph: migrateEffectsToGraph({ effects: [{ type: "message", text: "secret graph" }] }), visibility: "public" as const }], visibility: { ...structuredClone(DEFAULT_VISIBILITY), fields: { ...structuredClone(DEFAULT_VISIBILITY.fields), description: "gm" as const, bonuses: "public" as const, abilities: "public" as const, numericValues: "gm" as const } } };
     const view = redactForViewer(hidden, { isGM: false, selection: true });
     expect(view).not.toHaveProperty("gmNotes");
     expect(view).not.toHaveProperty("description");
     expect(view?.passiveBonuses).toEqual([]);
     expect(JSON.stringify(view)).not.toContain("secret");
     expect(JSON.stringify(view)).not.toContain("Secret bonus");
+    expect(view?.abilities?.[0]).not.toHaveProperty("graph");
+    expect(view?.abilities?.[0]?.effects).toEqual([]);
   });
 
   it("does not expose drafts through the public API", () => {
@@ -78,6 +172,17 @@ describe("visibility model", () => {
     service.save({ ...deity, status: "draft" });
     expect(new GodForgeApi(service, new AdapterRegistry()).getDeity("a")).toBeNull();
     vi.unstubAllGlobals();
+  });
+
+  it("keeps undiscovered deity assets secret until explicitly revealed", () => {
+    const undiscovered = { ...deity, image: "secret/deity.webp", discovery: { enabled: true, defaultState: "rumor" as const, rumorName: "A shadow", rumorText: "Whispers remain.", revealedToUsers: ["keeper"], revealedToActors: [] } };
+    expect(discoveryForViewer(undiscovered, { isGM: false, userId: "player" })).toBe("rumor");
+    expect(discoveryForViewer(undiscovered, { isGM: false, userId: "keeper" })).toBe("revealed");
+    expect(JSON.stringify({ name: undiscovered.discovery.rumorName, text: undiscovered.discovery.rumorText })).not.toContain("secret/deity.webp");
+    const service = new DeityService(); service.save(undiscovered);
+    const api = new GodForgeApi(service, new AdapterRegistry());
+    expect(api.isDeitySelectableByPlayer(undiscovered.id, { isGM: false, selection: true, userId: "player" })).toBe(false);
+    expect(api.isDeitySelectableByPlayer(undiscovered.id, { isGM: false, selection: true, userId: "keeper" })).toBe(true);
   });
 
   it("rejects GM-only access for players", () => {
@@ -113,6 +218,15 @@ describe("Foundry journal persistence", () => {
     expect(documentClass.create).toHaveBeenCalledOnce();
     expect(new JournalDeityRepository({ contents, documentClass }).load()).toEqual([deity]);
   });
+  it("deletes only journals owned by GodForge", async () => {
+    const remove = vi.fn(async () => undefined);
+    const journal = { id: "j", uuid: "Journal.j", name: "A", flags: { "darkis-godforge": { schemaVersion: 1, deity } }, update: async () => undefined, delete: remove };
+    const foreign = { id: "x", uuid: "Journal.x", name: "Notes", flags: {}, update: async () => undefined, delete: vi.fn() };
+    const repository = new JournalDeityRepository({ contents: [journal, foreign] });
+    expect(await repository.deleteAll()).toBe(1);
+    expect(remove).toHaveBeenCalledOnce();
+    expect(foreign.delete).not.toHaveBeenCalled();
+  });
 });
 describe("GM authority", () => { it("rejects a duplicate activation request", async () => { const service = new DeityService(); service.save({ ...deity, abilities: [{ id: "a1", name: "A", description: "", effects: [{ type: "message", text: "ok" }] }] }); const actor: GodForgeActor = { id: "actor", flags: { "darkis-godforge": { deityId: "a", grants: [], usages: {} } }, update: async () => undefined }; const authority: AuthorityContext = { currentUserId: "gm", isGM: true, isGMUser: (userId) => userId === "gm", ownsActor: (_actor, userId) => userId === "player", resolveActor: () => actor }; const handlers = new Map<string, (payload: unknown, senderId: string) => Promise<unknown>>(); const transport: SocketTransport = { register: (name, callback) => { handlers.set(name, callback); }, executeAsGM: async () => undefined }; const router = new SocketRouter(new GodForgeApi(service, new AdapterRegistry()), authority, transport); router.register(); const payload = { activationId: "fixed", actorId: "actor", userId: "forged", abilityId: "a1", options: {} }; await handlers.get("activateAbility")?.(payload, "player"); await expect(handlers.get("activateAbility")?.(payload, "player")).rejects.toThrow("already been processed"); expect(router.status("fixed")).toBe("completed"); }); it("ignores a forged payload user id and authorizes only the authenticated sender", async () => { const service = new DeityService(); service.save({ ...deity, abilities: [{ id: "a1", name: "A", description: "", effects: [] }] }); const actor: GodForgeActor = { id: "actor", flags: { "darkis-godforge": { deityId: "a", grants: [], usages: {} } }, update: async () => undefined }; const authority: AuthorityContext = { currentUserId: "gm", isGM: true, isGMUser: (userId) => userId === "gm", ownsActor: (_actor, userId) => userId === "owner", resolveActor: () => actor }; const handlers = new Map<string, (payload: unknown, senderId: string) => Promise<unknown>>(); const transport: SocketTransport = { register: (name, callback) => { handlers.set(name, callback); }, executeAsGM: async () => undefined }; const router = new SocketRouter(new GodForgeApi(service, new AdapterRegistry()), authority, transport); router.register(); await expect(handlers.get("activateAbility")?.({ activationId: "spoof", actorId: "actor", userId: "owner", abilityId: "a1", options: {} }, "attacker")).rejects.toThrow("not allowed"); }); });
 describe("GM-authoritative deity assignment", () => { it("allows an owning player to select published content and rejects drafts", async () => { const service = new DeityService(); service.save(deity); service.save({ ...deity, id: "draft", status: "draft" }); const actor: GodForgeActor = { id: "actor", flags: {}, update: async (data) => { actor.flags = data.flags; } }; const authority: AuthorityContext = { currentUserId: "gm", isGM: true, isGMUser: (userId) => userId === "gm", ownsActor: (_actor, userId) => userId === "player", resolveActor: () => actor }; const handlers = new Map<string, (payload: unknown, senderId: string) => Promise<unknown>>(); const transport: SocketTransport = { register: (name, callback) => { handlers.set(name, callback); }, executeAsGM: async () => undefined }; const router = new SocketRouter(new GodForgeApi(service, new AdapterRegistry()), authority, transport); router.register(); await handlers.get("assignDeity")?.({ activationId: "assign-ok", actorId: "actor", deityId: "a", choices: {} }, "player"); expect((actor.flags?.["darkis-godforge"] as { deityId: string }).deityId).toBe("a"); await expect(handlers.get("assignDeity")?.({ activationId: "assign-draft", actorId: "actor", deityId: "draft", choices: {} }, "player")).rejects.toThrow("not available"); }); });
@@ -126,7 +240,7 @@ describe("character widget", () => { it("exposes assigned deity and remaining us
 describe("character widget security", () => { it("omits GM-only abilities and internal grant references for players", () => { const actor: GodForgeActor = { id: "actor", flags: { "darkis-godforge": { deityId: "a", grants: ["secret-grant"], usages: {} } }, testUserPermission: () => true, update: async () => undefined }; vi.stubGlobal("game", { user: { id: "player", isGM: false, character: actor }, system: { id: "pf2e" } }); const service = new DeityService(); service.save({ ...deity, abilities: [{ id: "hidden", name: "Hidden", description: "secret", visibility: "gm", effects: [] }], visibility: { ...structuredClone(DEFAULT_VISIBILITY), fields: { ...structuredClone(DEFAULT_VISIBILITY.fields), abilities: "public" } } }); const data = new GodForgeApi(service, new AdapterRegistry()).getCharacterWidgetData(actor); expect(data.abilities).toEqual([]); expect(data.grants).toEqual([]); expect(JSON.stringify(data)).not.toContain("secret"); vi.unstubAllGlobals(); }); });
 describe("formulas and random systems", () => { it("respects precedence and resolves mixed dice formulas", async () => { expect(evaluateFormula("2 + 3 * 4", { actor: { level: 0 }, target: {} })).toBe(14); expect(evaluateFormula("clamp(@actor.level, 1, 5)", { actor: { level: 8 }, target: {} })).toBe(5); expect(await evaluateFormulaWithDice("3d8 + @actor.level", { actor: { level: 4 }, target: {} }, async () => 12)).toBe(16); expect(validateFormula("globalThis.alert(1)")).toBe(false); }); it("draws weighted entries and resolves a wheel", () => { const entries = [{ id: "a", label: "A", weight: 1 }, { id: "b", label: "B", weight: 3 }]; expect(drawWeighted(entries, () => 0.1).entry.id).toBe("a"); expect(resolveWheel(entries, () => 0.9).status).toBe("resolved"); }); });
 describe("random content management", () => { it("creates persistent table and wheel definitions before resolving results", () => { const service = new RandomContentService(); const table = service.createTable({ name: "Fate", formula: "1d100", visibility: "public", entries: [{ id: "one", label: "One", weight: 1 }] }); const wheel = service.createWheel({ name: "Wheel", tableId: table.id, visibility: "gm", duration: 6, minimumSpins: 5 }); expect(service.snapshot()).toMatchObject({ tables: [{ name: "Fate" }], wheels: [{ name: "Wheel" }] }); expect(service.spinWheel(wheel.id, () => 0).draw.entry.id).toBe("one"); }); it("rejects malformed imported random data before replacing content", () => { const service = new RandomContentService(); const table = service.createTable({ name: "Safe", formula: "1d20", visibility: "public", entries: [{ id: "one", label: "One", weight: 1 }] }); const invalid = { tables: [{ ...table, entries: [{ id: "bad", label: "Bad", weight: -1 }] }], wheels: [] }; expect(validateRandomContentSnapshot(invalid)).toBe(false); expect(() => service.replace(invalid)).toThrow("Invalid"); expect(service.listTables()[0]?.name).toBe("Safe"); }); });
-describe("API data workflows", () => { it("exports the current schema, imports deity data and caches catalog reads", async () => { const service = new DeityService(); service.save(deity); const api = new GodForgeApi(service, new AdapterRegistry()); const first = await api.getSelectableDeities({}); expect(await api.getSelectableDeities({})).toBe(first); const exported = api.exportDeities("2026-07-20T00:00:00.000Z"); expect(exported.schemaVersion).toBe(3); expect(await api.importDeities(exported)).toBe(1); expect(api.drawRandomDeity(() => 0).entry.id).toBe("a"); }); });
+describe("API data workflows", () => { it("exports the current schema, imports deity data and caches catalog reads", async () => { const service = new DeityService(); service.save(deity); const api = new GodForgeApi(service, new AdapterRegistry()); const first = await api.getSelectableDeities({}); expect(await api.getSelectableDeities({})).toBe(first); const exported = api.exportDeities("2026-07-20T00:00:00.000Z"); expect(exported.schemaVersion).toBe(4); expect(await api.importDeities(exported)).toBe(1); expect(api.drawRandomDeity(() => 0).entry.id).toBe("a"); }); });
 describe("security and replacement regressions", () => { it("allows Foundry image paths and blocks unsafe schemes", () => { expect(escapeHtml(`<img src=x onerror=alert(1)>`)).toContain("&lt;img"); expect(safeImageUrl("worlds/noclaris/gods/tenebris.webp")).toBe("worlds/noclaris/gods/tenebris.webp"); expect(safeImageUrl("modules/darkis-godforge/assets/a.png")).toBe("modules/darkis-godforge/assets/a.png"); expect(safeImageUrl("assets/a.png")).toBe("assets/a.png"); expect(safeImageUrl("https://x.com/a&b.png")).toBe("https://x.com/a&b.png"); expect(safeImageUrl("javascript:alert(1)")).toBe("icons/svg/eye.svg"); }); it("hides an official Compendium UUID only in the configured context", async () => { const sourceUuid = "Compendium.pf2e.deities.Item.abc123"; vi.stubGlobal("game", { system: { id: "pf2e" }, packs: { contents: [{ collection: "pf2e.deities", documentName: "Item", metadata: { system: "pf2e" }, getIndex: async () => [{ _id: "abc123", name: "Official", type: "deity", system: { domains: ["sun"] } }] }] } }); const service = new DeityService(); service.save({ ...deity, id: "homebrew", replacement: { sourceUuid, mode: "hide", contexts: ["characterBuilder"] } }); const api = new GodForgeApi(service, new AdapterRegistry()); expect((await api.getSelectableDeities({ systemId: "pf2e", catalogContext: "characterBuilder" })).map((entry) => entry.sourceUuid)).not.toContain(sourceUuid); expect((await api.getSelectableDeities({ systemId: "pf2e", catalogContext: "compendium" })).map((entry) => entry.sourceUuid)).toContain(sourceUuid); vi.unstubAllGlobals(); }); });
 describe("socketlib bridge", () => { it("forwards Socketlib's authenticated sender instead of payload identity", async () => { let registered = ""; let socketHandler: ((this: { socketdata?: { userId?: string } }, payload: unknown) => Promise<unknown>) | undefined; const transport = createSocketlibTransport({ registerModule: () => ({ register: (name: string, handler: typeof socketHandler) => { registered = name; socketHandler = handler; }, executeAsGM: async () => "ok" }) }); expect(transport).not.toBeNull(); const receiver = vi.fn(); transport?.register("activateAbility", receiver); expect(registered).toBe("activateAbility"); await socketHandler?.call({ socketdata: { userId: "authenticated-player" } }, { userId: "forged-gm" }); expect(receiver).toHaveBeenCalledWith({ userId: "forged-gm" }, "authenticated-player"); }); });
 describe("localization catalogs", () => { it("keeps every English and German localization key in parity", () => { expect(localizationLeafKeys(german)).toEqual(localizationLeafKeys(english)); }); });
@@ -189,15 +303,15 @@ describe("dashboard markup regressions", () => {
     const template = readFileSync("templates/deity-editor.hbs", "utf8");
     const implementation = readFileSync("scripts/applications/deity-editor.ts", "utf8");
     expect(template).not.toMatch(/href="#dg-/);
-    expect([...template.matchAll(/data-wizard-step="(\d+)"/g)].map((match) => match[1])).toEqual(["0", "1", "2", "3", "4", "5", "6", "7"]);
-    expect([...template.matchAll(/data-wizard-panel="(\d+)"/g)].map((match) => match[1])).toEqual(["0", "1", "2", "3", "4", "5", "6", "7"]);
+    expect([...template.matchAll(/data-wizard-step="(\d+)"/g)].map((match) => match[1])).toEqual(["0", "1", "2", "3", "4"]);
+    expect([...new Set([...template.matchAll(/data-wizard-panel="(\d+)"/g)].map((match) => match[1]))]).toEqual(["0", "1", "2", "3", "4"]);
     expect([...template.matchAll(/<[^>]+\srequired(?:\s|>)/g)]).toHaveLength(1);
     expect(template).toContain('<input type="hidden" name="replacement.sourceUuid"');
     expect(template).toContain('data-picker="official"');
     expect(template).toContain('data-picker="weapons"');
     expect(template).toContain('data-picker="spells"');
     expect(implementation).toContain("private setupWizard");
-    expect(implementation).toContain("panel.hidden = panel !== activePanel");
+    expect(implementation).toContain("panel.dataset.wizardPanel !== activeId");
   });
 
   it("uses a reusable filtered picker for known system values", () => {

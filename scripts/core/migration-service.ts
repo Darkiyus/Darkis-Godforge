@@ -1,6 +1,7 @@
 import { DEFAULT_VISIBILITY, type DeityDefinition, type VisibilityConfiguration, type VisibilityLevel } from "./types";
+import { migrateEffectsToGraph, validateAbilityGraph } from "./ability-graph";
 
-export const CURRENT_SCHEMA_VERSION = 3;
+export const CURRENT_SCHEMA_VERSION = 4;
 
 export interface MigrationResult { definition: DeityDefinition; migrated: boolean; warnings: string[]; }
 
@@ -31,7 +32,8 @@ export function migrateDefinition(input: unknown): MigrationResult {
     grantGroups: source.kind === "lore" ? [] : Array.isArray(source.grantGroups) ? source.grantGroups : [],
     replacement: source.kind === "lore" ? { sourceUuid: "", mode: "none", contexts: [] } : normalizeReplacement(source.replacement),
     imagePresentation: normalizeImagePresentation(source.imagePresentation),
-    domains: Array.isArray(source.domains) ? source.domains : []
+    domains: Array.isArray(source.domains) ? source.domains : [],
+    discovery: normalizeDiscovery(source.discovery)
   } as unknown as DeityDefinition;
 
   if (schemaVersion < CURRENT_SCHEMA_VERSION) warnings.push(`Legacy definition migrated to schema version ${CURRENT_SCHEMA_VERSION}.`);
@@ -99,8 +101,26 @@ function normalizeBonus(value: unknown): unknown {
 function normalizeAbility(value: unknown): unknown {
   if (!value || typeof value !== "object") return value;
   const ability = value as Record<string, unknown>;
-  return { ...ability, enabled: ability.enabled !== false, visibility: visibilityLevel(ability.visibility, "followers") };
+  const legacy = { trigger: typeof ability.trigger === "string" ? ability.trigger : undefined, effects: Array.isArray(ability.effects) ? ability.effects : [] };
+  const graph = validateAbilityGraph(ability.graph).valid ? structuredClone(ability.graph) : migrateEffectsToGraph(legacy);
+  return { ...ability, effects: legacy.effects, graph, enabled: ability.enabled !== false, visibility: visibilityLevel(ability.visibility, "followers") };
 }
+
+function normalizeDiscovery(value: unknown): DeityDefinition["discovery"] {
+  if (!value || typeof value !== "object") return { enabled: false, defaultState: "revealed", revealedToUsers: [], revealedToActors: [] };
+  const source = value as Record<string, unknown>;
+  const defaultState = source.defaultState === "hidden" || source.defaultState === "rumor" ? source.defaultState : "revealed";
+  return {
+    enabled: source.enabled === true,
+    defaultState,
+    rumorName: typeof source.rumorName === "string" ? source.rumorName.slice(0, 160) : undefined,
+    rumorText: typeof source.rumorText === "string" ? source.rumorText.slice(0, 2_000) : undefined,
+    revealedToUsers: stringArray(source.revealedToUsers),
+    revealedToActors: stringArray(source.revealedToActors)
+  };
+}
+
+function stringArray(value: unknown): string[] { return Array.isArray(value) ? [...new Set(value.filter((entry): entry is string => typeof entry === "string" && entry.length <= 128))].slice(0, 500) : []; }
 
 function visibilityLevel(value: unknown, fallback: VisibilityLevel): VisibilityLevel {
   return value === "public" || value === "selection" || value === "followers" || value === "owner" || value === "trusted" || value === "gm" || value === "hidden-until-selected" ? value : fallback;

@@ -5,7 +5,7 @@
       <h2>{{ui.NEW_DEITY}}</h2>
       <p>{{ui.WIZARD_INTRO}}</p>
     </div>
-    <button type="button" class="dg-secondary" data-action="preview-player" title="{{ui.PLAYER_PREVIEW}}"><i class="fas fa-eye" aria-hidden="true"></i> {{ui.PLAYER_PREVIEW}}</button>
+    <div class="dg-editor-header-actions"><label class="dg-expert-toggle"><input type="checkbox" data-expert-toggle> {{ui.EXPERT_MODE}}</label><button type="button" class="dg-secondary" data-action="preview-player" title="{{ui.PLAYER_PREVIEW}}"><i class="fas fa-eye" aria-hidden="true"></i> {{ui.PLAYER_PREVIEW}}</button></div>
   </header>
 
   <form>
@@ -13,11 +13,8 @@
       <button type="button" data-wizard-step="0" aria-current="step"><b>1</b><span>{{ui.BASIC_DATA}}</span></button>
       <button type="button" data-wizard-step="1"><b>2</b><span>{{ui.APPEARANCE}}</span></button>
       <button type="button" data-wizard-step="2"><b>3</b><span>{{ui.SYSTEM_VALUES}}</span></button>
-      <button type="button" data-wizard-step="3"><b>4</b><span>{{ui.PASSIVE_BONUSES}}</span></button>
-      <button type="button" data-wizard-step="4"><b>5</b><span>{{ui.DIVINE_WONDERS}}</span></button>
-      <button type="button" data-wizard-step="5"><b>6</b><span>{{ui.REPLACEMENT}}</span></button>
-      <button type="button" data-wizard-step="6"><b>7</b><span>{{ui.VISIBILITY}}</span></button>
-      <button type="button" data-wizard-step="7"><b>8</b><span>{{ui.PREVIEW}}</span></button>
+      <button type="button" data-wizard-step="3"><b>4</b><span>{{ui.ABILITIES}}</span></button>
+      <button type="button" data-wizard-step="4"><b>5</b><span>{{ui.PREVIEW}}</span></button>
     </nav><button type="button" data-action="scroll-steps-right" aria-label="{{ui.NEXT}}"><i class="fas fa-chevron-right"></i></button></div>
 
     <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="0">
@@ -36,12 +33,11 @@
     <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="1" hidden>
       <div class="dg-section-title"><div><h3>{{ui.APPEARANCE}}</h3><p>{{ui.STEP_APPEARANCE_INTRO}}</p></div><i class="fas fa-images" aria-hidden="true"></i></div>
       <p class="dg-wizard-note">{{ui.OPTIONAL_STEP_HINT}}</p>
-      <fieldset class="dg-image-variants"><legend>Bildvarianten erzeugen / Create image variants</legend><p>Das Porträt bleibt unverändert. GodForge erzeugt eigene WebP-Dateien mit passendem Seitenverhältnis und dem gesetzten Fokuspunkt.</p><div><label><input type="checkbox" name="variant.icon" checked> Icon 512×512</label><label><input type="checkbox" name="variant.symbol" checked> Kultsymbol 1024×1024</label><label><input type="checkbox" name="variant.banner" checked> Banner 1600×600</label></div><button type="button" class="dg-secondary" data-action="generate-image-variants"><i class="fas fa-crop-simple"></i> Varianten aus Porträt erzeugen</button><small data-variant-status></small></fieldset>
       <div class="dg-form-grid">
         <label class="dg-image-field" data-image-field="image">{{ui.PORTRAIT}}<small>{{ui.HELP_PORTRAIT}} · 2:3–3:4 · ≥1024×1536 · WebP/PNG</small><span class="dg-file-control"><input name="image" data-image-input placeholder="{{ui.FILE_PATH}}"><button type="button" data-action="browse-image" data-target="image" data-type="image" title="{{ui.BROWSE_FILES}}"><i class="fas fa-folder-open" aria-hidden="true"></i></button></span><img data-image-preview="image" alt="" hidden><span class="dg-crop-controls"><select name="imagePresentation.image.fit" data-image-setting="image"><option value="cover">Fläche füllen</option><option value="contain">Vollständig zeigen</option></select><label>Fokus ↔<input type="range" min="0" max="100" value="50" name="imagePresentation.image.focusX" data-image-setting="image"></label><label>Fokus ↕<input type="range" min="0" max="100" value="25" name="imagePresentation.image.focusY" data-image-setting="image"></label><label>Zoom<input type="range" min="1" max="3" step="0.05" value="1" name="imagePresentation.image.zoom" data-image-setting="image"></label><label>Drehung<input type="range" min="-180" max="180" value="0" name="imagePresentation.image.rotation" data-image-setting="image"></label></span></label>
-        <label class="dg-image-field" data-image-field="icon">{{ui.ICON}}<small>{{ui.HELP_ICON}} · 1:1 · 512×512 · PNG/WebP</small><span class="dg-file-control"><input name="icon" data-image-input placeholder="{{ui.FILE_PATH}}"><button type="button" data-action="browse-image" data-target="icon" data-type="image" title="{{ui.BROWSE_FILES}}"><i class="fas fa-folder-open" aria-hidden="true"></i></button></span><img data-image-preview="icon" alt="" hidden><span class="dg-crop-controls"><select name="imagePresentation.icon.fit" data-image-setting="icon"><option value="cover">Fläche füllen</option><option value="contain">Vollständig zeigen</option></select><label>Fokus ↔<input type="range" min="0" max="100" value="50" name="imagePresentation.icon.focusX" data-image-setting="icon"></label><label>Fokus ↕<input type="range" min="0" max="100" value="25" name="imagePresentation.icon.focusY" data-image-setting="icon"></label><input type="hidden" name="imagePresentation.icon.zoom" value="1"><input type="hidden" name="imagePresentation.icon.rotation" value="0"></span></label>
-        <label class="dg-image-field" data-image-field="symbol">{{ui.SYMBOL}}<small>{{ui.HELP_SYMBOL}} · 1:1 · 512–1024 · transparentes PNG/WebP</small><span class="dg-file-control"><input name="symbol" data-image-input placeholder="{{ui.FILE_PATH}}"><button type="button" data-action="browse-image" data-target="symbol" data-type="image" title="{{ui.BROWSE_FILES}}"><i class="fas fa-folder-open" aria-hidden="true"></i></button></span><img data-image-preview="symbol" alt="" hidden><span class="dg-crop-controls"><select name="imagePresentation.symbol.fit" data-image-setting="symbol"><option value="contain">Vollständig zeigen</option><option value="cover">Fläche füllen</option></select><label>Fokus ↔<input type="range" min="0" max="100" value="50" name="imagePresentation.symbol.focusX" data-image-setting="symbol"></label><label>Fokus ↕<input type="range" min="0" max="100" value="50" name="imagePresentation.symbol.focusY" data-image-setting="symbol"></label><input type="hidden" name="imagePresentation.symbol.zoom" value="1"><input type="hidden" name="imagePresentation.symbol.rotation" value="0"></span></label>
-        <label class="dg-image-field" data-image-field="banner">{{ui.BANNER}}<small>{{ui.HELP_BANNER}} · ca. 16:5 · ≥1600×500 · WebP/PNG</small><span class="dg-file-control"><input name="banner" data-image-input placeholder="{{ui.FILE_PATH}}"><button type="button" data-action="browse-image" data-target="banner" data-type="image" title="{{ui.BROWSE_FILES}}"><i class="fas fa-folder-open" aria-hidden="true"></i></button></span><img data-image-preview="banner" alt="" hidden><span class="dg-crop-controls"><select name="imagePresentation.banner.fit" data-image-setting="banner"><option value="cover">Fläche füllen</option><option value="contain">Vollständig zeigen</option></select><label>Fokus ↔<input type="range" min="0" max="100" value="50" name="imagePresentation.banner.focusX" data-image-setting="banner"></label><label>Fokus ↕<input type="range" min="0" max="100" value="25" name="imagePresentation.banner.focusY" data-image-setting="banner"></label><input type="hidden" name="imagePresentation.banner.zoom" value="1"><input type="hidden" name="imagePresentation.banner.rotation" value="0"></span></label>
+        <label class="dg-image-field" data-image-field="icon">{{ui.ICON}}<small>{{ui.HELP_ICON}} · 1:1 · 512×512 · PNG/WebP</small><span class="dg-file-control"><input name="icon" data-image-input placeholder="{{ui.FILE_PATH}}"><button type="button" data-action="browse-image" data-target="icon" data-type="image" title="{{ui.BROWSE_FILES}}"><i class="fas fa-folder-open" aria-hidden="true"></i></button></span><img data-image-preview="icon" alt="" hidden><span class="dg-crop-controls"><select name="imagePresentation.icon.fit" data-image-setting="icon"><option value="cover">Fläche füllen</option><option value="contain">Vollständig zeigen</option></select><label>Fokus ↔<input type="range" min="0" max="100" value="50" name="imagePresentation.icon.focusX" data-image-setting="icon"></label><label>Fokus ↕<input type="range" min="0" max="100" value="25" name="imagePresentation.icon.focusY" data-image-setting="icon"></label><label>Zoom<input type="range" min="1" max="3" step="0.05" value="1" name="imagePresentation.icon.zoom" data-image-setting="icon"></label><label>Drehung<input type="range" min="-180" max="180" value="0" name="imagePresentation.icon.rotation" data-image-setting="icon"></label></span></label>
+        <label class="dg-image-field" data-image-field="symbol">{{ui.SYMBOL}}<small>{{ui.HELP_SYMBOL}} · 1:1 · 512–1024 · transparentes PNG/WebP</small><span class="dg-file-control"><input name="symbol" data-image-input placeholder="{{ui.FILE_PATH}}"><button type="button" data-action="browse-image" data-target="symbol" data-type="image" title="{{ui.BROWSE_FILES}}"><i class="fas fa-folder-open" aria-hidden="true"></i></button></span><img data-image-preview="symbol" alt="" hidden><span class="dg-crop-controls"><select name="imagePresentation.symbol.fit" data-image-setting="symbol"><option value="contain">Vollständig zeigen</option><option value="cover">Fläche füllen</option></select><label>Fokus ↔<input type="range" min="0" max="100" value="50" name="imagePresentation.symbol.focusX" data-image-setting="symbol"></label><label>Fokus ↕<input type="range" min="0" max="100" value="50" name="imagePresentation.symbol.focusY" data-image-setting="symbol"></label><label>Zoom<input type="range" min="1" max="3" step="0.05" value="1" name="imagePresentation.symbol.zoom" data-image-setting="symbol"></label><label>Drehung<input type="range" min="-180" max="180" value="0" name="imagePresentation.symbol.rotation" data-image-setting="symbol"></label></span></label>
+        <label class="dg-image-field" data-image-field="banner">{{ui.BANNER}}<small>{{ui.HELP_BANNER}} · ca. 16:5 · ≥1600×500 · WebP/PNG</small><span class="dg-file-control"><input name="banner" data-image-input placeholder="{{ui.FILE_PATH}}"><button type="button" data-action="browse-image" data-target="banner" data-type="image" title="{{ui.BROWSE_FILES}}"><i class="fas fa-folder-open" aria-hidden="true"></i></button></span><img data-image-preview="banner" alt="" hidden><span class="dg-crop-controls"><select name="imagePresentation.banner.fit" data-image-setting="banner"><option value="cover">Fläche füllen</option><option value="contain">Vollständig zeigen</option></select><label>Fokus ↔<input type="range" min="0" max="100" value="50" name="imagePresentation.banner.focusX" data-image-setting="banner"></label><label>Fokus ↕<input type="range" min="0" max="100" value="25" name="imagePresentation.banner.focusY" data-image-setting="banner"></label><label>Zoom<input type="range" min="1" max="3" step="0.05" value="1" name="imagePresentation.banner.zoom" data-image-setting="banner"></label><label>Drehung<input type="range" min="-180" max="180" value="0" name="imagePresentation.banner.rotation" data-image-setting="banner"></label></span></label>
       </div>
     </section>
 
@@ -50,7 +46,7 @@
       <div class="dg-form-grid">
         <label>{{ui.DOMAINS}}<small>{{ui.HELP_DOMAINS}}</small><span class="dg-system-picker-control" data-picker-control="domains"><input type="hidden" name="domains"><span data-picker-label>{{ui.PICKER_NONE}}</span><button type="button" data-action="open-system-picker" data-picker="domains" title="{{ui.PICKER_OPEN}}"><i class="fas fa-list-check"></i></button></span></label>
         <label>{{ui.FAVORED_WEAPON}}<small>{{ui.HELP_WEAPON}}</small><span class="dg-system-picker-control" data-picker-control="weapons"><input type="hidden" name="favoredWeapon"><input type="hidden" name="favoredWeaponUuid"><span data-picker-label>{{ui.PICKER_NONE}}</span><button type="button" data-action="open-system-picker" data-picker="weapons" title="{{ui.PICKER_OPEN}}"><i class="fas fa-list-check"></i></button></span></label>
-        <label>{{ui.TRAINED_SKILL}} – PF2e-Ausbildung<small>{{ui.HELP_SKILL}} Kein zusätzlicher Zahlenbonus.</small><span class="dg-system-picker-control" data-picker-control="skills"><input type="hidden" name="skill"><span data-picker-label>{{ui.PICKER_NONE}}</span><button type="button" data-action="open-system-picker" data-picker="skills" title="{{ui.PICKER_OPEN}}"><i class="fas fa-list-check"></i></button></span></label>
+        <label>{{ui.TRAINED_SKILL_PF2E}}<small>{{ui.HELP_SKILL}} {{ui.SKILL_NO_BONUS}}</small><span class="dg-system-picker-control" data-picker-control="skills"><input type="hidden" name="skill"><span data-picker-label>{{ui.PICKER_NONE}}</span><button type="button" data-action="open-system-picker" data-picker="skills" title="{{ui.PICKER_OPEN}}"><i class="fas fa-list-check"></i></button></span></label>
         <label>{{ui.DIVINE_FONT}}<small>{{ui.HELP_FONT}}</small><span class="dg-system-picker-control" data-picker-control="fonts"><input type="hidden" name="font"><span data-picker-label>{{ui.PICKER_NONE}}</span><button type="button" data-action="open-system-picker" data-picker="fonts" title="{{ui.PICKER_OPEN}}"><i class="fas fa-list-check"></i></button></span></label>
         <label>{{ui.SANCTIFICATION}}<small>{{ui.HELP_SANCTIFICATION}}</small><span class="dg-system-picker-control" data-picker-control="sanctifications"><input type="hidden" name="sanctification"><span data-picker-label>{{ui.PICKER_NONE}}</span><button type="button" data-action="open-system-picker" data-picker="sanctifications" title="{{ui.PICKER_OPEN}}"><i class="fas fa-list-check"></i></button></span></label>
         <label>{{ui.CHAMPION_CAUSE}}<small>{{ui.HELP_CAUSE}}</small><input name="cause"></label>
@@ -69,12 +65,12 @@
     </section>
 
     <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="3" data-selectable-only hidden>
-      <div class="dg-section-title"><div><h3>Zusätzliche Anhängerboni</h3><p>Diese Boni kommen gegebenenfalls zur göttlichen Ausbildung hinzu.</p></div><button type="button" class="dg-secondary" data-action="add-bonus"><i class="fas fa-plus" aria-hidden="true"></i> {{ui.ADD_BONUS}}</button></div>
+      <div class="dg-section-title"><div><h3>{{ui.ADDITIONAL_FOLLOWER_BONUSES}}</h3><p>{{ui.BONUS_SECTION_HINT}}</p></div><button type="button" class="dg-secondary" data-action="add-bonus"><i class="fas fa-plus" aria-hidden="true"></i> {{ui.ADD_BONUS}}</button></div>
       <p class="dg-wizard-note">{{ui.BONUS_EDITOR_HINT}}</p>
       <div class="dg-editor-list" data-bonus-list></div>
     </section>
 
-    <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="4" data-selectable-only hidden>
+    <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="3" data-selectable-only hidden>
       <div class="dg-section-title"><div><h3>{{ui.DIVINE_WONDERS}}</h3><p>{{ui.STEP_WONDERS_INTRO}}</p></div><button type="button" class="dg-secondary" data-action="add-ability"><i class="fas fa-plus" aria-hidden="true"></i> {{ui.ADD_ABILITY}}</button></div>
       <p class="dg-wizard-note">{{ui.ABILITY_EDITOR_HINT}}</p>
       <div class="dg-editor-list" data-ability-list></div>
@@ -86,18 +82,18 @@
       </details>
     </section>
 
-    <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="5" data-selectable-only hidden>
+    <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="4" data-selectable-only data-expert-only hidden>
       <div class="dg-section-title"><div><h3>{{ui.REPLACEMENT}}</h3><p>{{ui.STEP_REPLACEMENT_INTRO}}</p></div><i class="fas fa-code-compare" aria-hidden="true"></i></div>
       <div class="dg-form-grid">
         <label>{{ui.REPLACEMENT_MODE}}<small>{{ui.HELP_REPLACEMENT_MODE}}</small><select name="replacement.mode"><option value="none">{{ui.REPLACE_NONE}}</option><option value="hide">{{ui.REPLACE_HIDE}}</option><option value="replace">{{ui.REPLACE_SOURCE}}</option></select></label>
         <label>{{ui.OFFICIAL_DEITY}}<small>{{ui.HELP_OFFICIAL_DEITY}}</small><span class="dg-system-picker-control" data-picker-control="official"><input type="hidden" name="replacement.sourceUuid"><span data-picker-label>{{ui.PICKER_NONE}}</span><button type="button" data-action="open-system-picker" data-picker="official" title="{{ui.PICKER_OPEN}}"><i class="fas fa-list-check"></i></button></span></label>
       </div>
       {{#unless officialDeities.length}}<p class="dg-wizard-note"><i class="fas fa-circle-info" aria-hidden="true"></i> {{ui.NO_OFFICIAL_DEITIES_HINT}}</p>{{/unless}}
-      <fieldset class="dg-check-grid"><legend>{{ui.INHERITANCE}} · empfohlene technische Werte werden automatisch gewählt</legend><label><input type="checkbox" name="replacement.inherit.domains"> {{ui.DOMAINS}}</label><label><input type="checkbox" name="replacement.inherit.favoredWeapon"> {{ui.FAVORED_WEAPON}}</label><label><input type="checkbox" name="replacement.inherit.spells"> {{ui.SPELLS}}</label><label><input type="checkbox" name="replacement.inherit.sanctification"> {{ui.SANCTIFICATION}}</label><label><input type="checkbox" name="replacement.inherit.skill"> {{ui.TRAINED_SKILL}}</label><label><input type="checkbox" name="replacement.inherit.font"> {{ui.DIVINE_FONT}}</label><label><input type="checkbox" name="replacement.inherit.divineAttributes"> {{ui.DIVINE_ATTRIBUTES}}</label><label><input type="checkbox" name="replacement.inherit.edicts"> {{ui.EDICTS}}</label><label><input type="checkbox" name="replacement.inherit.anathema"> {{ui.ANATHEMA}}</label><label><input type="checkbox" name="replacement.keepForExistingActors" checked> {{ui.KEEP_EXISTING_ACTORS}}</label></fieldset>
+      <fieldset class="dg-check-grid"><legend>{{ui.INHERITANCE}} · {{ui.INHERITANCE_HINT}}</legend><label><input type="checkbox" name="replacement.inherit.domains"> {{ui.DOMAINS}}</label><label><input type="checkbox" name="replacement.inherit.favoredWeapon"> {{ui.FAVORED_WEAPON}}</label><label><input type="checkbox" name="replacement.inherit.spells"> {{ui.SPELLS}}</label><label><input type="checkbox" name="replacement.inherit.sanctification"> {{ui.SANCTIFICATION}}</label><label><input type="checkbox" name="replacement.inherit.skill"> {{ui.TRAINED_SKILL}}</label><label><input type="checkbox" name="replacement.inherit.font"> {{ui.DIVINE_FONT}}</label><label><input type="checkbox" name="replacement.inherit.divineAttributes"> {{ui.DIVINE_ATTRIBUTES}}</label><label><input type="checkbox" name="replacement.inherit.edicts"> {{ui.EDICTS}}</label><label><input type="checkbox" name="replacement.inherit.anathema"> {{ui.ANATHEMA}}</label><label><input type="checkbox" name="replacement.keepForExistingActors" checked> {{ui.KEEP_EXISTING_ACTORS}}</label></fieldset>
       <details class="dg-wizard-advanced"><summary>{{ui.EXPERT_OPTIONS}}</summary><label>{{ui.REPLACEMENT_CONTEXTS}}<small>{{ui.HELP_REPLACEMENT_CONTEXTS}}</small><input name="replacement.contexts" placeholder="characterBuilder, compendium, leveler"></label></details>
     </section>
 
-    <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="6" hidden>
+    <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="4" data-expert-only hidden>
       <div class="dg-section-title"><div><h3>{{ui.VISIBILITY}}</h3><p>{{ui.STEP_VISIBILITY_INTRO}}</p></div><i class="fas fa-eye" aria-hidden="true"></i></div>
       <label class="dg-mechanics-master"><input type="checkbox" name="visibility.showMechanicsInSelection"> Mechanische Vorteile schon bei der Auswahl zeigen<small>Standardmäßig aus. Boni, Wunder, Nutzungen, Zauber und Systemwerte bleiben sonst Anhängern vorbehalten.</small></label>
       <label>{{ui.DEITY_VISIBILITY}}<small>{{ui.HELP_DEITY_VISIBILITY}}</small><select name="visibility.deity">{{#each visibilityOptions}}<option value="{{value}}">{{label}}</option>{{/each}}</select></label>
@@ -109,7 +105,7 @@
       <label>{{ui.GM_NOTES}}<small>{{ui.HELP_GM_NOTES}}</small><textarea name="gmNotes" rows="4"></textarea></label>
     </section>
 
-    <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="7" hidden>
+    <section class="dg-editor-section dg-panel-ornament dg-wizard-panel" data-wizard-panel="4" hidden>
       <div class="dg-section-title"><div><h3>{{ui.PREVIEW_AND_SAVE}}</h3><p>{{ui.STEP_PREVIEW_INTRO}}</p></div><i class="fas fa-circle-check" aria-hidden="true"></i></div>
       <article class="dg-wizard-preview">
         <img data-wizard-preview-image src="modules/darkis-godforge/assets/logo.png" alt="">
@@ -119,11 +115,19 @@
         <label>{{ui.STATUS}}<small>{{ui.HELP_STATUS}}</small><select name="status"><option value="draft">{{ui.STATUS_DRAFT}}</option><option value="test">{{ui.STATUS_TEST}}</option><option value="published">{{ui.STATUS_PUBLISHED}}</option><option value="disabled">{{ui.STATUS_DISABLED}}</option><option value="archived">{{ui.STATUS_ARCHIVED}}</option></select></label>
         <button type="button" class="dg-secondary" data-action="preview-player"><i class="fas fa-eye" aria-hidden="true"></i> {{ui.PLAYER_PREVIEW}}</button>
       </div>
+      <fieldset class="dg-discovery-controls">
+        <legend>{{ui.DISCOVERY}}</legend>
+        <label><input type="checkbox" name="discovery.enabled"> {{ui.DISCOVERY_ENABLE}}</label>
+        <label>{{ui.DISCOVERY_DEFAULT}}<select name="discovery.defaultState"><option value="revealed">{{ui.DISCOVERY_REVEALED}}</option><option value="rumor">{{ui.DISCOVERY_RUMOR}}</option><option value="hidden">{{ui.DISCOVERY_HIDDEN}}</option></select></label>
+        <label>{{ui.RUMOR_NAME}}<input name="discovery.rumorName" maxlength="160"></label>
+        <label class="dg-span-2">{{ui.RUMOR_TEXT}}<textarea name="discovery.rumorText" rows="3" maxlength="2000"></textarea></label>
+        <details class="dg-span-2 dg-wizard-advanced"><summary>{{ui.EXPERT_OPTIONS}}</summary><div class="dg-form-grid"><label>{{ui.REVEALED_USERS}}<input name="discovery.revealedToUsers" placeholder="{{ui.COMMA_SEPARATED}}"></label><label>{{ui.REVEALED_ACTORS}}<input name="discovery.revealedToActors" placeholder="{{ui.COMMA_SEPARATED}}"></label></div></details>
+      </fieldset>
     </section>
 
     <div class="dg-editor-actions">
       <button type="button" data-action="close">{{ui.CANCEL}}</button>
-      <span class="dg-wizard-progress" aria-live="polite"><b data-wizard-current>1</b> / <span data-wizard-total>8</span></span>
+      <span class="dg-wizard-progress" aria-live="polite"><b data-wizard-current>1</b> / <span data-wizard-total>5</span></span>
       <button type="button" data-action="previous-step"><i class="fas fa-arrow-left" aria-hidden="true"></i> {{ui.BACK}}</button>
       <button type="button" data-action="save-draft"><i class="fas fa-floppy-disk" aria-hidden="true"></i> {{ui.SAVE_DRAFT}}</button>
       <button type="button" class="dg-primary" data-action="next-step">{{ui.NEXT}} <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
@@ -143,7 +147,7 @@
         <label>{{ui.VISIBILITY}}<select name="bonus.visibility">{{#each visibilityOptions}}<option value="{{value}}">{{label}}</option>{{/each}}</select></label>
         <label class="dg-span-3">{{ui.CONDITION}}<input name="bonus.condition" placeholder="{{ui.OPTIONAL_CONDITION}}"></label>
       </div>
-      <p class="dg-form-warning" data-stacking-warning hidden><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> {{ui.STACKING_WARNING}}</p><p class="dg-form-warning" data-skill-overlap hidden><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Diese Fertigkeit wird ausgebildet und erhält zusätzlich den Bonus. Das ist erlaubt, kann aber stärker als beabsichtigt sein.</p>
+      <p class="dg-form-warning" data-stacking-warning hidden><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> {{ui.STACKING_WARNING}}</p><p class="dg-form-warning" data-skill-overlap hidden><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> {{ui.SKILL_OVERLAP_WARNING}}</p>
     </article>
   </template>
 
@@ -153,7 +157,7 @@
       <div class="dg-form-grid dg-form-grid-3">
         <label>{{ui.NAME}}<small>{{ui.HELP_WONDER_NAME}}</small><input name="ability.name"></label>
         <label class="dg-span-2">{{ui.DESCRIPTION}}<small>{{ui.HELP_WONDER_DESCRIPTION}}</small><textarea name="ability.description" rows="3"></textarea></label>
-        <label>Fähigkeitstyp<select name="ability.abilityType"><option value="standard">Standard</option><option value="fortune-wheel">Glücksrad / Zufallstabelle</option></select></label>
+        <label>{{ui.ABILITY_TYPE}}<select name="ability.abilityType"><option value="standard">{{ui.ABILITY_STANDARD}}</option><option value="fortune-wheel">{{ui.ABILITY_FORTUNE_WHEEL}}</option></select></label>
         <label>{{ui.ACTION_COST}}<select name="ability.actionCost"><option value="automatic">{{ui.ACTION_AUTOMATIC}}</option><option value="free">{{ui.ACTION_FREE}}</option><option value="reaction">{{ui.ACTION_REACTION}}</option><option value="actions">{{ui.ACTIONS}}</option><option value="exploration">{{ui.ACTION_EXPLORATION}}</option><option value="downtime">{{ui.ACTION_DOWNTIME}}</option></select></label>
         <label>{{ui.ACTION_COUNT}}<input type="number" min="0" max="3" name="ability.actions" value="1"></label>
         <label>{{ui.USAGES}}<small>{{ui.HELP_USAGES}}</small><input type="number" min="0" name="ability.usageMax" value="1"></label>
@@ -164,8 +168,12 @@
         <label>{{ui.DURATION_UNIT}}<select name="ability.durationUnit"><option value="instant">{{ui.INSTANT}}</option><option value="rounds">{{ui.ROUNDS}}</option><option value="minutes">{{ui.MINUTES}}</option><option value="hours">{{ui.HOURS}}</option><option value="encounter">{{ui.ENCOUNTER}}</option><option value="scene">{{ui.SCENE}}</option><option value="until-reset">{{ui.UNTIL_RESET}}</option></select></label>
         <label>{{ui.VISIBILITY}}<select name="ability.visibility">{{#each visibilityOptions}}<option value="{{value}}">{{label}}</option>{{/each}}</select></label>
       </div>
-      <div class="dg-effect-head"><strong>Effektkette</strong><button type="button" class="dg-secondary" data-action="add-effect"><i class="fas fa-plus"></i> Effekt hinzufügen</button></div>
-      <div class="dg-editor-list dg-effect-list" data-effect-list></div>
+      <input type="hidden" name="ability.graph">
+      <section class="dg-ability-blueprint">
+        <div><i class="fas fa-diagram-project" aria-hidden="true"></i><span><strong>{{ui.BLUEPRINT}}</strong><small data-graph-status>{{ui.BLUEPRINT_EMPTY}}</small></span></div>
+        <button type="button" class="dg-primary" data-action="open-ability-builder"><i class="fas fa-hammer" aria-hidden="true"></i> {{ui.OPEN_BUILDER}}</button>
+      </section>
+      <details class="dg-wizard-advanced"><summary>{{ui.LEGACY_EFFECTS}}</summary><div class="dg-effect-head"><strong>{{ui.EFFECT_CHAIN}}</strong><button type="button" class="dg-secondary" data-action="add-effect"><i class="fas fa-plus"></i> {{ui.ADD_EFFECT}}</button></div><div class="dg-editor-list dg-effect-list" data-effect-list></div></details>
     </article>
   </template>
 

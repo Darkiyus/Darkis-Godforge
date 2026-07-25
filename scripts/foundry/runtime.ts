@@ -1,6 +1,6 @@
 import type { DeityDefinition } from "../core/types";
 
-export interface FoundryJournalDocument { id: string; uuid: string; name: string; flags?: Record<string, unknown>; update(data: Record<string, unknown>): Promise<unknown>; }
+export interface FoundryJournalDocument { id: string; uuid: string; name: string; flags?: Record<string, unknown>; ownership?: Record<string, number>; update(data: Record<string, unknown>): Promise<unknown>; delete?(): Promise<unknown>; }
 export interface FoundryJournalDocumentClass { create(data: Record<string, unknown>): Promise<FoundryJournalDocument | null>; }
 export interface FoundryJournalCollection { contents: FoundryJournalDocument[]; documentClass?: FoundryJournalDocumentClass; }
 export interface FoundryHooks { once(event: string, callback: (...args: unknown[]) => void): void; on(event: string, callback: (...args: unknown[]) => void): void; callAll(event: string, ...args: unknown[]): void; }

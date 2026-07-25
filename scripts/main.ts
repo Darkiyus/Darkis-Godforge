@@ -10,13 +10,15 @@ import type { GodForgeActor } from "./api";
 import { getFoundryGame, getFoundryRuntime, getFoundryUi } from "./foundry/runtime";
 import { isCurrentUserGM, notifyGMOnly } from "./foundry/permissions";
 import { RandomContentService } from "./core/random-service";
-import { localize } from "./foundry/i18n";
+import { localize, uiText } from "./foundry/i18n";
 import { escapeHtml } from "./core/sanitize";
+import { GodForgeAbilityApproval } from "./applications/ability-approval";
 
 const deityService = new DeityService();
 const registry = new AdapterRegistry();
 const api = new GodForgeApi(deityService, registry);
 const randomContentService = new RandomContentService();
+let approvalQueue: Promise<void> = Promise.resolve();
 
 let dashboard: GodForgeDashboard | null = null;
 function openDashboard(): void {
@@ -44,8 +46,12 @@ function renderHub(selected: GodForgeActor): void {
   void hub.render(true).catch((error: unknown) => { console.error("Darkis GodForge | Could not open hub.", error); getFoundryUi()?.notifications?.error?.(localize("DARKIS_GODFORGE.ERROR.HUB_OPEN")); });
 }
 const runtime = getFoundryRuntime();
-const socketRouter = new SocketRouter(api, { get currentUserId() { return getFoundryGame()?.user?.id ?? "unknown"; }, get isGM() { return getFoundryGame()?.user?.isGM ?? false; }, isGMUser: (userId) => getFoundryGame()?.users?.get(userId)?.isGM === true, ownsActor: (actor, userId) => { const user = getFoundryGame()?.users?.get(userId) ?? { id: userId }; return actor.testUserPermission?.(user, "OWNER") ?? false; }, resolveActor: (actorId) => (getFoundryGame()?.actors?.get(actorId) as GodForgeActor | null | undefined) ?? null });
-if (runtime) { registerFoundryBootstrap(api, deityService, openDashboard, openCodex, socketRouter, randomContentService, openHub); runtime.Hooks.once("ready", () => { const systemId = getFoundryGame()?.system?.id; if (systemId && !registry.supports(systemId)) getFoundryUi()?.notifications?.warn?.(localize("DARKIS_GODFORGE.ERROR.UNSUPPORTED_SYSTEM").replace("{system}", systemId)); }); }
+const socketRouter = new SocketRouter(api, { get currentUserId() { return getFoundryGame()?.user?.id ?? "unknown"; }, get isGM() { return getFoundryGame()?.user?.isGM ?? false; }, isGMUser: (userId) => getFoundryGame()?.users?.get(userId)?.isGM === true, ownsActor: (actor, userId) => { const user = getFoundryGame()?.users?.get(userId) ?? { id: userId }; return actor.testUserPermission?.(user, "OWNER") ?? false; }, resolveActor: (actorId) => (getFoundryGame()?.actors?.get(actorId) as GodForgeActor | null | undefined) ?? null }, undefined, (prepared) => {
+  const pending = approvalQueue.then(() => new GodForgeAbilityApproval(prepared).wait());
+  approvalQueue = pending.then(() => undefined, () => undefined);
+  return pending;
+});
+if (runtime) { registerFoundryBootstrap(api, deityService, openDashboard, openCodex, socketRouter, randomContentService, openHub, registry); runtime.Hooks.once("ready", () => { const systemId = getFoundryGame()?.system?.id; if (systemId && !registry.supports(systemId)) getFoundryUi()?.notifications?.warn?.(localize("DARKIS_GODFORGE.ERROR.UNSUPPORTED_SYSTEM").replace("{system}", systemId)); }); }
 else if (typeof document !== "undefined") openDashboard();
 
 export { api, deityService, registry, socketRouter, randomContentService, GodForgeDashboard };
@@ -68,11 +74,13 @@ async function selectHubActor(explicit?: GodForgeActor): Promise<GodForgeActor |
   if (owned.length === 1) return owned[0];
   type DialogApi = { input(options: Record<string, unknown>): Promise<Record<string, unknown> | null>; prompt(options: Record<string, unknown>): Promise<unknown> };
   const DialogV2 = (globalThis as unknown as { foundry?: { applications?: { api?: { DialogV2?: DialogApi } } } }).foundry?.applications?.api?.DialogV2;
-  const explanation = "Der Anhänger-Hub zeigt Gottheit, Boni und Wunder eines Charakters.";
+  const text = uiText();
+  const label = (key: string, fallback: string): string => text[key] ?? fallback;
+  const explanation = label("HUB_EXPLANATION", "Choose an owned character to open GodForge.");
   if (!DialogV2) { getFoundryUi()?.notifications?.warn?.(explanation); return undefined; }
-  if (!owned.length) { await DialogV2.prompt({ window: { title: "Anhänger-Hub" }, content: `<p>${explanation}</p><p>Lege einen eigenen Charakter fest oder kontrolliere einen Token.</p>`, rejectClose: false, ok: { label: "Verstanden" } }); return undefined; }
+  if (!owned.length) { await DialogV2.prompt({ window: { title: label("HUB", "GodForge") }, content: `<p>${escapeHtml(explanation)}</p><p>${escapeHtml(label("HUB_NO_CHARACTER", "No owned character is available."))}</p>`, rejectClose: false, ok: { label: label("UNDERSTOOD", "OK") } }); return undefined; }
   const options = owned.map((actor) => `<option value="${escapeHtml(actor.id)}">${escapeHtml(actor.name ?? actor.id)}</option>`).join("");
-  const result = await DialogV2.input({ window: { title: "Anhänger-Hub – Charakter auswählen" }, content: `<p>${explanation}</p><label>Charakter<select name="actorId">${options}</select></label>`, rejectClose: false, ok: { label: "Anhänger-Hub öffnen" } });
+  const result = await DialogV2.input({ window: { title: `${label("HUB", "GodForge")} – ${label("CHOOSE_CHARACTER", "Choose character")}` }, content: `<p>${escapeHtml(explanation)}</p><label>${escapeHtml(label("CHARACTERS", "Characters"))}<select name="actorId">${options}</select></label>`, rejectClose: false, ok: { label: label("OPEN_HUB_ACTION", "Open") } });
   const actorId = typeof result?.actorId === "string" ? result.actorId : "";
   return owned.find((actor) => actor.id === actorId);
 }

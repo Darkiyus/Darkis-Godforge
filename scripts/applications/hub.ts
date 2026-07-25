@@ -4,11 +4,21 @@ import { safeImageUrl } from "../core/sanitize";
 import { handlebarsApplicationBase } from "../foundry/application-base";
 import { uiText } from "../foundry/i18n";
 import { reportActionError } from "../foundry/error-reporting";
+import { getFoundryGame } from "../foundry/runtime";
 
 export class GodForgeHub extends handlebarsApplicationBase() {
   static DEFAULT_OPTIONS = { id: "darkis-godforge-hub", classes: ["darkis-godforge"], window: { title: "DARKIS_GODFORGE.UI.HUB", resizable: true }, position: { width: 520, height: 650 } };
   static PARTS = { main: { template: "modules/darkis-godforge/templates/hub.hbs" } };
   constructor(private readonly actor: GodForgeActor, private readonly api: GodForgeApi, private readonly socketRouter: SocketRouter, private readonly openCodex: () => void) { super(); }
-  async _prepareContext(): Promise<Record<string, unknown>> { const data = this.api.getCharacterWidgetData(this.actor); return { ui: uiText(), actorId: this.actor.id, ...data, deity: data.deity ? { ...data.deity, image: safeImageUrl(data.deity.image) } : null, abilities: data.abilities.map((ability) => ({ ...ability, remaining: ability.uses ? Math.max(0, ability.uses.max - ability.uses.used) : null, available: !ability.uses || ability.uses.used < ability.uses.max })) }; }
-  _onRender(): void { const root = this.element; root?.querySelector<HTMLElement>("[data-action='codex']")?.addEventListener("click", this.openCodex); root?.querySelectorAll<HTMLElement>("[data-ability]").forEach((button) => button.addEventListener("click", () => void this.socketRouter.activate({ actorId: this.actor.id, abilityId: button.dataset.ability ?? "", options: {} }).then(() => this.render(true)).catch((error: unknown) => reportActionError("Ability activation failed.", error)))); }
+  async _prepareContext(): Promise<Record<string, unknown>> {
+    const data = getFoundryGame()?.user?.isGM === true ? this.api.getCharacterWidgetData(this.actor) : await this.socketRouter.characterWidgetSnapshot(this.actor.id);
+    return { ui: uiText(), actorId: this.actor.id, ...data, deity: data.deity ? { ...data.deity, image: safeImageUrl(data.deity.image) } : null, abilities: data.abilities.map((ability) => ({ ...ability, remaining: ability.uses ? Math.max(0, ability.uses.max - ability.uses.used) : null, available: !ability.uses || ability.uses.used < ability.uses.max })) };
+  }
+  _onRender(): void { const root = this.element; root?.querySelector<HTMLElement>("[data-action='codex']")?.addEventListener("click", this.openCodex); root?.querySelectorAll<HTMLElement>("[data-ability]").forEach((button) => button.addEventListener("click", () => { const targets = selectedTargetActorIds(); void this.socketRouter.activate({ actorId: this.actor.id, abilityId: button.dataset.ability ?? "", options: { targetActorId: targets[0], enemyActorIds: targets, triggerEvent: "manual" } }).then(() => this.render(true)).catch((error: unknown) => reportActionError("Ability activation failed.", error)); })); }
+}
+
+function selectedTargetActorIds(): string[] {
+  const canvas = (globalThis as unknown as { canvas?: { tokens?: { controlled?: Array<{ actor?: { id?: string } }>; placeables?: Array<{ isTargeted?: boolean; actor?: { id?: string } }> } } }).canvas;
+  const targeted = canvas?.tokens?.placeables?.filter((token) => token.isTargeted).map((token) => token.actor?.id).filter((id): id is string => Boolean(id)) ?? [];
+  return [...new Set(targeted)];
 }
