@@ -105,7 +105,7 @@ export class GodForgeAbilityBuilder extends gmApplicationBase() {
       connecting: Boolean(this.connectFrom),
       canUndo: this.history.length > 0,
       canRedo: this.future.length > 0,
-      outline: describeAbilityGraph(this.graph).map((line) => localizeOutline(line, ui)),
+      outline: describeAbilityGraph({ ...this.graph, nodes: this.graph.nodes.map((node) => ({ ...node, label: localizedNodeLabel(node, ui) })) }).map((line) => localizeOutline(line, ui)),
       simulation: this.simulation
       , zoomPercent: Math.round(this.zoom * 100)
       , canvasStyle: `transform:scale(${this.zoom});transform-origin:0 0`
